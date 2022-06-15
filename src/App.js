@@ -1,131 +1,80 @@
-import { Button, Form, Input, Select } from "antd";
-import React from "react";
 import "./App.less";
-const { Option } = Select;
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-};
+import { Button, Checkbox, Form, Input } from "antd";
 
-class App extends React.Component {
-  formRef = React.createRef();
-  onGenderChange = (value) => {
-    switch (value) {
-      case "male":
-        this.formRef.current.setFieldsValue({
-          note: "Hi, man!",
-        });
-        return;
-
-      case "female":
-        this.formRef.current.setFieldsValue({
-          note: "Hi, lady!",
-        });
-        return;
-
-      case "other":
-        this.formRef.current.setFieldsValue({
-          note: "Hi there!",
-        });
-    }
-  };
-  onFinish = (values) => {
-    console.log(values);
-  };
-  onReset = () => {
-    this.formRef.current.resetFields();
-  };
-  onFill = () => {
-    this.formRef.current.setFieldsValue({
-      note: "Hello world!",
-      gender: "male",
-    });
+const App = () => {
+  const onFinish = (values) => {
+    console.log("Success:", values);
   };
 
-  render() {
-    return (
-      <Form
-        {...layout}
-        ref={this.formRef}
-        name="control-ref"
-        onFinish={this.onFinish}
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  return (
+    <Form
+      name="basic"
+      labelCol={{
+        span: 8,
+      }}
+      wrapperCol={{
+        span: 16,
+      }}
+      initialValues={{
+        remember: true,
+      }}
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+      autoComplete="off"
+    >
+      <Form.Item
+        label="Username"
+        name="username"
+        rules={[
+          {
+            required: true,
+            message: "Please input your username!",
+          },
+        ]}
       >
-        <Form.Item
-          name="note"
-          label="Note"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="gender"
-          label="Gender"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Select
-            placeholder="Select a option and change input text above"
-            onChange={this.onGenderChange}
-            allowClear
-          >
-            <Option value="male">male</Option>
-            <Option value="female">female</Option>
-            <Option value="other">other</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          noStyle
-          shouldUpdate={(prevValues, currentValues) =>
-            prevValues.gender !== currentValues.gender
-          }
-        >
-          {({ getFieldValue }) =>
-            getFieldValue("gender") === "other" ? (
-              <Form.Item
-                name="customizeGender"
-                label="Customize Gender"
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            ) : null
-          }
-        </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-          <Button htmlType="button" onClick={this.onReset}>
-            Reset
-          </Button>
-          <Button type="link" htmlType="button" onClick={this.onFill}>
-            Fill form
-          </Button>
-        </Form.Item>
-      </Form>
-    );
-  }
-}
+        <Input />
+      </Form.Item>
+
+      <Form.Item
+        label="Password"
+        name="password"
+        rules={[
+          {
+            required: true,
+            message: "Please input your password!",
+          },
+        ]}
+      >
+        <Input.Password />
+      </Form.Item>
+
+      <Form.Item
+        name="remember"
+        valuePropName="checked"
+        wrapperCol={{
+          offset: 8,
+          span: 16,
+        }}
+      >
+        <Checkbox>Remember me</Checkbox>
+      </Form.Item>
+
+      <Form.Item
+        wrapperCol={{
+          offset: 8,
+          span: 16,
+        }}
+      >
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
 
 export default App;
