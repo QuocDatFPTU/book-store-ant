@@ -1,0 +1,56 @@
+.welcome-page {
+  .wrapDes {
+    display: flex;
+    flex-direction: row;
+    padding: 24px;
+    background-color: #4cc9f0;
+    min-height: 214px;
+    @media screen and (max-width: 576px) {
+      padding: 24px 6px;
+    }
+    .wrapLogo {
+      padding-left: 40px;
+      padding-right: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      @media screen and (max-width: 992px) {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      @media screen and (max-width: 576px) {
+        padding: 6px;
+      }
+    }
+    .uniclub {
+      margin-left: 40px;
+      div:first-child {
+        font-size: 45px;
+        font-weight: 900;
+        color: white;
+        @media screen and(min-width:992px) and (max-width: 1400px) {
+          font-size: 40px;
+        }
+
+        @media screen and(min-width:576) and (max-width: 992px) {
+          font-size: 35px;
+        }
+
+        @media screen and (max-width: 576px) {
+          font-size: 30px;
+        }
+      }
+      div:last-child {
+        font-size: 28px;
+        font-weight: 400;
+        color: white;
+        @media screen and(max-width: 576px) {
+          font-size: 20px;
+        }
+      }
+      @media screen and(max-width: 576) {
+        margin-left: 6px;
+      }
+    }
+  }
+}

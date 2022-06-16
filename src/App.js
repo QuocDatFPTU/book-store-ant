@@ -1,80 +1,39 @@
+import React from "react";
+import { Provider } from "react-redux";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.less";
-import { Button, Checkbox, Form, Input } from "antd";
+import { store } from "../src/redux/store";
+import HomePage from "pages/store/home";
+import Login from "pages/home/login";
+import ProfilePage from "pages/store/profile";
+import { Button } from "antd";
 
-const App = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
+const AppWrapper = () => {
   return (
-    <Form
-      name="basic"
-      labelCol={{
-        span: 8,
-      }}
-      wrapperCol={{
-        span: 16,
-      }}
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        rules={[
-          {
-            required: true,
-            message: "Please input your username!",
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+};
+const App = () => {
+  // const { currentUser } = useSelector((state) => state.user);
+  return (
+    <>
 
-      <Form.Item
-        label="Password"
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: "Please input your password!",
-          },
-        ]}
-      >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item
-        name="remember"
-        valuePropName="checked"
-        wrapperCol={{
-          offset: 8,
-          span: 16,
-        }}
-      >
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
-
-      <Form.Item
-        wrapperCol={{
-          offset: 8,
-          span: 16,
-        }}
-      >
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+      {/* <HomePage /> */}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
+          <Route
+            path='/profile'
+            element={<ProfilePage />}
+          />
+        </Routes>
+      </BrowserRouter >
+    </>
   );
 };
 
-export default App;
+export default AppWrapper;
