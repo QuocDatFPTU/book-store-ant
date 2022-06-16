@@ -1,6 +1,6 @@
-import { Breadcrumb, Layout, Menu } from "antd";
+import { Layout, Menu } from "antd";
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logoImg from "assets/logo-new.png";
 const { Header, Content, Footer } = Layout;
 
@@ -9,6 +9,7 @@ const HomePage = () => {
         <Layout className="layout">
             <Header>
                 <div className="logo" >
+                    debugger
                     <img src={logoImg} alt="logo image" />
                 </div>
                 <div className="header_search__form">
