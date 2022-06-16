@@ -1,0 +1,189 @@
+.dashboard-layout {
+  min-width: 90vw;
+
+  .sider {
+    z-index: 100;
+    min-height: 100vh;
+    background: #fff;
+    box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2),
+      0px 0px 0px 0 rgba(0, 0, 0, 0.19) !important;
+
+    .logo-wrapper {
+      display: flex;
+      .logo {
+        margin: 2px auto;
+        height: 32px;
+      }
+      .logoCollapse {
+        margin: 4px auto;
+        height: 56px;
+      }
+      background-color: #4cc9f0;
+    }
+    .ant-menu-inline {
+      border-right: 0;
+    }
+    display: flex;
+    justify-content: space-between;
+    .ant-layout-sider-children {
+      width: 100%;
+    }
+    .sider-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 90vh;
+
+      .sider-bottom {
+        padding: 8px 16px;
+
+        .sider-bottom-account {
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-start;
+
+          .sider-bottom-version {
+            flex-grow: 1;
+            text-align: right;
+            color: gray;
+            font-size: small;
+          }
+
+          .sider-bottom-setting {
+            padding: 4px;
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+
+  scroll-behavior: smooth;
+  .header {
+    padding: 0 0px;
+
+    .logo {
+      height: 38px;
+      padding-top: 0px;
+    }
+  }
+
+  .header-container {
+    display: flex;
+    justify-content: flex-end;
+    background-color: #4cc9f0;
+    .nav-container {
+      display: flex;
+      flex-direction: row;
+      width: 80%;
+
+      .nav-logo {
+        background-color: #062634;
+        width: 256px;
+        padding-left: 10px;
+      }
+
+      .nav-link {
+        flex: 1;
+        margin-left: 24px;
+      }
+    }
+
+    .profile-container {
+      color: white;
+      width: 50%;
+      height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-right: 16px;
+      justify-content: flex-end;
+
+      .profile {
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden;
+        margin-left: 16px;
+      }
+
+      #space {
+        border-left: 1px solid white;
+        height: 30%;
+        margin-right: 10px;
+        margin-left: 10px;
+
+        @media screen and (max-width: 575px) {
+          margin-right: 5px;
+          margin-left: 5px;
+        }
+      }
+      .ant-dropdown.ant-dropdown-placement-bottomCenter {
+        min-width: 24px;
+        left: 1324.04px;
+        top: 65px;
+      }
+    }
+
+    .sider-layout-background {
+      background-color: #fff;
+      margin-top: 20px;
+      margin-left: 20px;
+    }
+  }
+
+  .ant-layout-header {
+    background-color: #fff;
+  }
+}
+
+.customPageHeader {
+  padding: 5px 24px;
+  .ant-breadcrumb + .ant-page-header-heading {
+    margin-top: 0;
+  }
+
+  .ant-page-header-footer {
+    margin-top: 0;
+    padding: 0;
+  }
+  .ant-tabs-content-holder {
+    display: none;
+  }
+
+  @media screen and (max-width: 575px) {
+    padding: 5px 12px;
+  }
+}
+
+.layoutContent {
+  .ant-layout-content {
+    padding: 12px 24px;
+    @media screen and(max-width:575px) {
+      padding: 12px;
+    }
+  }
+}
+
+.customFormSearch {
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+  .customItem {
+    @media screen and (max-width: 576px) {
+      .ant-form-item.label {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+      }
+      .ant-form-item-control {
+        flex: 0 0 75% !important;
+        max-width: 75% !important;
+      }
+    }
+  }
+}
+
+.cardSearch {
+  margin-bottom: 12px !important;
+}
