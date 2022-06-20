@@ -10,12 +10,33 @@ import {
   Rate,
   Row,
   Typography,
+  Input,
+  Dropdown,
+  Space,
+  Badge,
+  Avatar,
+  Affix,
 } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logoImg from 'assets/logo-new.png';
+import paymentImg from 'assets/footer-payment.png';
+import socialtImg from 'assets/footer-social.png';
+import appImg from 'assets/footer-app.png';
 import './styles.less';
-import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
+import {
+  AntDesignOutlined,
+  AppstoreAddOutlined,
+  DownOutlined,
+  FireOutlined,
+  LogoutOutlined,
+  SaveOutlined,
+  ShoppingCartOutlined,
+  SmileOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import FooterContainer from 'layouts/store/footer';
+import WrapperConentContainer from 'layouts/store/wrapper.content';
 const { Header, Content, Footer } = Layout;
 
 const contentStyle = {
@@ -26,15 +47,184 @@ const contentStyle = {
   background: '#364d79',
 };
 
+const menu = (
+  <Menu
+    className="header-custom-menu"
+    theme="dark"
+    style={{ width: 200 }}
+    items={[
+      {
+        key: '1',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.antgroup.com"
+          >
+            Văn học
+          </a>
+        ),
+      },
+      {
+        key: '2',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.aliyun.com"
+          >
+            Ngoại ngữ
+          </a>
+        ),
+      },
+      {
+        key: '3',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.luohanacademy.com"
+          >
+            Anime
+          </a>
+        ),
+      },
+      {
+        key: '4',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.luohanacademy.com"
+          >
+            Manga
+          </a>
+        ),
+      },
+    ]}
+  />
+);
+const menuUser = (
+  <Menu
+    className="header-custom-menu"
+    theme="dark"
+    style={{ width: 200 }}
+    items={[
+      {
+        icon: <UserOutlined />,
+        key: '1',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.antgroup.com"
+          >
+            Nguyễn Hoàng Anh
+          </a>
+        ),
+      },
+      {
+        key: '2',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.aliyun.com"
+          >
+            Đơn hàng của tôi
+          </a>
+        ),
+        icon: <SaveOutlined />,
+      },
+      {
+        key: '3',
+        label: (
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.luohanacademy.com"
+          >
+            Thoát tài khoản
+          </a>
+        ),
+        icon: <LogoutOutlined />,
+      },
+    ]}
+  />
+);
+
 const HomePage = () => {
+  const onSearch = (value) => console.log(value);
+
   return (
     <Layout className="layout">
-      <Header>
-        <div className="logo">
-          <img src={logoImg} alt="logo image" />
-        </div>
-        <div className="header_search__form"></div>
-      </Header>
+      <Affix offsetTop={0}>
+        <Header style={{ padding: '0', height: 'auto' }}>
+          <WrapperConentContainer>
+            <Row align="middle" style={{ padding: '3px 0' }}>
+              <Col span={2}>
+                <img
+                  style={{ height: '48px' }}
+                  src={logoImg}
+                  alt="logo image"
+                />
+              </Col>
+              <Col
+                className="header_categories header-item"
+                span={1}
+                style={{}}
+              >
+                <Dropdown overlay={menu} placement="bottomLeft">
+                  <AppstoreAddOutlined
+                    style={{ color: 'white', fontSize: '40px' }}
+                  />
+                </Dropdown>
+              </Col>
+              <Col
+                className="header_search_form header-item"
+                span={10}
+                offset={2}
+              >
+                <Input.Search
+                  style={{ widows: '80%' }}
+                  size="large"
+                  placeholder="Tìm tên sản phẩm"
+                  onSearch={onSearch}
+                  enterButton
+                />
+              </Col>
+              <Col
+                // style={{ paddingTop: '10px' }}
+                className="header_cart header-item"
+                span={1}
+                offset={4}
+              >
+                <Badge
+                  className="custom-badge"
+                  color="cyan"
+                  count={5}
+                  size="small"
+                >
+                  <ShoppingCartOutlined
+                    style={{ color: 'white', fontSize: '32px' }}
+                  />
+                </Badge>
+              </Col>
+              <Col className="header-item" span={4}>
+                <Dropdown overlay={menuUser}>
+                  <a onClick={(e) => e.preventDefault()}>
+                    <Space>
+                      Nguyễn Hoàng Anh
+                      <Avatar src="https://joeschmoe.io/api/v1/random" />
+                    </Space>
+                  </a>
+                </Dropdown>
+              </Col>
+            </Row>
+          </WrapperConentContainer>
+        </Header>
+      </Affix>
+
       <Content
         style={
           {
@@ -409,13 +599,7 @@ const HomePage = () => {
           </Col>
         </Row>
       </Content>
-      <Footer
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        Ant Design ©2018 Created by Ant UED
-      </Footer>
+      <FooterContainer />
     </Layout>
   );
 };

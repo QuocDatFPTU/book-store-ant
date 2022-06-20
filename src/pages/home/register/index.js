@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Input, message, Row } from 'antd';
+import {
+  GoogleOutlined,
+  HomeOutlined,
+  LockOutlined,
+  PhoneOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Row,
+  Select,
+  Typography,
+} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import bgLogin from 'assets/bgLogin.png';
@@ -8,15 +23,27 @@ import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 
-const Login = (props) => {
+// SHOW MESSAGE ANNOUNCE: VERIFY EMAIL
+const validateMessages = {
+  //   required: 'Nhập ${label}!',
+  types: {
+    email: '${label} không hợp lệ!',
+    // number: '${label} is not a valid number!',
+  },
+  //   number: {
+  //     range: '${label} must be between ${min} and ${max}',
+  //   },
+};
+
+const Register = (props) => {
   const [loading, setLoading] = useState(false);
   // const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   async function handleSubmit(value) {
-    const { username, password } = value;
-    await dispatch(loginInitiate(username, password));
+    console.log(value);
+    // await dispatch(loginInitiate(username, password));
     // .then((result) => {
     // 	if (!result?.error) {
     // 		let role = localStorage.getItem("__role");
@@ -30,7 +57,7 @@ const Login = (props) => {
     // 	}
     // })
     // .catch((error) => message.error(error));
-    message.success('Login success');
+    message.success('Register success');
     setLoading(true);
     return true;
   }
@@ -61,10 +88,10 @@ const Login = (props) => {
               marginBottom: 20,
               textAlign: 'center',
               fontSize: '2rem',
-              paddingTop: 141,
+              paddingTop: 90,
             }}
           >
-            {'Đăng nhập'}
+            {'Đăng ký'}
           </h3>
           <Row justify="center">
             <Col
@@ -73,37 +100,94 @@ const Login = (props) => {
               style={{ display: 'flex', justifyContent: 'center' }}
             >
               <Form
+                layout="horizontal"
                 name="normal_login"
                 className="login-form"
                 onFinish={handleSubmit}
                 style={{ width: 300 }}
+                validateMessages={validateMessages}
               >
                 <Form.Item
-                  name="username"
-                  rules={[{ required: true, message: 'Nhập tài khoản!' }]}
+                  name="fullName"
+                  rules={[{ required: true, message: 'Nhập họ và tên!' }]}
                 >
                   <Input
                     prefix={<UserOutlined className="site-form-item-icon" />}
-                    placeholder="Tên đăng nhập "
+                    placeholder="Họ và tên"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="email"
+                  rules={[
+                    {
+                      required: 'true',
+                      message: 'Nhập Email!',
+                    },
+                    {
+                      type: 'email',
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={<GoogleOutlined className="site-form-item-icon" />}
+                    placeholder="Email"
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="phoneNumber"
+                  rules={[
+                    {
+                      required: 'true',
+                      message: 'Nhập số điện thoại!',
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={<PhoneOutlined className="site-form-item-icon" />}
+                    placeholder="Số điện thoại"
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="address"
+                  rules={[
+                    {
+                      required: 'true',
+                      message: 'Nhập địa chỉ!',
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={<HomeOutlined className="site-form-item-icon" />}
+                    placeholder="Địa chỉ"
                   />
                 </Form.Item>
                 <Form.Item
                   name="password"
                   rules={[{ required: true, message: 'Nhập mật khẩu!' }]}
                 >
-                  <Input.Password
+                  <Input
                     prefix={<LockOutlined className="site-form-item-icon" />}
+                    type="password"
                     placeholder="Mật khẩu"
                     autoComplete="new-password"
-                    allowClear
                   />
                 </Form.Item>
-                <Form.Item>
-                  <a className="login-form-forgot" href="">
-                    Quên mật khẩu
-                  </a>
+                <Form.Item
+                  name="gender"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Chọn giới tính',
+                    },
+                  ]}
+                >
+                  <Select placeholder="Giới tính" allowClear>
+                    <Select.Option value="male">male</Select.Option>
+                    <Select.Option value="female">female</Select.Option>
+                    <Select.Option value="other">other</Select.Option>
+                  </Select>
                 </Form.Item>
-
                 <Form.Item>
                   <Button
                     type="primary"
@@ -111,9 +195,12 @@ const Login = (props) => {
                     className="login-form-button"
                     loading={loading}
                   >
-                    Đăng nhập
+                    Đăng ký
                   </Button>
                 </Form.Item>
+                <p style={{ textAlign: 'center' }}>
+                  Quay lại<Typography.Link> đăng nhập</Typography.Link>
+                </p>
               </Form>
             </Col>
           </Row>
@@ -137,4 +224,4 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+export default Register;

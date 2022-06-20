@@ -15,7 +15,6 @@ import {
   Select,
   Pagination,
 } from 'antd';
-import React from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import logoImg from 'assets/logo-new.png';
 import './styles.less';
@@ -26,7 +25,6 @@ import {
   ShoppingCartOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
-import HomePage from '../home';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 
