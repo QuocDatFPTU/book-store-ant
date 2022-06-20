@@ -1,80 +1,63 @@
-import "./App.less";
-import { Button, Checkbox, Form, Input } from "antd";
+import React from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.less';
+import { store } from '../src/redux/store';
+import HomePage from 'pages/store/home';
+import Login from 'pages/home/login';
+import ProductList from 'pages/store/product-list';
+import ProfilePage from 'pages/store/profile';
+import ProductDetail from 'pages/store/product-detail';
+import BlogDetail from 'pages/store/blog-detail';
+import CartContact from 'pages/store/cart-contact';
+import Register from 'pages/home/register';
+import ForgetPassword from 'pages/home/forget-password';
+import ResetPassword from 'pages/home/reset-password';
+import ChangePassword from 'pages/home/change-password';
+import { Button } from 'antd';
+import OrderList from 'pages/store/order-list';
+import Cart from 'pages/store/cart';
+import InformationOrder from 'pages/store/information-order';
 
-const App = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
+const AppWrapper = () => {
   return (
-    <Form
-      name="basic"
-      labelCol={{
-        span: 8,
-      }}
-      wrapperCol={{
-        span: 16,
-      }}
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-    >
-      <Form.Item
-        label="Username"
-        name="username"
-        rules={[
-          {
-            required: true,
-            message: "Please input your username!",
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+};
+const App = () => {
+  // const { currentUser } = useSelector((state) => state.user);
+  return (
+    <>
+      {/* <HomePage /> */}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/product-list" element={<ProductList />} />
 
-      <Form.Item
-        label="Password"
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: "Please input your password!",
-          },
-        ]}
-      >
-        <Input.Password />
-      </Form.Item>
+          <Route path="/product-detail" element={<ProductDetail />} />
+          <Route path="/blog-detail" element={<BlogDetail />} />
+          <Route path="/cart-contact" element={<CartContact />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
 
-      <Form.Item
-        name="remember"
-        valuePropName="checked"
-        wrapperCol={{
-          offset: 8,
-          span: 16,
-        }}
-      >
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
-
-      <Form.Item
-        wrapperCol={{
-          offset: 8,
-          span: 16,
-        }}
-      >
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/order-list" element={<OrderList />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/information-order" element={<InformationOrder />} />
+          {/* </Route> */}
+          {/* <Route path="/profile" element={<ProfilePage />} /> */}
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 };
 
-export default App;
+export default AppWrapper;
