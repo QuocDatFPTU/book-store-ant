@@ -47,12 +47,9 @@ import {
   BookOutlined,
   CommentOutlined,
   InfoCircleOutlined,
-  GoogleOutlined,
-  PhoneOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import StoreLayoutContainer from 'layouts/store/store.layout';
-// import './styles.less';
+import './styles.less';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 const { RangePicker } = DatePicker;
@@ -60,17 +57,17 @@ const { TextArea } = Input;
 
 const layout = {
   labelCol: {
-    span: 24,
+    span: 6,
   },
   wrapperCol: {
-    span: 24,
+    span: 18,
   },
 };
 const tailLayout = {
-  // wrapperCol: {
-  //   offset: 8,
-  //   span: 16,
-  // },
+  wrapperCol: {
+    offset: 8,
+    span: 16,
+  },
 };
 
 const validateMessages = {
@@ -84,7 +81,7 @@ const validateMessages = {
   },
 };
 
-const ProfilePage = () => {
+const CartContact = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
@@ -112,32 +109,43 @@ const ProfilePage = () => {
   });
 
   return (
-    <StoreLayoutContainer>
-      <Col
-        style={{
-          backgroundColor: 'white',
-          padding: '10px',
-          borderRadius: '10px',
-        }}
-        span={16}
-        offset={4}
-      >
-        <h3>Thông tin chung</h3>
-        <Row>
-          <Col span={4} offset={2}>
-            <Avatar size={100} icon={<UserOutlined />} />
-          </Col>
-          <Col span={16}>
-            <Form
-              size="middle"
-              {...layout}
-              form={form}
-              name="control-hooks"
-              validateMessages={validateMessages}
-              onFinish={onFinish}
+    <Layout className="layout">
+      <Header>
+        <div className="logo">
+          <img src={logoImg} alt="logo image" />
+        </div>
+        <div className="header_search__form"></div>
+      </Header>
+      <Content>
+        <Row className="container">
+          <Col className="contact-infor" span={16} offset={4}>
+            <h2
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '22px',
+              }}
             >
-              <Row>
-                <Col span={10}>
+              <InfoCircleOutlined
+                style={{
+                  fontSize: '28px',
+                  marginRight: '5px',
+                  color: 'red',
+                }}
+              />
+              Thông tin nhận hàng
+            </h2>
+            <Divider style={{ margin: '18px 0' }} />
+            <Row className="form-contact-container" justify="space-evenly">
+              <Col span={14}>
+                <Form
+                  size="middle"
+                  {...layout}
+                  form={form}
+                  name="control-hooks"
+                  validateMessages={validateMessages}
+                  onFinish={onFinish}
+                >
                   <Form.Item
                     name="fullName"
                     label="Họ và tên"
@@ -147,27 +155,7 @@ const ProfilePage = () => {
                       },
                     ]}
                   >
-                    <Input
-                      prefix={<UserOutlined className="site-form-item-icon" />}
-                      placeholder="Họ và tên"
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="email"
-                    label="Email"
-                    rules={[
-                      {
-                        required: 'true',
-                        type: 'email',
-                      },
-                    ]}
-                  >
-                    <Input
-                      prefix={
-                        <GoogleOutlined className="site-form-item-icon" />
-                      }
-                      placeholder="Email"
-                    />
+                    <Input />
                   </Form.Item>
                   <Form.Item
                     name="gender"
@@ -187,19 +175,18 @@ const ProfilePage = () => {
                       <Option value="other">other</Option>
                     </Select>
                   </Form.Item>
-                  <Form.Item {...tailLayout}>
-                    <Button type="link" htmlType="button" onClick={onFill}>
-                      Hủy
-                    </Button>
-                    <Button type="primary" htmlType="submit">
-                      Cập nhật
-                    </Button>
-                    <Button style={{ marginLeft: '20px' }} type="ghost">
-                      Đổi mật khẩu
-                    </Button>
+                  <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[
+                      {
+                        required: 'true',
+                        type: 'email',
+                      },
+                    ]}
+                  >
+                    <Input />
                   </Form.Item>
-                </Col>
-                <Col span={12} offset={2}>
                   <Form.Item
                     name="phoneNumber"
                     label="Số điện thoại"
@@ -209,10 +196,7 @@ const ProfilePage = () => {
                       },
                     ]}
                   >
-                    <Input
-                      prefix={<PhoneOutlined className="site-form-item-icon" />}
-                      placeholder="Số điện thoại"
-                    />
+                    <Input />
                   </Form.Item>
                   <Form.Item
                     name="address"
@@ -223,18 +207,30 @@ const ProfilePage = () => {
                       },
                     ]}
                   >
-                    <Input
-                      prefix={<HomeOutlined className="site-form-item-icon" />}
-                      placeholder="Địa chỉ"
-                    />
+                    <Input />
                   </Form.Item>
-                </Col>
-              </Row>
-            </Form>
+                  <Form.Item name="note" label="Ghi chú">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit">
+                      Submit
+                    </Button>
+                    <Button htmlType="button" onClick={onReset}>
+                      Reset
+                    </Button>
+                    <Button type="link" htmlType="button" onClick={onFill}>
+                      Fill form
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Col>
+            </Row>
           </Col>
         </Row>
-      </Col>
-    </StoreLayoutContainer>
+      </Content>
+    </Layout>
   );
 };
-export default ProfilePage;
+
+export default CartContact;
