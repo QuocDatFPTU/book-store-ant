@@ -5,20 +5,16 @@ import {
   Col,
   Divider,
   Image,
-  Layout,
   Rate,
   Row,
   Typography,
   Breadcrumb,
-  Select,
   Pagination,
   Descriptions,
   InputNumber,
   Avatar,
   List,
 } from 'antd';
-
-import './styles.less';
 import {
   FireOutlined,
   HomeOutlined,
@@ -29,33 +25,13 @@ import {
   BookOutlined,
   CommentOutlined,
 } from '@ant-design/icons';
+import './styles.less';
 import { useState } from 'react';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 
 const ProductDetail = () => {
-  const [btnExpand, setBtnExpand] = useState(true);
-  const onClickNotExpand = () => {
-    setBtnExpand((val) => !val);
-  };
-
-  const onChange = (checkedValues) => {
-    console.log('checked = ', checkedValues);
-  };
-  const plainOptions = [
-    'Sách tham khảo',
-    'Sách học ngoại ngữ',
-    'Văn học',
-    'Thiếu nhi',
-    'Tâm lý kỹ năng',
-    'Kinh tế',
-    'Sách giáo khoa',
-    'Foreigns Books',
-    'Văn phòng phẩm',
-    'Đồ chơi',
-  ];
-  const [visible, setVisible] = useState(false);
-  //
+  //data
   const dataProduct = {
     'Mã hàng': 'ID09543455',
     // NXB: 'NXB Trẻ',
@@ -65,7 +41,7 @@ const ProductDetail = () => {
     'Thể loại': 'Văn học',
     'Ngôn ngữ': 'Tiếng việt',
   };
-  const data = [
+  const dataListFeedbacks = [
     {
       author: 'Nguyễn Hoàng Anh',
       // avatar:
@@ -126,6 +102,55 @@ const ProductDetail = () => {
       ),
     },
   ];
+  const dataProductSameCates = [
+    {
+      name: 'Sách học ngoại ngữ Sách học ngoại ngữ ',
+      imgLink:
+        'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
+      price: '182.200',
+      rate: 1,
+    },
+    {
+      name: 'Tư Duy Nhanh Và Chậm (Tái Bản 2021)',
+      imgLink:
+        'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+      price: '375.000',
+      rate: 4,
+    },
+    {
+      name: 'Bộ Hộp Nhật Ký Trưởng Thành Của Đứa Trẻ Ngoan (Bộ 10 Cuốn)',
+      imgLink:
+        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
+      price: '200.000',
+      rate: 5,
+    },
+    {
+      name: 'Phân Tích Chứng Khoán (Security Analysis)',
+      imgLink:
+        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
+      price: '299.400',
+      rate: 4,
+    },
+    {
+      name: 'Bộ Hộp Tam Quốc Diễn Nghĩa (Bộ 3 Cuốn)',
+      imgLink:
+        'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
+      price: '207.200',
+      rate: 5,
+    },
+  ];
+
+  //State
+  const [btnExpand, setBtnExpand] = useState(true);
+
+  //Method
+  const onClickNotExpand = () => {
+    setBtnExpand((val) => !val);
+  };
+  const onChange = (checkedValues) => {
+    console.log('checked = ', checkedValues);
+  };
+  const [visible, setVisible] = useState(false);
 
   return (
     <StoreLayoutContainer>
@@ -246,43 +271,7 @@ const ProductDetail = () => {
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
-            {[
-              {
-                name: 'Sách học ngoại ngữ Sách học ngoại ngữ ',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-                price: '182.200',
-                rate: 1,
-              },
-              {
-                name: 'Tư Duy Nhanh Và Chậm (Tái Bản 2021)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-                price: '375.000',
-                rate: 4,
-              },
-              {
-                name: 'Bộ Hộp Nhật Ký Trưởng Thành Của Đứa Trẻ Ngoan (Bộ 10 Cuốn)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-                price: '200.000',
-                rate: 5,
-              },
-              {
-                name: 'Phân Tích Chứng Khoán (Security Analysis)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-                price: '299.400',
-                rate: 4,
-              },
-              {
-                name: 'Bộ Hộp Tam Quốc Diễn Nghĩa (Bộ 3 Cuốn)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-                price: '207.200',
-                rate: 5,
-              },
-            ].map((item) => (
+            {dataProductSameCates.map((item) => (
               <Col flex={'19%'} style={{ marginBottom: '30px' }}>
                 <Card
                   className="product-card"
@@ -302,7 +291,7 @@ const ProductDetail = () => {
                   }
                 >
                   <Typography.Paragraph
-                    className="product-title"
+                    className="home-product-title"
                     ellipsis={{
                       rows: 2,
                       // expandable: true,
@@ -433,9 +422,9 @@ const ProductDetail = () => {
           </h2>
           <List
             className="comment-list"
-            header={`${data.length} replies`}
+            header={`${dataListFeedbacks.length} replies`}
             itemLayout="horizontal"
-            dataSource={data}
+            dataSource={dataListFeedbacks}
             renderItem={(item) => (
               <li>
                 <Comment

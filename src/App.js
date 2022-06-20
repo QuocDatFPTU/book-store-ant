@@ -19,7 +19,6 @@ import OrderList from 'pages/store/order-list';
 import Cart from 'pages/store/cart';
 import InformationOrder from 'pages/store/information-order';
 
-
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -36,11 +35,13 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product-list" element={<ProductList />} />
-
           <Route path="/product-detail" element={<ProductDetail />} />
-          <Route path="/blog-detail" element={<BlogDetail />} />
-          <Route path="/cart-contact" element={<CartContact />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
+          <Route path="/cart" element={<Cart />} />
+          {/* <Route path="/cart-contact" element={<CartContact />} /> */}
+          {/* <Route path="/order-list" element={<OrderList />} /> */}
+          {/* <Route path="/information-order" element={<InformationOrder />} /> */}
+          {/* <Route path="/profile" element={<ProfilePage />} /> */}
         </Routes>
 
         <Routes>
@@ -49,11 +50,6 @@ const App = () => {
           <Route path="/forget-password" element={<ForgetPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/order-list" element={<OrderList />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/information-order" element={<InformationOrder />} />
-          {/* </Route> */}
-          {/* <Route path="/profile" element={<ProfilePage />} /> */}
         </Routes>
       </BrowserRouter>
     </>
