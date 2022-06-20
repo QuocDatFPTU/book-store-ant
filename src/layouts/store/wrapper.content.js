@@ -3,7 +3,7 @@ import React from 'react';
 
 const WrapperConentContainer = (props) => {
   return (
-    <Row>
+    <Row style={{ position: 'relative', marginTop: '20px' }}>
       <Col span={16} offset={4}>
         {props.children}
       </Col>

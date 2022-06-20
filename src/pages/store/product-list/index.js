@@ -15,62 +15,56 @@ import {
   Select,
   Pagination,
 } from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+
 import './styles.less';
 import {
-  AntDesignOutlined,
-  FireOutlined,
   HomeOutlined,
   ShoppingCartOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
+import StoreLayoutContainer from 'layouts/store/store.layout';
+import WrapperConentContainer from 'layouts/store/wrapper.content';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
+
+const plainOptions = [
+  'Sách tham khảo',
+  'Sách học ngoại ngữ',
+  'Văn học',
+  'Thiếu nhi',
+  'Tâm lý kỹ năng',
+  'Kinh tế',
+  'Sách giáo khoa',
+  'Foreigns Books',
+  'Văn phòng phẩm',
+  'Đồ chơi',
+];
+const priceOptions = [
+  { label: '0đ - 150.000đ', value: { min: 0, max: 150 } },
+  { label: '150,000đ - 300.000đ', value: { min: 150000, max: 300000 } },
+  { label: '300,000đ - 500.000đ', value: { min: 300000, max: 500000 } },
+  { label: '500,000đ - 700,000đ', value: { min: 500000, max: 700000 } },
+  { label: '700,000đ - Trở lên', value: { min: 700000, max: 'more' } },
+];
 
 const ProductList = () => {
   const onChange = (checkedValues) => {
     console.log('checked = ', checkedValues);
   };
-  const plainOptions = [
-    'Sách tham khảo',
-    'Sách học ngoại ngữ',
-    'Văn học',
-    'Thiếu nhi',
-    'Tâm lý kỹ năng',
-    'Kinh tế',
-    'Sách giáo khoa',
-    'Foreigns Books',
-    'Văn phòng phẩm',
-    'Đồ chơi',
-  ];
-  const priceOptions = [
-    { label: '0đ - 150.000đ', value: { min: 0, max: 150 } },
-    { label: '150,000đ - 300.000đ', value: { min: 150000, max: 300000 } },
-    { label: '300,000đ - 500.000đ', value: { min: 300000, max: 500000 } },
-    { label: '500,000đ - 700,000đ', value: { min: 500000, max: 700000 } },
-    { label: '700,000đ - Trở lên', value: { min: 700000, max: 'more' } },
-  ];
 
   return (
-    <Layout className="layout">
-      <Header>
-        <div className="logo">
-          <img src={logoImg} alt="logo image" />
-        </div>
-        <div className="header_search__form"></div>
-      </Header>
-      <Content style={{ marginTop: '20px' }}>
-        <Row className="list-products">
-          <Col span={16} offset={4} style={{ marginBottom: '10px' }}>
-            <Breadcrumb>
-              <Breadcrumb.Item href="/">
-                <HomeOutlined />
-              </Breadcrumb.Item>
-              <Breadcrumb.Item>THỂ LOẠI</Breadcrumb.Item>
-            </Breadcrumb>
-          </Col>
-          <Col style={{ borderRadius: '4px' }} span={4} offset={4}>
+    <StoreLayoutContainer>
+      <WrapperConentContainer>
+        <Breadcrumb>
+          <Breadcrumb.Item href="/">
+            <HomeOutlined />
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>THỂ LOẠI</Breadcrumb.Item>
+        </Breadcrumb>
+      </WrapperConentContainer>
+      <WrapperConentContainer>
+        <Row>
+          <Col style={{ borderRadius: '4px' }} span={4}>
             <div className="list-options">
               <div className="option-cate">
                 <h4>THỂ LOẠI</h4>
@@ -95,7 +89,7 @@ const ProductList = () => {
               />
             </div>
           </Col>
-          <Col style={{ backgroundColor: 'white' }} span={12}>
+          <Col style={{ backgroundColor: 'white' }} span={20}>
             <Row>
               <Col style={{ padding: '40px', paddingBottom: '20px' }} span={24}>
                 Sắp xếp theo:
@@ -286,15 +280,8 @@ const ProductList = () => {
             </Row>
           </Col>
         </Row>
-      </Content>
-      <Footer
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        Ant Design ©2018 Created by Ant UED
-      </Footer>
-    </Layout>
+      </WrapperConentContainer>
+    </StoreLayoutContainer>
   );
 };
 

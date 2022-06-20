@@ -289,106 +289,106 @@ const HomePage = () => {
         </Col>
       </Row>
       <WrapperConentContainer className="home-categories">
-        <h2
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '22px',
-          }}
-        >
-          <AntDesignOutlined
+        <Row className="categories-content">
+          <h2
             style={{
-              fontSize: '32px',
-              marginRight: '5px',
-              color: '#3f6600',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '22px',
             }}
-          />
-          Danh mục sản phẩm
-        </h2>
-        <Divider style={{ margin: '18px 0' }} />
-        <Row justify="space-evenly">
-          {[
-            {
-              name: 'Sách tham khảo',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
-            },
-            {
-              name: 'Sách học ngoại ngữ',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-            },
-            {
-              name: 'Văn học',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
-            },
-            {
-              name: 'Thiếu nhi',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-            },
-            {
-              name: 'Tâm lý kỹ năng',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-            },
-            {
-              name: 'Kinh tế',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-            },
-            {
-              name: 'Sách giáo khoa',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-            },
-            {
-              name: 'Foreigns Books',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
-            },
-            {
-              name: 'Văn phòng phẩm',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
-            },
-            {
-              name: 'Đồ chơi',
-              imgLink:
-                'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
-            },
-          ].map((cateItem) => (
-            <Col span={2}>
-              <a href="https://www.fahasa.com/sach-trong-nuoc/thieu-nhi.html?order=num_orders&limit=24&p=1">
-                <Card
-                  className="custom-card"
-                  hoverable={false}
-                  bordered={false}
-                  cover={
-                    <img
-                      style={{
-                        width: '70%',
-                        height: '110px',
-                        objectFit: 'cover',
-                        margin: '0 auto',
-                      }}
-                      alt="example"
-                      src={cateItem.imgLink}
-                    />
-                  }
-                >
-                  <a>{cateItem.name}</a>
-                </Card>
-              </a>
-            </Col>
-          ))}
+          >
+            <AntDesignOutlined
+              style={{
+                fontSize: '32px',
+                marginRight: '5px',
+                color: '#3f6600',
+              }}
+            />
+            Danh mục sản phẩm
+          </h2>
+          <Divider style={{ margin: '18px 0' }} />
+          <Row justify="space-evenly" style={{ width: '100%' }}>
+            {[
+              {
+                name: 'Sách tham khảo',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
+              },
+              {
+                name: 'Sách học ngoại ngữ',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
+              },
+              {
+                name: 'Văn học',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
+              },
+              {
+                name: 'Thiếu nhi',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+              },
+              {
+                name: 'Tâm lý kỹ năng',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
+              },
+              {
+                name: 'Kinh tế',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
+              },
+              {
+                name: 'Sách giáo khoa',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
+              },
+              {
+                name: 'Foreigns Books',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
+              },
+              {
+                name: 'Văn phòng phẩm',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
+              },
+              {
+                name: 'Đồ chơi',
+                imgLink:
+                  'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
+              },
+            ].map((cateItem) => (
+              <Col span={2}>
+                <a href="https://www.fahasa.com/sach-trong-nuoc/thieu-nhi.html?order=num_orders&limit=24&p=1">
+                  <Card
+                    className="custom-card"
+                    hoverable={false}
+                    bordered={false}
+                    cover={
+                      <img
+                        style={{
+                          width: '70%',
+                          height: '110px',
+                          objectFit: 'cover',
+                          margin: '0 auto',
+                        }}
+                        alt="example"
+                        src={cateItem.imgLink}
+                      />
+                    }
+                  >
+                    <a>{cateItem.name}</a>
+                  </Card>
+                </a>
+              </Col>
+            ))}
+          </Row>
         </Row>
       </WrapperConentContainer>
-      <WrapperConentContainer className=""></WrapperConentContainer>
-
-      <Row className="home-products-featured">
-        <Col className="products-content" span={16} offset={4}>
+      <WrapperConentContainer className="home-products-featured">
+        <Row className="products-content">
           <h2
             style={{
               display: 'flex',
@@ -517,13 +517,13 @@ const HomePage = () => {
               </Col>
             ))}
           </Row>
-          <Row>
+          <Row style={{ width: '100%' }}>
             <Col style={{ textAlign: 'center' }} span={24}>
               <Button danger>Xem thêm</Button>
             </Col>
           </Row>
-        </Col>
-      </Row>
+        </Row>
+      </WrapperConentContainer>
     </StoreLayoutContainer>
   );
 };
