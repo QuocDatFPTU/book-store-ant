@@ -64,16 +64,28 @@ const InformationOrder = () => {
           {orderData.map((item) => (
             <Row className="infor-detail" align="middle">
               <Col span={9} className="infor-detail-container">
-                <img className="infor-img" src={item.imgLink} />
-                <div className="infor-form">
-                  <p className="infor-type">{item.title}</p>
-                  <p className="infor-pushlisher">{item.publisher}</p>
-                  <p className="infor-category">{item.Category}</p>
+                <div className="infor-lock">
+                  <img className="infor-img" src={item.imgLink} />
+                  <div className="infor-form">
+                    <p className="infor-type">{item.title}</p>
+                    <p className="infor-pushlisher">{item.publisher}</p>
+                    <p className="infor-category">{item.Category}</p>
+                  </div>
                 </div>
               </Col>
-              <Col span={5}>20.200đ</Col>
+              <Col style={{ display: 'flex' }} span={5}>
+                20.200đ
+              </Col>
               <Col span={5}>2</Col>
               <Col span={5}>40.400đ</Col>
+              <Row className="infor-form-buy">
+                <Col span={18} offset={6}>
+                  <div className="infor-back">
+                    <button> Viết nhận xét</button>
+                    <button className="infor-return"> Mua lại</button>
+                  </div>
+                </Col>
+              </Row>
             </Row>
           ))}
         </Col>
