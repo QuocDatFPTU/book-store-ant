@@ -1,6 +1,6 @@
 import React from 'react';
 import './styles.less';
-import { Col, Divider, Row } from 'antd';
+import { Button, Col, Divider, Input, Row } from 'antd';
 
 const InformationOrder = () => {
   const orderData = [
@@ -18,7 +18,7 @@ const InformationOrder = () => {
     <div style={{ backgroundColor: '#F0F2F5', height: '200vh' }}>
       <Row className="infor-content">
         <Col span={8} offset={4}>
-          Thông tin đơn hàng
+          Thông Tin Đơn Hàng
         </Col>
       </Row>
       <Row>
@@ -48,7 +48,8 @@ const InformationOrder = () => {
                     <p>Ngày đặt hàng: 28/06/2021</p>
                     <p>Tổng tiền: 40.400đ</p>
                     <p className="status">
-                      Trạng Thái: <span>Đợi xác nhận</span>
+                      Trạng Thái:{' '}
+                      <span className="infor-wait">Đợi xác nhận</span>
                     </p>
                   </div>
                 </Col>
@@ -81,8 +82,11 @@ const InformationOrder = () => {
               <Row className="infor-form-buy">
                 <Col span={18} offset={6}>
                   <div className="infor-back">
-                    <button> Viết nhận xét</button>
-                    <button className="infor-return"> Mua lại</button>
+                    <Button danger>Viết nhận xét</Button>
+                    <Button danger className="infor-return">
+                      {' '}
+                      Mua lại
+                    </Button>
                   </div>
                 </Col>
               </Row>
