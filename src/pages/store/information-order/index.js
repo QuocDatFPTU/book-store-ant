@@ -92,6 +92,16 @@ const InformationOrder = () => {
               </Row>
             </Row>
           ))}
+          <Row className="infor-update">
+            <Col span={4} offset={20}>
+              <Button
+                className="infor-min"
+                style={{ backgroundColor: '#1c2260', color: '#fff' }}
+              >
+                Cập nhật
+              </Button>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </div>
