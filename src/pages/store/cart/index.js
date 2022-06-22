@@ -1,17 +1,16 @@
-import { Button, Col, Input, InputNumber, Row, Typography } from 'antd';
-import React from 'react';
-import './styles.less';
-import { Checkbox, Divider } from 'antd';
-import { useState } from 'react';
-import StoreLayoutContainer from 'layouts/store/store.layout';
-import WrapperConentContainer from 'layouts/store/wrapper.content';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Input, InputNumber, Row, Typography, Checkbox, Divider } from "antd";
+import React, { useState } from "react";
+import "./styles.less";
+
+import StoreLayoutContainer from "layouts/store/store.layout";
+import WrapperConentContainer from "layouts/store/wrapper.content";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 const CheckboxGroup = Checkbox.Group;
-const plainOptions = ['123', '124', '125'];
+const plainOptions = ["123", "124", "125"];
 const defaultCheckedList = [];
 
 const Cart = () => {
-  //state
+  // state
   const [checkedList, setCheckedList] = useState(defaultCheckedList);
   const [checkAll, setCheckAll] = useState(false);
 
@@ -25,40 +24,40 @@ const Cart = () => {
     setCheckAll(e.target.checked);
   };
 
-  //data
+  // data
   const orderData = [
     {
-      _id: '123',
+      _id: "123",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
+        "https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg",
       title:
-        'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
-      salePrice: '26.000.200đ',
-      publisher: 'NXB Trẻ',
+        "Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l",
+      salePrice: "26.000.200đ",
+      publisher: "NXB Trẻ",
       quantity: 2,
-      totalAmount: '40.400đ',
+      totalAmount: "40.400đ"
     },
     {
-      _id: '124',
+      _id: "124",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
+        "https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg",
       title:
-        'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
-      salePrice: '77.000 đ',
-      publisher: 'NXB Trẻ',
+        "Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard",
+      salePrice: "77.000 đ",
+      publisher: "NXB Trẻ",
       quantity: 1,
-      totalAmount: '77.400đ',
+      totalAmount: "77.400đ"
     },
     {
-      _id: '125',
+      _id: "125",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
-      title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
-      salePrice: '162.000 đ',
-      publisher: 'NXB Dân Trí',
+        "https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg",
+      title: "Siêu Nhí Hỏi Nhà Khoa Học Trả Lời",
+      salePrice: "162.000 đ",
+      publisher: "NXB Dân Trí",
       quantity: 2,
-      totalAmount: '324.000đ',
-    },
+      totalAmount: "324.000đ"
+    }
   ];
 
   console.log(checkedList);
@@ -82,13 +81,13 @@ const Cart = () => {
       <WrapperConentContainer>
         <Row>
           <Col span={17}>
-            <Row style={{ width: '100%' }} className="cart-type">
+            <Row style={{ width: "100%" }} className="cart-type">
               <Col span={1}>
                 <Checkbox onChange={onCheckAllChange} checked={checkAll} />
               </Col>
               <Col
                 className="cart-type-title"
-                style={{ textAlign: 'left' }}
+                style={{ textAlign: "left" }}
                 span={13}
               >
                 Chọn tất cả (1 sản phẩm)
@@ -101,7 +100,7 @@ const Cart = () => {
               </Col>
             </Row>
             <CheckboxGroup
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               value={checkedList}
               onChange={onChange}
             >
@@ -122,7 +121,7 @@ const Cart = () => {
                       <p className="cart-price">{item.salePrice}</p>
                     </Col>
                     <Col
-                      style={{ textAlign: 'center', fontSize: '27px' }}
+                      style={{ textAlign: "center", fontSize: "27px" }}
                       span={4}
                       offset={1}
                     >
@@ -139,7 +138,7 @@ const Cart = () => {
                           max={5}
                           defaultValue={item.quantity}
                           value={qProduct}
-                          style={{ width: '43px' }}
+                          style={{ width: "43px" }}
                         />
                         <Button
                           type="primary"
@@ -152,7 +151,7 @@ const Cart = () => {
                     </Col>
                     <Col
                       className="cart-productitem-saleprice"
-                      style={{ textAlign: 'center' }}
+                      style={{ textAlign: "center" }}
                       span={4}
                       offset={1}
                     >
@@ -167,19 +166,19 @@ const Cart = () => {
           <Col span={6} offset={1}>
             <Row className="cart-main">
               <Col span={24}>
-                <div class="cart-money">
+                <div className="cart-money">
                   <h2>Thành tiền</h2>
-                  <div class="cart-cost">
+                  <div className="cart-cost">
                     <p>Tổng cộng</p>
                     <p>448.800 đ</p>
                   </div>
-                  <div class="cart-cost">
+                  <div className="cart-cost">
                     <p>Tiền ship</p>
                     <p>20.000 đ</p>
                   </div>
-                  <div class="cart-cost">
+                  <div className="cart-cost">
                     <p>Tổng Tiền</p>
-                    <p class="total-price">468.800 đ</p>
+                    <p className="total-price">468.800 đ</p>
                   </div>
                   <button>
                     <a href="">Thanh toán</a>

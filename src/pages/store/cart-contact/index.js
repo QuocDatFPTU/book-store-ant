@@ -27,10 +27,10 @@ import {
   Input,
   Radio,
   Switch,
-  TreeSelect,
-} from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+  TreeSelect
+} from "antd";
+import { Link, Route, Routes } from "react-router-dom";
+import logoImg from "assets/logo-new.png";
 import {
   AntDesignOutlined,
   FireOutlined,
@@ -48,12 +48,12 @@ import {
   CommentOutlined,
   InfoCircleOutlined,
   QuestionOutlined,
-  ArrowLeftOutlined,
-} from '@ant-design/icons';
-import { useEffect, useState } from 'react';
-import './styles.less';
-import StoreLayoutContainer from 'layouts/store/store.layout';
-import WrapperConentContainer from 'layouts/store/wrapper.content';
+  ArrowLeftOutlined
+} from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import "./styles.less";
+import StoreLayoutContainer from "layouts/store/store.layout";
+import WrapperConentContainer from "layouts/store/wrapper.content";
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 const { RangePicker } = DatePicker;
@@ -61,28 +61,28 @@ const { TextArea } = Input;
 
 const layout = {
   labelCol: {
-    span: 6,
+    span: 6
   },
   wrapperCol: {
-    span: 18,
-  },
+    span: 18
+  }
 };
 const tailLayout = {
   wrapperCol: {
     offset: 8,
-    span: 16,
-  },
+    span: 16
+  }
 };
 
 const validateMessages = {
-  required: 'Nhập ${label}!',
+  required: "Nhập ${label}!",
   types: {
-    email: '${label} không hợp lệ!',
-    number: '${label} is not a valid number!',
+    email: "${label} không hợp lệ!",
+    number: "${label} is not a valid number!"
   },
   number: {
-    range: '${label} must be between ${min} and ${max}',
-  },
+    range: "${label} must be between ${min} and ${max}"
+  }
 };
 
 const CartContact = () => {
@@ -98,12 +98,12 @@ const CartContact = () => {
 
   const onFill = () => {
     form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
+      fullName: "Nguyễn Hoàng Anh",
+      gender: "male",
+      email: "hoanganhgo28062001@gmail.com",
+      phoneNumber: "0375627583",
+      address: "36/38 Đường Trần Việt Châu",
+      note: "Chú cc"
     });
   };
 
@@ -112,40 +112,40 @@ const CartContact = () => {
     onFill();
   });
 
-  //data
+  // data
   const orderData = [
     {
-      _id: '123',
+      _id: "123",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
+        "https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg",
       title:
-        'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
-      salePrice: '26.000.200đ',
-      publisher: 'NXB Trẻ',
+        "Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l",
+      salePrice: "26.000.200đ",
+      publisher: "NXB Trẻ",
       quantity: 2,
-      totalAmount: '40.400đ',
+      totalAmount: "40.400đ"
     },
     {
-      _id: '124',
+      _id: "124",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
+        "https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg",
       title:
-        'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
-      salePrice: '77.000 đ',
-      publisher: 'NXB Trẻ',
+        "Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard",
+      salePrice: "77.000 đ",
+      publisher: "NXB Trẻ",
       quantity: 1,
-      totalAmount: '77.400đ',
+      totalAmount: "77.400đ"
     },
     {
-      _id: '125',
+      _id: "125",
       imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
-      title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
-      salePrice: '162.000 đ',
-      publisher: 'NXB Dân Trí',
+        "https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg",
+      title: "Siêu Nhí Hỏi Nhà Khoa Học Trả Lời",
+      salePrice: "162.000 đ",
+      publisher: "NXB Dân Trí",
       quantity: 2,
-      totalAmount: '324.000đ',
-    },
+      totalAmount: "324.000đ"
+    }
   ];
 
   return (
@@ -154,21 +154,21 @@ const CartContact = () => {
         <div className="contact-infor">
           <h2
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              fontSize: '22px',
+              display: "flex",
+              alignItems: "center",
+              fontSize: "22px"
             }}
           >
             <InfoCircleOutlined
               style={{
-                fontSize: '28px',
-                marginRight: '5px',
-                color: 'red',
+                fontSize: "28px",
+                marginRight: "5px",
+                color: "red"
               }}
             />
             Thông tin nhận hàng
           </h2>
-          <Divider style={{ margin: '18px 0' }} />
+          <Divider style={{ margin: "18px 0" }} />
           <Row className="form-contact-container" justify="space-evenly">
             <Col span={14}>
               <Form
@@ -184,8 +184,8 @@ const CartContact = () => {
                   label="Họ và tên"
                   rules={[
                     {
-                      required: true,
-                    },
+                      required: true
+                    }
                   ]}
                 >
                   <Input />
@@ -195,8 +195,8 @@ const CartContact = () => {
                   label="Giới tính"
                   rules={[
                     {
-                      required: true,
-                    },
+                      required: true
+                    }
                   ]}
                 >
                   <Select
@@ -213,9 +213,9 @@ const CartContact = () => {
                   label="Email"
                   rules={[
                     {
-                      required: 'true',
-                      type: 'email',
-                    },
+                      required: "true",
+                      type: "email"
+                    }
                   ]}
                 >
                   <Input />
@@ -225,8 +225,8 @@ const CartContact = () => {
                   label="Số điện thoại"
                   rules={[
                     {
-                      required: 'true',
-                    },
+                      required: "true"
+                    }
                   ]}
                 >
                   <Input />
@@ -236,8 +236,8 @@ const CartContact = () => {
                   label="Địa chỉ"
                   rules={[
                     {
-                      required: 'true',
-                    },
+                      required: "true"
+                    }
                   ]}
                 >
                   <Input />
@@ -262,33 +262,33 @@ const CartContact = () => {
         </div>
       </WrapperConentContainer>
       <WrapperConentContainer>
-        <Row style={{ backgroundColor: 'white', padding: '10px' }}>
+        <Row style={{ backgroundColor: "white", padding: "10px" }}>
           <Col span={24}>
             <Row>
               <Col span={24}></Col>
               <h2
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: '22px',
+                  display: "flex",
+                  alignItems: "center",
+                  fontSize: "22px"
                 }}
               >
                 <QuestionOutlined
                   style={{
-                    fontSize: '28px',
-                    marginRight: '5px',
-                    color: 'red',
+                    fontSize: "28px",
+                    marginRight: "5px",
+                    color: "red"
                   }}
                 />
                 Kiểm tra lại đơn hàng
               </h2>
             </Row>
-            <Divider style={{ margin: '18px 0' }} />
+            <Divider style={{ margin: "18px 0" }} />
             {orderData.map((item) => (
               <div className="cart-value">
                 <Row
                   className="cart-form"
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   align="middle"
                 >
                   <Col span={2} className="cart-detail-container">
@@ -302,7 +302,7 @@ const CartContact = () => {
                     <p className="cart-price">{item.salePrice}</p>
                   </Col>
                   <Col
-                    style={{ textAlign: 'center', fontSize: '27px' }}
+                    style={{ textAlign: "center", fontSize: "27px" }}
                     span={4}
                     offset={1}
                   >
@@ -310,7 +310,7 @@ const CartContact = () => {
                   </Col>
                   <Col
                     className="cart-productitem-saleprice"
-                    style={{ textAlign: 'center' }}
+                    style={{ textAlign: "center" }}
                     span={4}
                     offset={1}
                   >
@@ -325,20 +325,20 @@ const CartContact = () => {
       <WrapperConentContainer>
         <Row
           style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '10px',
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "10px"
           }}
         >
           <Col span={8} offset={16}>
             <div className="cart-money">
-              <div class="cart-cost">
+              <div className="cart-cost">
                 <p>Thành tiền</p>
-                <p class="total-price">468.800 đ</p>
+                <p className="total-price">468.800 đ</p>
               </div>
             </div>
           </Col>
-          <Divider style={{ margin: '5px 0 5px 0' }} />
+          <Divider style={{ margin: "5px 0 5px 0" }} />
           <Col span={8}>
             <Button type="link" size="large">
               <ArrowLeftOutlined />
@@ -346,7 +346,7 @@ const CartContact = () => {
             </Button>
           </Col>
           <Col span={8} offset={8}>
-            <div class="cart-money">
+            <div className="cart-money">
               <button>
                 <a href="">Xác nhận thanh toán</a>
               </button>

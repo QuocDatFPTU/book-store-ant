@@ -1,9 +1,9 @@
-import axiosClient from 'util/axiosClient';
+import axiosClient from "util/axiosClient";
 
-//Get all products
+// Get all products
 export const getProductList = async (params) => {
   // eslint-disable-next-line quotes
   console.log(123400);
-  const url = '/products';
+  const url = "/products";
   return axiosClient.get(url, { params });
 };

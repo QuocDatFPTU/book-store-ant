@@ -1,21 +1,21 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from 'antd';
-import { pickBy } from 'lodash';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import TableCustom from '../../../components/TableCustom';
+import { EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from "antd";
+import { pickBy } from "lodash";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import TableCustom from "../../../components/TableCustom";
 import {
   defaultPage,
   formatDate,
   formatDateTime,
-  formatDateTimeFull,
-} from '../../../util/constant';
-import { getListAccount } from './account.service';
+  formatDateTimeFull
+} from "../../../util/constant";
+import { getListAccount } from "./account.service";
 
 const defaultSort = {
-  'is-ascending': 'true',
-  'order-by': 'Id',
+  "is-ascending": "true",
+  "order-by": "Id"
 };
 const AccountList = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const AccountList = () => {
     getProductList({ ...params, ...sortedInfo })
       .then((result) => {
         setUniList([...result.data.items]);
-        setTotalItem(result.data['total-count']);
+        setTotalItem(result.data["total-count"]);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
@@ -44,9 +44,9 @@ const AccountList = () => {
 
   const columns = [
     {
-      title: 'Username',
-      dataIndex: 'user-name',
-      width: '12%',
+      title: "Username",
+      dataIndex: "user-name",
+      width: "12%",
       ellipsis: true,
       render: (text, record) => {
         return (
@@ -58,25 +58,25 @@ const AccountList = () => {
             {text}
           </Button>
         );
-      },
+      }
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      width: '12%',
+      title: "Email",
+      dataIndex: "email",
+      width: "12%"
     },
     {
-      title: 'Role name',
-      dataIndex: 'name',
-      width: '12%',
+      title: "Role name",
+      dataIndex: "name",
+      width: "12%"
     },
     {
-      title: 'Action',
-      align: 'center',
-      width: '8%',
-      fixed: 'right',
+      title: "Action",
+      align: "center",
+      width: "8%",
+      fixed: "right",
       render: (text, record) => (
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
           <Button
             type="link"
             size="small"
@@ -86,8 +86,8 @@ const AccountList = () => {
             }}
           />
         </div>
-      ),
-    },
+      )
+    }
   ];
 
   const extraButton = [
@@ -95,23 +95,23 @@ const AccountList = () => {
       key="btn-complete"
       type="primary"
       onClick={() => {
-        navigate('/admin/create-account');
+        navigate("/admin/create-account");
       }}
     >
-      {'Create'}
+      {"Create"}
       <PlusOutlined />
-    </Button>,
+    </Button>
   ];
 
   const routes = [
     {
-      path: '/dashboard',
-      breadcrumbName: 'Home',
+      path: "/dashboard",
+      breadcrumbName: "Home"
     },
     {
-      path: '/dashboard',
-      breadcrumbName: 'University',
-    },
+      path: "/dashboard",
+      breadcrumbName: "University"
+    }
   ];
 
   return (
@@ -132,12 +132,12 @@ const AccountList = () => {
             onFinish={(value) => {
               const cleanValue = pickBy(
                 value,
-                (v) => v !== undefined && v !== ''
+                (v) => v !== undefined && v !== ""
               );
               setParams({
                 ...cleanValue,
-                'page-number': 1,
-                'page-size': params['page-size'],
+                "page-number": 1,
+                "page-size": params["page-size"]
               });
             }}
           >
@@ -155,7 +155,7 @@ const AccountList = () => {
                     icon={<SearchOutlined />}
                     htmlType="submit"
                   >
-                    {'Search'}
+                    {"Search"}
                   </Button>
                 </Form.Item>
               </Col>
@@ -166,7 +166,7 @@ const AccountList = () => {
           title={() => (
             <Row>
               <Col span={12}>
-                <h3> {'University List'}</h3>
+                <h3> {"University List"}</h3>
               </Col>
             </Row>
           )}
@@ -176,20 +176,20 @@ const AccountList = () => {
           columns={columns}
           dataSource={uniList}
           onChange={(pagination, filters, sorter) => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            if (pagination.pageSize !== params['page-size']) {
-              params['page-number'] = 1;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (pagination.pageSize !== params["page-size"]) {
+              params["page-number"] = 1;
             } else {
-              params['page-number'] = pagination.current;
+              params["page-number"] = pagination.current;
             }
-            params['page-size'] = pagination.pageSize;
+            params["page-size"] = pagination.pageSize;
             setParams({ ...params });
           }}
           pagination={{
             total: totalItem,
             showSizeChanger: true,
-            pageSize: params['page-size'],
-            current: params['page-number'],
+            pageSize: params["page-size"],
+            current: params["page-number"]
           }}
           scroll={{ x: 1200 }}
         />

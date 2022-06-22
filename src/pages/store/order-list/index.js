@@ -1,48 +1,48 @@
-import { Col, Divider, Row } from 'antd';
-import Item from 'antd/lib/list/Item';
-import StoreLayoutContainer from 'layouts/store/store.layout';
-import React from 'react';
-import './styles.less';
+import { Col, Divider, Row } from "antd";
+import Item from "antd/lib/list/Item";
+import StoreLayoutContainer from "layouts/store/store.layout";
+import React from "react";
+import "./styles.less";
 const OrderList = () => {
   const orderData = [
     {
-      id: '0458',
-      receiver: 'Lê Duy Nam Em',
-      orderDate: '28/06/2001',
-      address: '321 Hoàng Hữu Nam',
-      phoneNumber: '098934985',
-      status: 'Đợi xác nhận',
+      id: "0458",
+      receiver: "Lê Duy Nam Em",
+      orderDate: "28/06/2001",
+      address: "321 Hoàng Hữu Nam",
+      phoneNumber: "098934985",
+      status: "Đợi xác nhận",
       products: [
         {
           imgLink:
-            'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-          title: 'Miền đất hứa',
-          salePrice: '20.200đ',
-          publisher: 'NXB Trẻ',
+            "https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg",
+          title: "Miền đất hứa",
+          salePrice: "20.200đ",
+          publisher: "NXB Trẻ",
           quantity: 2,
-          totalAmount: '40.400đ',
-        },
-      ],
+          totalAmount: "40.400đ"
+        }
+      ]
     },
     {
-      id: '0456',
-      receiver: 'Nguyễn Hoàng Anh',
-      orderDate: '28/06/2001',
-      address: '197 Lê Lai',
-      phoneNumber: '083934912',
-      status: 'Thành công',
+      id: "0456",
+      receiver: "Nguyễn Hoàng Anh",
+      orderDate: "28/06/2001",
+      address: "197 Lê Lai",
+      phoneNumber: "083934912",
+      status: "Thành công",
       products: [
         {
           imgLink:
-            'https://cdn0.fahasa.com/media/catalog/product/i/m/image_182308.jpg',
-          title: 'Tam quốc diễn nghĩa',
-          salePrice: '207.200đ',
-          publisher: 'NXB Trẻ',
+            "https://cdn0.fahasa.com/media/catalog/product/i/m/image_182308.jpg",
+          title: "Tam quốc diễn nghĩa",
+          salePrice: "207.200đ",
+          publisher: "NXB Trẻ",
           quantity: 1,
-          totalAmount: '207.200đ',
-        },
-      ],
-    },
+          totalAmount: "207.200đ"
+        }
+      ]
+    }
   ];
 
   return (
@@ -74,7 +74,7 @@ const OrderList = () => {
                   {item.status}
                 </Col>
               </Row>
-              <Divider style={{ margin: '15px 0 ' }} />
+              <Divider style={{ margin: "15px 0 " }} />
               {item.products.map((product) => (
                 <Row className="order-products" align="middle">
                   <Col

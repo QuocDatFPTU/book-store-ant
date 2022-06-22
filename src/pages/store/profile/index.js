@@ -27,10 +27,10 @@ import {
   Input,
   Radio,
   Switch,
-  TreeSelect,
-} from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+  TreeSelect
+} from "antd";
+import { Link, Route, Routes } from "react-router-dom";
+import logoImg from "assets/logo-new.png";
 import {
   AntDesignOutlined,
   FireOutlined,
@@ -48,10 +48,10 @@ import {
   CommentOutlined,
   InfoCircleOutlined,
   GoogleOutlined,
-  PhoneOutlined,
-} from '@ant-design/icons';
-import { useEffect, useState } from 'react';
-import StoreLayoutContainer from 'layouts/store/store.layout';
+  PhoneOutlined
+} from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import StoreLayoutContainer from "layouts/store/store.layout";
 // import './styles.less';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
@@ -60,11 +60,11 @@ const { TextArea } = Input;
 
 const layout = {
   labelCol: {
-    span: 24,
+    span: 24
   },
   wrapperCol: {
-    span: 24,
-  },
+    span: 24
+  }
 };
 const tailLayout = {
   // wrapperCol: {
@@ -74,14 +74,14 @@ const tailLayout = {
 };
 
 const validateMessages = {
-  required: 'Nhập ${label}!',
+  required: "Nhập ${label}!",
   types: {
-    email: '${label} không hợp lệ!',
-    number: '${label} is not a valid number!',
+    email: "${label} không hợp lệ!",
+    number: "${label} is not a valid number!"
   },
   number: {
-    range: '${label} must be between ${min} and ${max}',
-  },
+    range: "${label} must be between ${min} and ${max}"
+  }
 };
 
 const ProfilePage = () => {
@@ -97,12 +97,12 @@ const ProfilePage = () => {
 
   const onFill = () => {
     form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
+      fullName: "Nguyễn Hoàng Anh",
+      gender: "male",
+      email: "hoanganhgo28062001@gmail.com",
+      phoneNumber: "0375627583",
+      address: "36/38 Đường Trần Việt Châu",
+      note: "Chú cc"
     });
   };
 
@@ -115,9 +115,9 @@ const ProfilePage = () => {
     <StoreLayoutContainer>
       <Col
         style={{
-          backgroundColor: 'white',
-          padding: '10px',
-          borderRadius: '10px',
+          backgroundColor: "white",
+          padding: "10px",
+          borderRadius: "10px"
         }}
         span={16}
         offset={4}
@@ -143,8 +143,8 @@ const ProfilePage = () => {
                     label="Họ và tên"
                     rules={[
                       {
-                        required: true,
-                      },
+                        required: true
+                      }
                     ]}
                   >
                     <Input
@@ -157,9 +157,9 @@ const ProfilePage = () => {
                     label="Email"
                     rules={[
                       {
-                        required: 'true',
-                        type: 'email',
-                      },
+                        required: "true",
+                        type: "email"
+                      }
                     ]}
                   >
                     <Input
@@ -175,8 +175,8 @@ const ProfilePage = () => {
                     label="Giới tính"
                     rules={[
                       {
-                        required: true,
-                      },
+                        required: true
+                      }
                     ]}
                   >
                     <Select
@@ -195,7 +195,7 @@ const ProfilePage = () => {
                     <Button type="primary" htmlType="submit">
                       Cập nhật
                     </Button>
-                    <Button style={{ marginLeft: '20px' }} type="ghost">
+                    <Button style={{ marginLeft: "20px" }} type="ghost">
                       Đổi mật khẩu
                     </Button>
                   </Form.Item>
@@ -206,8 +206,8 @@ const ProfilePage = () => {
                     label="Số điện thoại"
                     rules={[
                       {
-                        required: 'true',
-                      },
+                        required: "true"
+                      }
                     ]}
                   >
                     <Input
@@ -220,8 +220,8 @@ const ProfilePage = () => {
                     label="Địa chỉ"
                     rules={[
                       {
-                        required: 'true',
-                      },
+                        required: "true"
+                      }
                     ]}
                   >
                     <Input
