@@ -1,23 +1,23 @@
-import React from "react";
-import { Provider } from "react-redux";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import "./App.less";
-import { store } from "../src/redux/store";
-import HomePage from "pages/store/home";
-import Login from "pages/home/login";
-import ProductList from "pages/store/product-list";
-import ProfilePage from "pages/store/profile";
-import ProductDetail from "pages/store/product-detail";
-import BlogDetail from "pages/store/blog-detail";
-import CartContact from "pages/store/cart-contact";
-import Register from "pages/home/register";
-import ForgetPassword from "pages/home/forget-password";
-import ResetPassword from "pages/home/reset-password";
-import ChangePassword from "pages/home/change-password";
-import { Button } from "antd";
-import OrderList from "pages/store/order-list";
-import Cart from "pages/store/cart";
-import InformationOrder from "pages/store/information-order";
+import React from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.less';
+import { store } from '../src/redux/store';
+import HomePage from 'pages/store/home';
+import Login from 'pages/home/login';
+import ProductList from 'pages/store/product-list';
+import ProfilePage from 'pages/store/profile';
+import ProductDetail from 'pages/store/product-detail';
+import BlogDetail from 'pages/store/blog-detail';
+import CartContact from 'pages/store/cart-contact';
+import Register from 'pages/home/register';
+import ForgetPassword from 'pages/home/forget-password';
+import ResetPassword from 'pages/home/reset-password';
+import ChangePassword from 'pages/home/change-password';
+import { Button } from 'antd';
+import OrderList from 'pages/store/order-list';
+import Cart from 'pages/store/cart';
+import InformationOrder from 'pages/store/information-order';
 
 const AppWrapper = () => {
   return (
@@ -33,7 +33,7 @@ const App = () => {
       {/* <HomePage /> */}
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage />}></Route>
           <Route path="/product-list/:id" element={<ProductList />} />
           <Route path="/product-detail/:id" element={<ProductDetail />} />
           {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}

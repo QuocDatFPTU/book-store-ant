@@ -14,6 +14,7 @@ import {
   InputNumber,
   Avatar,
   List,
+  Form,
 } from 'antd';
 import {
   FireOutlined,
@@ -32,6 +33,7 @@ import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductDetailById } from './service';
+import axiosClient from 'util/axiosClient';
 
 const ProductDetail = () => {
   //data
@@ -135,6 +137,7 @@ const ProductDetail = () => {
   ];
 
   //State
+  const [form] = Form.useForm();
   const [btnExpand, setBtnExpand] = useState(true);
   const [productDetail, setProductDetail] = useState({});
 
@@ -145,11 +148,23 @@ const ProductDetail = () => {
   const onChange = (checkedValues) => {
     console.log('checked = ', checkedValues);
   };
+  const addToCart = () => {
+    const quantityNeed = form.getFieldValue('quantityNeed');
+    const cartItem = {
+      quantity: form.getFieldValue('quantityNeed'),
+      productId: productDetail._id,
+    };
+    console.log(cartItem);
+    axiosClient.post('/cart', cartItem);
+  };
+
+  //State
   const [visible, setVisible] = useState(false);
 
   //RUN
   const { id } = useParams();
   useEffect(() => {
+    form.setFieldsValue({ quantityNeed: 1 });
     getProductDetailById(id)
       .then((result) => {
         console.log(result);
@@ -173,96 +188,121 @@ const ProductDetail = () => {
         </Breadcrumb>
       </WrapperConentContainer>
       <WrapperConentContainer className="products-detail-intro">
-        <Row style={{ padding: '20px', backgroundColor: 'white' }}>
-          <Col className="detail-images" span={10}>
-            <Row>
-              <Col span={3}>
-                <Image.PreviewGroup>
-                  {[
-                    'https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_2-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_3-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_7-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_9-390x510.jpg',
-                  ].map((item) => (
-                    <div className="image-preview">
-                      <Image
-                        style={{ cursor: 'pointer' }}
-                        preview={true}
-                        width="100%"
-                        src={item}
-                      />
-                    </div>
-                  ))}
-                </Image.PreviewGroup>
-              </Col>
-              <Col style={{ textAlign: 'center' }} span={21}>
-                <Image
-                  height={'34vh'}
-                  preview={false}
-                  src={productDetail.thumbnail}
-                />
-              </Col>
-            </Row>
-            <Row
-              justify="center"
-              style={{ marginTop: '10px', marginBottom: '10px' }}
-            >
-              <button className="btn-cart">
-                <ShoppingCartOutlined style={{ fontSize: '25px' }} /> Thêm vào
-                giỏ hàng
-              </button>
-              <button className="btn-buy">Mua ngay</button>
-            </Row>
-          </Col>
-          <Col className="detail-info" span={14}>
-            <h1>{productDetail.title}</h1>
-            <Descriptions column={2}>
-              <Descriptions.Item span={1} label="Nhà xuất bản">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.publisher}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Tác giả">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.author}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Ngày phát hành">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.publicDate}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Số trang">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.pages}
-                </div>
-              </Descriptions.Item>
-            </Descriptions>
-            <Rate style={{ fontSize: '15px' }} defaultValue={4} />
-            <div className="detail-sale">
-              {productDetail.salePrice} đ
-              <span className="detail-price"> {productDetail.listPrice} đ</span>
-            </div>
+        <Form form={form}>
+          <Row style={{ padding: '20px', backgroundColor: 'white' }}>
+            <Col className="detail-images" span={10}>
+              <Row>
+                <Col span={3}>
+                  <Image.PreviewGroup>
+                    {[
+                      'https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_2-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_3-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_7-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_9-390x510.jpg',
+                    ].map((item) => (
+                      <div className="image-preview">
+                        <Image
+                          style={{ cursor: 'pointer' }}
+                          preview={true}
+                          width="100%"
+                          src={item}
+                        />
+                      </div>
+                    ))}
+                  </Image.PreviewGroup>
+                </Col>
+                <Col style={{ textAlign: 'center' }} span={21}>
+                  <Image
+                    height={'34vh'}
+                    preview={false}
+                    src={productDetail.thumbnail}
+                  />
+                </Col>
+              </Row>
+              <Row
+                justify="center"
+                style={{ marginTop: '10px', marginBottom: '10px' }}
+              >
+                <Col span={12}>
+                  <Form.Item>
+                    <button
+                      style={{ width: '80%' }}
+                      className="btn-cart"
+                      onClick={addToCart}
+                    >
+                      <ShoppingCartOutlined style={{ fontSize: '25px' }} /> Thêm
+                      vào giỏ hàng
+                    </button>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item style={{ width: '100%' }}>
+                    <button style={{ width: '80%' }} className="btn-buy">
+                      Mua ngay
+                    </button>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Col>
+            <Col className="detail-info" span={14}>
+              <h1>{productDetail.title}</h1>
+              <Descriptions column={2}>
+                <Descriptions.Item span={1} label="Nhà xuất bản">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.publisher}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Tác giả">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.author}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Ngày phát hành">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.publicDate}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Số trang">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.pages}
+                  </div>
+                </Descriptions.Item>
+              </Descriptions>
+              <Rate style={{ fontSize: '15px' }} defaultValue={4} />
+              <div className="detail-sale">
+                {productDetail.salePrice} đ
+                <span className="detail-price">
+                  {' '}
+                  {productDetail.listPrice} đ
+                </span>
+              </div>
 
-            <div className="detail-quantity">
-              Số lượng:
-              <InputNumber
-                style={{
-                  marginLeft: '20px',
-                  fontSize: '30px',
-                }}
-                controls={{
-                  upIcon: <PlusOutlined style={{ fontSize: '30px' }} />,
-                  downIcon: <MinusOutlined style={{ fontSize: '30px' }} />,
-                }}
-                min={1}
-                max={productDetail.quantity}
-                defaultValue={1}
-              />
-            </div>
-          </Col>
-        </Row>
+              <div className="detail-quantity">
+                Số lượng:
+                <Form.Item name="quantityNeed">
+                  <InputNumber
+                    onChange={(value) =>
+                      form.setFieldsValue({ quantityNeed: value })
+                    }
+                    name="quantityNeed"
+                    style={{
+                      marginLeft: '20px',
+                      fontSize: '30px',
+                    }}
+                    controls={{
+                      upIcon: <PlusOutlined style={{ fontSize: '30px' }} />,
+                      downIcon: <MinusOutlined style={{ fontSize: '30px' }} />,
+                    }}
+                    min={1}
+                    max={productDetail.quantity}
+                    defaultValue={1}
+                  />
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+        </Form>
       </WrapperConentContainer>
       <WrapperConentContainer>
         <Col className="products-content">
