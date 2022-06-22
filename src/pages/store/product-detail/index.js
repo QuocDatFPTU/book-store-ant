@@ -15,6 +15,7 @@ import {
   Avatar,
   List,
   Form,
+  message,
 } from 'antd';
 import {
   FireOutlined,
@@ -32,7 +33,7 @@ import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getProductDetailById } from './service';
+import { addProudctToCart, getProductDetailById } from './service';
 import axiosClient from 'util/axiosClient';
 
 const ProductDetail = () => {
@@ -140,22 +141,23 @@ const ProductDetail = () => {
   const [form] = Form.useForm();
   const [btnExpand, setBtnExpand] = useState(true);
   const [productDetail, setProductDetail] = useState({});
+  const [maxQuantity, setMaxQuantity] = useState(1);
 
   //Method
   const onClickNotExpand = () => {
     setBtnExpand((val) => !val);
   };
-  const onChange = (checkedValues) => {
-    console.log('checked = ', checkedValues);
-  };
-  const addToCart = () => {
-    const quantityNeed = form.getFieldValue('quantityNeed');
+  const addToCart = async () => {
     const cartItem = {
       quantity: form.getFieldValue('quantityNeed'),
       productId: productDetail._id,
     };
-    console.log(cartItem);
-    axiosClient.post('/cart', cartItem);
+    try {
+      const cart = await addProudctToCart(cartItem);
+      message.success('Thêm vào giỏ hàng thành công', 5);
+    } catch (error) {
+      message.error(`${error.response.data.error}`, 5);
+    }
   };
 
   //State
@@ -296,7 +298,6 @@ const ProductDetail = () => {
                     }}
                     min={1}
                     max={productDetail.quantity}
-                    defaultValue={1}
                   />
                 </Form.Item>
               </div>

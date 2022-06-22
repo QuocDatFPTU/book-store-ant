@@ -6,3 +6,10 @@ export const getProductDetailById = async (params) => {
   const url = `/products/${params}`;
   return axiosClient.get(url, { params });
 };
+
+// Get all products
+export const addProudctToCart = async (params) => {
+  // eslint-disable-next-line quotes
+  const url = '/cart';
+  return axiosClient.post(url, { ...params });
+};

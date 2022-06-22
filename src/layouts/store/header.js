@@ -24,6 +24,7 @@ import paymentImg from 'assets/footer-payment.png';
 import socialtImg from 'assets/footer-social.png';
 import appImg from 'assets/footer-app.png';
 import WrapperConentContainer from './wrapper.content';
+import { useNavigate } from 'react-router-dom';
 const { Header } = Layout;
 
 const menu = (
@@ -134,7 +135,9 @@ const menuUser = (
 
 const HeaderContainer = () => {
   const onSearch = (value) => console.log(value);
+  const navigate = useNavigate();
   console.log(23546546754756);
+
   return (
     <div>
       <Affix offsetTop={'-20px'}>
@@ -186,6 +189,7 @@ const HeaderContainer = () => {
                     size="small"
                   >
                     <ShoppingCartOutlined
+                      onClick={() => navigate('/cart')}
                       style={{ color: 'white', fontSize: '32px' }}
                     />
                   </Badge>

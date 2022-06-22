@@ -24,7 +24,7 @@
     "semi": [2, "always"],
     "quotes": [2, "double", { "avoidEscape": true }],
     "indent": "off",
-    "avoidEscape": true,
-    "allowTemplateLiterals": true
+    "avoidEscape": 2,
+    "allowTemplateLiterals": 2
   }
 }
