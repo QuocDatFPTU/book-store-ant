@@ -29,18 +29,12 @@ import './styles.less';
 import { useState } from 'react';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getProductDetailById } from './service';
 
 const ProductDetail = () => {
   //data
-  const dataProduct = {
-    'Mã hàng': 'ID09543455',
-    // NXB: 'NXB Trẻ',
-    'Tác giả': 'Nguyễn Hoàng Anh',
-    'Năm XB': '16/05/2000',
-    'Số trang': '200',
-    'Thể loại': 'Văn học',
-    'Ngôn ngữ': 'Tiếng việt',
-  };
   const dataListFeedbacks = [
     {
       author: 'Nguyễn Hoàng Anh',
@@ -142,6 +136,7 @@ const ProductDetail = () => {
 
   //State
   const [btnExpand, setBtnExpand] = useState(true);
+  const [productDetail, setProductDetail] = useState({});
 
   //Method
   const onClickNotExpand = () => {
@@ -152,6 +147,20 @@ const ProductDetail = () => {
   };
   const [visible, setVisible] = useState(false);
 
+  //RUN
+  const { id } = useParams();
+  useEffect(() => {
+    getProductDetailById(id)
+      .then((result) => {
+        console.log(result);
+        setProductDetail(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+  console.log(productDetail.briefInformation);
+
   return (
     <StoreLayoutContainer>
       <WrapperConentContainer className="proudcts-detail-link">
@@ -160,9 +169,7 @@ const ProductDetail = () => {
             <HomeOutlined />
           </Breadcrumb.Item>
           <Breadcrumb.Item href="/product-list">THỂ LOẠI</Breadcrumb.Item>
-          <Breadcrumb.Item>
-            Tôi Vẽ - Phương Pháp Tự Học Vẽ Truyện Tranh
-          </Breadcrumb.Item>
+          <Breadcrumb.Item>{productDetail.title}</Breadcrumb.Item>
         </Breadcrumb>
       </WrapperConentContainer>
       <WrapperConentContainer className="products-detail-intro">
@@ -193,7 +200,7 @@ const ProductDetail = () => {
                 <Image
                   height={'34vh'}
                   preview={false}
-                  src="https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg"
+                  src={productDetail.thumbnail}
                 />
               </Col>
             </Row>
@@ -209,24 +216,33 @@ const ProductDetail = () => {
             </Row>
           </Col>
           <Col className="detail-info" span={14}>
-            <h1>Tôi Vẽ - Phương Pháp Tự Học Vẽ Truyện Tranh</h1>
+            <h1>{productDetail.title}</h1>
             <Descriptions column={2}>
               <Descriptions.Item span={1} label="Nhà xuất bản">
-                <div className="infor-text">NXB Trẻ</div>
+                <div className="infor-text">
+                  {productDetail?.briefInformation?.publisher}
+                </div>
               </Descriptions.Item>
               <Descriptions.Item span={1} label="Tác giả">
-                <div className="infor-text">Nguyễn Hoàng Anh</div>
+                <div className="infor-text">
+                  {productDetail?.briefInformation?.author}
+                </div>
               </Descriptions.Item>
               <Descriptions.Item span={1} label="Ngày phát hành">
-                <div className="infor-text"> 14/02/3000</div>
+                <div className="infor-text">
+                  {productDetail?.briefInformation?.publicDate}
+                </div>
               </Descriptions.Item>
               <Descriptions.Item span={1} label="Số trang">
-                <div className="infor-text">200</div>
+                <div className="infor-text">
+                  {productDetail?.briefInformation?.pages}
+                </div>
               </Descriptions.Item>
             </Descriptions>
             <Rate style={{ fontSize: '15px' }} defaultValue={4} />
             <div className="detail-sale">
-              87.000 đ <span className="detail-price">100.000 đ</span>
+              {productDetail.salePrice} đ
+              <span className="detail-price"> {productDetail.listPrice} đ</span>
             </div>
 
             <div className="detail-quantity">
@@ -241,8 +257,8 @@ const ProductDetail = () => {
                   downIcon: <MinusOutlined style={{ fontSize: '30px' }} />,
                 }}
                 min={1}
-                max={10}
-                defaultValue={3}
+                max={productDetail.quantity}
+                defaultValue={1}
               />
             </div>
           </Col>
@@ -329,7 +345,7 @@ const ProductDetail = () => {
             Thông tin sản phẩm
           </h2>
           <Row className="products-description-briefs">
-            {Object.entries(dataProduct).map((item, index) => (
+            {Object.entries(productDetail).map((item, index) => (
               <Row
                 style={{ marginBottom: '10px' }}
                 className="products-description-briefs"
@@ -338,7 +354,7 @@ const ProductDetail = () => {
                   {item[0]}
                 </Col>
                 <Col style={{ color: 'black' }} span={17}>
-                  {item[1]}
+                  {/* {item[1]} */}
                 </Col>
               </Row>
             ))}
@@ -356,35 +372,7 @@ const ProductDetail = () => {
                 : false
             }
           >
-            “Tôi vẽ với 300 trang sách bao gồm những kỹ năng cơ bản cần có của
-            một họa sĩ truyện tranh, từ tạo hình nhân vật, thiết kế bối cảnh,
-            biểu cảm, các kỹ thuật diễn họa cho đến luật phối cảnh. Đây là một
-            cuốn cẩm nang tuyệt vời dành cho các bạn đang bắt đầu học vẽ truyện
-            tranh. Những kiến thức này có thể không giúp các bạn vẽ đẹp ngay lập
-            tức nhưng sẽ là nền tảng vững chắc giúp bạn hình thành các tiêu
-            chuẩn chuyên nghiệp trong nghề và không mất thời gian tự mò mẫm.
-            Phần minh họa cho các bài học cũng rất hấp dẫn và sáng tạo. Các tác
-            giả đã sử dụng chính nhân vật và trang truyện của mình để làm rõ sự
-            liên quan giữa lý thuyết và thực tế, tính ứng dụng rõ ràng của các
-            kỹ thuật và quy trình sáng tác.
-            <br />
-            <br />
-            Trên thị trường hiện tại không thiếu những quyển sách dạy vẽ truyện
-            tranh được dịch và biên tập lại từ nhiều nguồn nhưng đa số là kiểu
-            sách “cầm tay chỉ việc”, không thật sữ hữu ích với các bạn trẻ Việt
-            Nam – những bạn không theo học chuyên ngành mỹ thuật, thiếu kiến
-            thức nền tảng về hội họa… Ngược lại, trong quyển Tôi vẽ, mọi phần
-            kiến thức từ lớn đến nhỏ đều được lý giải và phân tích khá kỹ kèm
-            ảnh minh họa rõ ràng, giúp người xem hiểu được gốc rễ vấn đề đồng
-            thời áp dụng áp dụng vào nhiều “ngữ cảnh” khác nhau trong lúc sáng
-            tác. Hệ thống kiến thức trong sách cũng được sắp xếp hợp lý từ thấp
-            đến cao, xen kẽ là những trang truyện và hình minh họa vui nhộn làm
-            giảm áp lực cho phần lý thuyết hơi khô cứng như phần phối cảnh và
-            anatony (giải phẫu)”
-            <br />
-            <br />
-            Phan Vũ Linh Giảng viên Trường Đại học Mỹ thuật Tp. HCM Sáng lập Sân
-            Si Studio”
+            <p>{productDetail.description}</p>
           </Typography.Paragraph>
           <Row justify="center">
             <Button

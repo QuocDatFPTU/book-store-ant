@@ -10,7 +10,7 @@ import './styles.less';
 
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -30,8 +30,13 @@ const Login = (props) => {
     // 	}
     // })
     // .catch((error) => message.error(error));
+
+    //Move to User homepage
     message.success('Login success');
     setLoading(true);
+    setTimeout(() => {
+      navigate('/');
+    }, 3000);
     return true;
   }
 
