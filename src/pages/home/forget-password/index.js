@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import {
-  GoogleOutlined,
-  HomeOutlined,
-  LockOutlined,
-  PhoneOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 import { Button, Col, Form, Input, message, Row, Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';

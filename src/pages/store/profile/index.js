@@ -163,6 +163,7 @@ const ProfilePage = () => {
                     ]}
                   >
                     <Input
+                      disabled
                       prefix={
                         <GoogleOutlined className="site-form-item-icon" />
                       }

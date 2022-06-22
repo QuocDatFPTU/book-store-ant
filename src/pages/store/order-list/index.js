@@ -1,5 +1,6 @@
 import { Col, Divider, Row } from 'antd';
 import Item from 'antd/lib/list/Item';
+import StoreLayoutContainer from 'layouts/store/store.layout';
 import React from 'react';
 import './styles.less';
 const OrderList = () => {
@@ -45,7 +46,7 @@ const OrderList = () => {
   ];
 
   return (
-    <div style={{ backgroundColor: '#F0F2F5', height: '200vh' }}>
+    <StoreLayoutContainer>
       <Row className="order-content">
         <Col span={8} offset={4}>
           Danh sách đơn hàng
@@ -105,7 +106,7 @@ const OrderList = () => {
           ))}
         </Col>
       </Row>
-    </div>
+    </StoreLayoutContainer>
   );
 };
 

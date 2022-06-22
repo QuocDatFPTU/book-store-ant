@@ -1,26 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-  GoogleOutlined,
-  HomeOutlined,
-  LockOutlined,
-  PhoneOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  message,
-  Row,
-  Select,
-  Typography,
-} from 'antd';
+
+import { Button, Col, Form, Input, message, Row, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
-import { loginInitiate } from 'redux/action';
 
 const validateMessages = {
   required: 'Nhập ${label}!',
