@@ -7,3 +7,11 @@ export const getProductList = async (params) => {
   const url = '/products';
   return axiosClient.get(url, { params });
 };
+
+//Get all categories
+export const getCategoyList = async (params) => {
+  // eslint-disable-next-line quotes
+  console.log(123400);
+  const url = '/categories';
+  return axiosClient.get(url, { params });
+};

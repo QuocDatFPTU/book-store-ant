@@ -19,22 +19,13 @@ import {
 } from '@ant-design/icons';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
+import { getCategoyList, getProductListByCategory } from './service';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 const { Option } = Select;
 
 const ProductList = () => {
   // data
-  const cateOptions = [
-    'Sách tham khảo',
-    'Sách học ngoại ngữ',
-    'Văn học',
-    'Thiếu nhi',
-    'Tâm lý kỹ năng',
-    'Kinh tế',
-    'Sách giáo khoa',
-    'Foreigns Books',
-    'Văn phòng phẩm',
-    'Đồ chơi',
-  ];
   const priceOptions = [
     { label: '0đ - 150.000đ', value: { min: 0, max: 150 } },
     { label: '150,000đ - 300.000đ', value: { min: 150000, max: 300000 } },
@@ -134,6 +125,45 @@ const ProductList = () => {
     console.log('checked = ', checkedValues);
   };
 
+  //State
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [categoryIdHandle, setCategoryIdHandle] = useState('');
+  const { id: categoryId } = useParams();
+
+  const onClickCategory = (e) => {
+    console.log(e);
+    console.log(e.target.value);
+  };
+  const getCategories = () => {
+    getCategoyList()
+      .then((result) => {
+        console.log(result);
+        setCategories(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getProducts = (categoryId) => {
+    getProductListByCategory(categoryId)
+      .then((result) => {
+        console.log(result);
+        setProducts(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  useEffect(() => {
+    console.log('000');
+    setCategoryIdHandle(categoryId);
+    getCategories();
+  }, []);
+
+  useEffect(() => {
+    console.log(123);
+    console.log(categoryIdHandle);
+    getProducts(categoryIdHandle);
+  }, [categoryIdHandle]);
+
   return (
     <StoreLayoutContainer>
       <WrapperConentContainer>
@@ -151,10 +181,14 @@ const ProductList = () => {
               <div className="option-cate">
                 <h4>THỂ LOẠI</h4>
                 <ul className="list-cates">
-                  {cateOptions.map((item) => (
+                  {categories.map((item) => (
                     <li>
-                      <Button value={''} type="link" block>
-                        {item}
+                      <Button
+                        onClick={() => setCategoryIdHandle(item._id)}
+                        type="link"
+                        block
+                      >
+                        {item.name}
                       </Button>
                     </li>
                   ))}
@@ -206,9 +240,9 @@ const ProductList = () => {
               <Divider style={{ margin: '0 14px' }} />
             </Row>
             <Row justify="space-evenly">
-              {dataListBooks.map((item) => (
+              {products.map((item) => (
                 <Col flex={'24.8%'} style={{ marginBottom: '30px' }}>
-                  <a href="https://www.youtube.com/watch?v=kRXeKR86hHc">
+                  <a onClick={() => navigate(`/product-detail/${item._id}`)}>
                     <Card
                       className="product-card"
                       hoverable={true}
@@ -222,7 +256,7 @@ const ProductList = () => {
                             margin: '0 auto',
                           }}
                           alt="example"
-                          src={item.imgLink}
+                          src={item.thumbnail}
                         />
                       }
                     >
@@ -233,13 +267,13 @@ const ProductList = () => {
                           // expandable: true,
                         }}
                       >
-                        <a href="">{item.name}</a>
+                        <a href="">{item.title}</a>
                       </Typography.Paragraph>
                       <Typography.Text className="product-sale">
-                        {item.price}đ
+                        {item.salePrice}đ
                       </Typography.Text>
                       <Typography.Text className="product-price-old">
-                        100.000đ
+                        {item.listPrice}đ
                       </Typography.Text>
                       <Row justify="space-between">
                         <Col>

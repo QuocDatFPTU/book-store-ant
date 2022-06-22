@@ -14,23 +14,34 @@ import './styles.less';
 import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import StoreLayoutContainer from 'layouts/store/store.layout';
-import { getProductList } from './service';
+import { getCategoyList, getProductList } from './service';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const getProducts = () => {
     getProductList()
       .then((result) => {
         console.log(result);
-        console.log(123);
         setProducts(result);
       })
       .catch((e) => console.log(e));
   };
+  const getCategories = () => {
+    getCategoyList()
+      .then((result) => {
+        console.log(result);
+        setCategories(result);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   useEffect(() => {
     getProducts();
-  });
+    getCategories();
+  }, []);
 
   const onSearch = (value) => console.log(value);
   const dataPostFeature = [
@@ -114,78 +125,6 @@ const HomePage = () => {
         'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
     },
   ];
-  // const dataListBooksFeature = [
-  //   {
-  //     name: 'Sách học ngoại ngữ Sách học ngoại ngữ ',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-  //     price: '182.200',
-  //     rate: 1,
-  //   },
-  //   {
-  //     name: 'Tư Duy Nhanh Và Chậm (Tái Bản 2021)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-  //     price: '375.000',
-  //     rate: 4,
-  //   },
-  //   {
-  //     name: 'Bộ Hộp Nhật Ký Trưởng Thành Của Đứa Trẻ Ngoan (Bộ 10 Cuốn)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-  //     price: '200.000',
-  //     rate: 5,
-  //   },
-  //   {
-  //     name: 'Phân Tích Chứng Khoán (Security Analysis)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-  //     price: '299.400',
-  //     rate: 4,
-  //   },
-  //   {
-  //     name: 'Bộ Hộp Tam Quốc Diễn Nghĩa (Bộ 3 Cuốn)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-  //     price: '207.200',
-  //     rate: 5,
-  //   },
-  //   {
-  //     name: 'Boardgame Thỏ Tỉnh Táo',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/9/7/9784909466037_7.jpg',
-  //     price: '90.000',
-  //     rate: 1,
-  //   },
-  //   {
-  //     name: 'Hoàng Tử Bé (Tái Bản 2019)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/i/m/image_187010.jpg',
-  //     price: '63.750',
-  //     rate: 5,
-  //   },
-  //   {
-  //     name: 'Nhóc Miko! Cô Bé Nhí Nhảnh - Tập 35 - Tặng Kèm Sticker (1 Miếng 6 Hình Dán)',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179108.jpg',
-  //     price: '20.000',
-  //     rate: 0,
-  //   },
-  //   {
-  //     name: 'Trí Thông Minh Trên Giường',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-  //     price: '131.000',
-  //     rate: 4,
-  //   },
-  //   {
-  //     name: 'Văn Phòng Thám Tử Quái Vật - Tập 6',
-  //     imgLink:
-  //       'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179085_1.jpg',
-  //     price: '30.000',
-  //     rate: 5,
-  //   },
-  // ];
 
   return (
     <StoreLayoutContainer>
@@ -304,9 +243,9 @@ const HomePage = () => {
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly" style={{ width: '100%' }}>
-            {dataListCates.map((cateItem) => (
+            {categories.map((item, index) => (
               <Col span={2}>
-                <a href="https://www.fahasa.com/sach-trong-nuoc/thieu-nhi.html?order=num_orders&limit=24&p=1">
+                <a href={`/product-list/${item._id}`}>
                   <Card
                     className="custom-card"
                     hoverable={false}
@@ -320,11 +259,11 @@ const HomePage = () => {
                           margin: '0 auto',
                         }}
                         alt="example"
-                        src={cateItem.imgLink}
+                        src={dataListCates[index].imgLink}
                       />
                     }
                   >
-                    <a>{cateItem.name}</a>
+                    <a href={`/product-list/${item._id}`}>{item.name}</a>
                   </Card>
                 </a>
               </Col>
@@ -362,16 +301,18 @@ const HomePage = () => {
                   hoverable={false}
                   bordered={false}
                   cover={
-                    <img
-                      style={{
-                        width: '100%',
-                        height: '190px',
-                        // objectFit: 'cover',
-                        margin: '0 auto',
-                      }}
-                      alt="example"
-                      src={item.imgLink}
-                    />
+                    <a href={`/product-detail/${item._id}`}>
+                      <img
+                        style={{
+                          width: '100%',
+                          height: '190px',
+                          // objectFit: 'cover',
+                          margin: '0 auto',
+                        }}
+                        alt="example"
+                        src={item.thumbnail}
+                      />
+                    </a>
                   }
                 >
                   <Typography.Paragraph
@@ -381,12 +322,12 @@ const HomePage = () => {
                       // expandable: true,
                     }}
                   >
-                    <a href="">{item.name}</a>
+                    <a href="/product-detail">{item.title}</a>
                   </Typography.Paragraph>
                   <Typography.Text className="product-price">
-                    {item.price}đ
+                    {item.salePrice}đ
                   </Typography.Text>
-                  <Rate className="product-rate" value={item.rate} />
+                  <Rate className="product-rate" value={4} />
                 </Card>
               </Col>
             ))}

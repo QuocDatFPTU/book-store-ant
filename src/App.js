@@ -34,8 +34,8 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/product-list" element={<ProductList />} />
-          <Route path="/product-detail" element={<ProductDetail />} />
+          <Route path="/product-list/:id" element={<ProductList />} />
+          <Route path="/product-detail/:id" element={<ProductDetail />} />
           {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
           <Route path="/cart" element={<Cart />} />
           <Route path="/cart-contact" element={<CartContact />} />
