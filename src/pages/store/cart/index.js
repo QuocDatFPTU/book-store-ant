@@ -8,6 +8,7 @@ import {
   Checkbox,
   Divider,
   Modal,
+  message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
@@ -25,9 +26,11 @@ import {
   deleteCartItem,
   getCartItemList,
   getProductById,
+  onCheckout,
   updateCartItemQuantity,
 } from './service';
 import axiosClient from 'util/axiosClient';
+import { useNavigate } from 'react-router-dom';
 const CheckboxGroup = Checkbox.Group;
 const { confirm } = Modal;
 const plainOptions = ['123', '124', '125'];
@@ -71,6 +74,7 @@ const orderData = [
 
 const Cart = () => {
   // state
+  const navigate = useNavigate();
   const [checkedList, setCheckedList] = useState(defaultCheckedList);
   const [checkAll, setCheckAll] = useState(false);
   const [qProduct, setQProduct] = useState(1);
@@ -88,7 +92,22 @@ const Cart = () => {
   }, []);
 
   //Method
-  const onClickCheckout = () => {};
+  const onClickCheckout = async () => {
+    onCheckout()
+      .then((result) => {
+        console.log(result);
+        navigate('/cart-contact');
+      })
+      .catch((error) => {
+        const msgError = error.response.data.error.map((error) => (
+          <div>
+            {error} <br />
+          </div>
+        ));
+        message.error(msgError, 5);
+        setCart(cart);
+      });
+  };
   const onChange = (list) => {
     console.log(list);
     setCheckedList(list);
@@ -120,15 +139,15 @@ const Cart = () => {
         <Row>
           <Col span={18}>
             <Row style={{ width: '100%' }} className="cart-type">
-              <Col span={1}>
+              {/* <Col span={1}>
                 <Checkbox onChange={onCheckAllChange} checked={checkAll} />
-              </Col>
+              </Col> */}
               <Col
                 className="cart-type-title"
                 style={{ textAlign: 'left' }}
-                span={13}
+                span={14}
               >
-                Chọn tất cả (
+                Tổng sản phẩm (
                 {cart.items != null && cart.items?.length !== 0
                   ? cart.items.length
                   : 0}
@@ -144,126 +163,124 @@ const Cart = () => {
                 <DeleteOutlined />
               </Col>
             </Row>
-            <CheckboxGroup
+            {/* <CheckboxGroup
               style={{ width: '100%' }}
               value={checkedList}
               onChange={onChange}
-            >
-              {cart.items?.map((item) => (
-                <div className="cart-value">
-                  <Row className="cart-form" align="middle">
-                    <Col span={1}>
+            > */}
+            {cart.items?.map((item) => (
+              <div className="cart-value">
+                <Row className="cart-form" align="middle">
+                  {/* <Col span={1}>
                       <Checkbox value={item._id} />
-                    </Col>
-                    <Col span={3} className="cart-detail-container">
-                      <img className="cart-img" src={item.product.thumbnail} />
-                    </Col>
-                    <Col span={10}>
-                      <Typography.Text ellipsis={true} className="cart-title">
-                        {item.title}
-                      </Typography.Text>
-                      <p className="cart-pushlisher">
-                        {item.product.briefInformation.publisher}
-                      </p>
-                      <p className="cart-price">{item.amount}</p>
-                    </Col>
-                    <Col
-                      style={{ textAlign: 'center', fontSize: '27px' }}
-                      span={4}
-                      offset={1}
-                    >
-                      <div>
-                        <InputNumber
-                          onChange={async (value) => {
-                            console.log(value, item._id, item.product.quantity);
+                    </Col> */}
+                  <Col span={4} className="cart-detail-container">
+                    <img className="cart-img" src={item.product.thumbnail} />
+                  </Col>
+                  <Col span={10}>
+                    <Typography.Text ellipsis={true} className="cart-title">
+                      {item.title}
+                    </Typography.Text>
+                    <p className="cart-pushlisher">
+                      {item.product.briefInformation.publisher}
+                    </p>
+                    <p className="cart-price">{item.amount}</p>
+                  </Col>
+                  <Col
+                    style={{ textAlign: 'center', fontSize: '27px' }}
+                    span={4}
+                    offset={1}
+                  >
+                    <div>
+                      <InputNumber
+                        onChange={async (value) => {
+                          console.log(value, item._id, item.product.quantity);
 
-                            //Check case not update
-                            if (
-                              value < 0 ||
-                              value > item.product.quantity ||
-                              value === null
-                            )
-                              return;
-                            console.log('doWork');
+                          //Check case not update
+                          if (
+                            value < 0 ||
+                            value > item.product.quantity ||
+                            value === null
+                          )
+                            return;
+                          console.log('doWork');
 
-                            //Update:
-                            try {
-                              await updateCartItemQuantity({
-                                cartItemId: item._id,
-                                quantity: value,
-                              });
-                              const cart = await getCartItemList();
-                              setCart(cart);
-                              console.log(cart);
-                            } catch (error) {
-                              console.log(error.response.data);
-                            }
-                          }}
-                          style={{
-                            marginLeft: '20px',
-                            fontSize: '30px',
-                          }}
-                          controls={{
-                            upIcon: (
-                              <PlusOutlined style={{ fontSize: '30px' }} />
-                            ),
-                            downIcon: (
-                              <MinusOutlined style={{ fontSize: '30px' }} />
-                            ),
-                          }}
-                          min={0}
-                          max={item.product.quantity}
-                          defaultValue={item.quantity}
-                        />
-                      </div>
-                    </Col>
-                    <Col
-                      className="cart-productitem-saleprice"
-                      style={{ textAlign: 'center' }}
-                      span={3}
-                      offset={1}
-                    >
-                      {item.totalAmount}đ
-                    </Col>
-                    <Col span={1} style={{ textAlign: 'center' }}>
-                      <Typography.Link
-                        onClick={() => {
-                          confirm({
-                            title: 'Xóa sản phẩm',
-                            icon: (
-                              <CloseCircleOutlined style={{ color: 'red' }} />
-                            ),
-                            content: 'Bạn có muốn xóa sản phẩm này không?',
-                            okText: 'Xác nhận',
-                            cancelText: 'Hủy',
-
-                            onOk() {
-                              console.log('Xác nhận');
-
-                              deleteCartItem(item._id)
-                                .then(async () => {
-                                  const cart = await getCartItemList();
-                                  setCart(cart);
-                                  console.log(cart);
-                                })
-                                .catch((error) => {
-                                  console.log(error.response.data);
-                                });
-                            },
-
-                            onCancel() {
-                              console.log('Hủy');
-                            },
-                          });
+                          //Update:
+                          try {
+                            await updateCartItemQuantity({
+                              cartItemId: item._id,
+                              quantity: value,
+                            });
+                            const cart = await getCartItemList();
+                            setCart(cart);
+                            console.log(cart);
+                          } catch (error) {
+                            message.error(`${error.response.data.error}`, 5);
+                          }
                         }}
-                      >
-                        <DeleteOutlined style={{ cursor: 'pointer' }} />
-                      </Typography.Link>
-                    </Col>
-                  </Row>
-                </div>
-              ))}
-            </CheckboxGroup>
+                        style={{
+                          marginLeft: '20px',
+                          fontSize: '30px',
+                        }}
+                        controls={{
+                          upIcon: <PlusOutlined style={{ fontSize: '30px' }} />,
+                          downIcon: (
+                            <MinusOutlined style={{ fontSize: '30px' }} />
+                          ),
+                        }}
+                        min={1}
+                        max={item.product.quantity}
+                        defaultValue={item.quantity}
+                      />
+                    </div>
+                  </Col>
+                  <Col
+                    className="cart-productitem-saleprice"
+                    style={{ textAlign: 'center' }}
+                    span={3}
+                    offset={1}
+                  >
+                    {item.totalAmount}đ
+                  </Col>
+                  <Col span={1} style={{ textAlign: 'center' }}>
+                    <Typography.Link
+                      onClick={() => {
+                        confirm({
+                          title: 'Xóa sản phẩm',
+                          icon: (
+                            <CloseCircleOutlined style={{ color: 'red' }} />
+                          ),
+                          content: 'Bạn có muốn xóa sản phẩm này không?',
+                          okText: 'Xác nhận',
+                          cancelText: 'Hủy',
+
+                          onOk() {
+                            console.log('Xác nhận');
+
+                            deleteCartItem(item._id)
+                              .then(async () => {
+                                const cart = await getCartItemList();
+                                setCart(cart);
+                                console.log(cart);
+                              })
+                              .catch((error) => {
+                                console.log(error.response.data);
+                              });
+                          },
+
+                          onCancel() {
+                            console.log('Hủy');
+                          },
+                        });
+                      }}
+                    >
+                      <DeleteOutlined style={{ cursor: 'pointer' }} />
+                    </Typography.Link>
+                  </Col>
+                </Row>
+              </div>
+            ))}
+            {/* </CheckboxGroup> */}
           </Col>
 
           <Col span={5} offset={1}>

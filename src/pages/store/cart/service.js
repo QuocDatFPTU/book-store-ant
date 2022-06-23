@@ -23,3 +23,9 @@ export const deleteCartItem = async (params) => {
   const url = `/cart/${params}`;
   return axiosClient.delete(url, { ...params });
 };
+
+//Check cartItem valid when checkout
+export const onCheckout = async (params) => {
+  const url = `/checkout`;
+  return axiosClient.post(url, { ...params });
+};
