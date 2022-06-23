@@ -7,15 +7,29 @@ import {
   Typography,
   Checkbox,
   Divider,
+  Modal,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
 
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { getCartItemList, getProductById } from './service';
+import {
+  CloseCircleOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  MinusOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import {
+  deleteCartItem,
+  getCartItemList,
+  getProductById,
+  updateCartItemQuantity,
+} from './service';
+import axiosClient from 'util/axiosClient';
 const CheckboxGroup = Checkbox.Group;
+const { confirm } = Modal;
 const plainOptions = ['123', '124', '125'];
 const defaultCheckedList = [];
 
@@ -74,6 +88,7 @@ const Cart = () => {
   }, []);
 
   //Method
+  const onClickCheckout = () => {};
   const onChange = (list) => {
     console.log(list);
     setCheckedList(list);
@@ -94,6 +109,7 @@ const Cart = () => {
   console.log(checkedList);
   console.log(checkAll);
   console.log(cart);
+  console.log(cart);
 
   return (
     <StoreLayoutContainer>
@@ -102,7 +118,7 @@ const Cart = () => {
       </WrapperConentContainer>
       <WrapperConentContainer>
         <Row>
-          <Col span={17}>
+          <Col span={18}>
             <Row style={{ width: '100%' }} className="cart-type">
               <Col span={1}>
                 <Checkbox onChange={onCheckAllChange} checked={checkAll} />
@@ -112,13 +128,20 @@ const Cart = () => {
                 style={{ textAlign: 'left' }}
                 span={13}
               >
-                Chọn tất cả (1 sản phẩm)
+                Chọn tất cả (
+                {cart.items != null && cart.items?.length !== 0
+                  ? cart.items.length
+                  : 0}
+                )
               </Col>
               <Col className="cart-type-title" span={4} offset={1}>
                 Số lượng
               </Col>
-              <Col className="cart-type-title" span={4} offset={1}>
+              <Col className="cart-type-title" span={3} offset={1}>
                 Thành tiền
+              </Col>
+              <Col className="cart-type-title" span={1}>
+                <DeleteOutlined />
               </Col>
             </Row>
             <CheckboxGroup
@@ -150,38 +173,92 @@ const Cart = () => {
                       offset={1}
                     >
                       <div>
-                        <Button
-                          type="primary"
-                          // style={{ width: '40px' }}
-                          onClick={onClickMinus}
-                        >
-                          <MinusOutlined />
-                        </Button>
-
                         <InputNumber
-                          id={item._id}
+                          onChange={async (value) => {
+                            console.log(value, item._id, item.product.quantity);
+
+                            //Check case not update
+                            if (
+                              value < 0 ||
+                              value > item.product.quantity ||
+                              value === null
+                            )
+                              return;
+                            console.log('doWork');
+
+                            //Update:
+                            try {
+                              await updateCartItemQuantity({
+                                cartItemId: item._id,
+                                quantity: value,
+                              });
+                              const cart = await getCartItemList();
+                              setCart(cart);
+                              console.log(cart);
+                            } catch (error) {
+                              console.log(error.response.data);
+                            }
+                          }}
+                          style={{
+                            marginLeft: '20px',
+                            fontSize: '30px',
+                          }}
+                          controls={{
+                            upIcon: (
+                              <PlusOutlined style={{ fontSize: '30px' }} />
+                            ),
+                            downIcon: (
+                              <MinusOutlined style={{ fontSize: '30px' }} />
+                            ),
+                          }}
                           min={0}
                           max={item.product.quantity}
-                          onChange={(value) => console.log(value)}
-                          // value={qProduct}
-                          style={{ width: '43px' }}
+                          defaultValue={item.quantity}
                         />
-                        <Button
-                          type="primary"
-                          // style={{ width: '40px' }}
-                          onClick={onClickPlus}
-                        >
-                          <PlusOutlined />
-                        </Button>
                       </div>
                     </Col>
                     <Col
                       className="cart-productitem-saleprice"
                       style={{ textAlign: 'center' }}
-                      span={4}
+                      span={3}
                       offset={1}
                     >
-                      {item.totalAmount}
+                      {item.totalAmount}đ
+                    </Col>
+                    <Col span={1} style={{ textAlign: 'center' }}>
+                      <Typography.Link
+                        onClick={() => {
+                          confirm({
+                            title: 'Xóa sản phẩm',
+                            icon: (
+                              <CloseCircleOutlined style={{ color: 'red' }} />
+                            ),
+                            content: 'Bạn có muốn xóa sản phẩm này không?',
+                            okText: 'Xác nhận',
+                            cancelText: 'Hủy',
+
+                            onOk() {
+                              console.log('Xác nhận');
+
+                              deleteCartItem(item._id)
+                                .then(async () => {
+                                  const cart = await getCartItemList();
+                                  setCart(cart);
+                                  console.log(cart);
+                                })
+                                .catch((error) => {
+                                  console.log(error.response.data);
+                                });
+                            },
+
+                            onCancel() {
+                              console.log('Hủy');
+                            },
+                          });
+                        }}
+                      >
+                        <DeleteOutlined style={{ cursor: 'pointer' }} />
+                      </Typography.Link>
                     </Col>
                   </Row>
                 </div>
@@ -189,25 +266,25 @@ const Cart = () => {
             </CheckboxGroup>
           </Col>
 
-          <Col span={6} offset={1}>
+          <Col span={5} offset={1}>
             <Row className="cart-main">
               <Col span={24}>
                 <div className="cart-money">
                   <h2>Thành tiền</h2>
                   <div className="cart-cost">
                     <p>Tổng cộng</p>
-                    <p>448.800 đ</p>
+                    <p>{cart.totalCost} đ</p>
                   </div>
                   <div className="cart-cost">
                     <p>Tiền ship</p>
-                    <p>20.000 đ</p>
+                    <p>0 đ</p>
                   </div>
                   <div className="cart-cost">
                     <p>Tổng Tiền</p>
-                    <p className="total-price">468.800 đ</p>
+                    <p className="total-price">{cart.totalCost} đ</p>
                   </div>
-                  <button>
-                    <a href="">Thanh toán</a>
+                  <button style={{ color: 'white' }} onClick={onClickCheckout}>
+                    Thanh toán
                   </button>
                 </div>
               </Col>
