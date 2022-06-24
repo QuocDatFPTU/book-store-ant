@@ -135,8 +135,24 @@ const CartContact = () => {
     try {
       const order = await createOrder();
       console.log(order);
+      console.log('--------------------');
     } catch (error) {
-      message.error(error.response.data.error);
+      console.log(123);
+      //Dù lỗi gì thì redirect car-contact
+      navigate('/cart');
+
+      //Anounce error message
+      const dataError = error.response.data.error;
+      const msgError = Array.isArray(dataError)
+        ? dataError.map((error) => (
+            <div>
+              {error} <br />
+            </div>
+          ))
+        : dataError;
+      console.log(msgError, '=================');
+      message.error(msgError, 5);
+      setCart(cart);
     }
   };
 
