@@ -7,6 +7,7 @@ import {
   Select,
   Form,
   Input,
+  message,
 } from 'antd';
 
 import {
@@ -19,7 +20,12 @@ import './styles.less';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useNavigate } from 'react-router-dom';
-import { getReceiverInfor } from './service';
+import {
+  createOrder,
+  getCartItemList,
+  getReceiverInfor,
+  setReceiverInforSession,
+} from './service';
 const { Option } = Select;
 
 const layout = {
@@ -48,9 +54,48 @@ const validateMessages = {
   },
 };
 
+// data
+const orderData = [
+  {
+    _id: '123',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
+    title:
+      'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
+    salePrice: '26.000.200đ',
+    publisher: 'NXB Trẻ',
+    quantity: 2,
+    totalAmount: '40.400đ',
+  },
+  {
+    _id: '124',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
+    title:
+      'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
+    salePrice: '77.000 đ',
+    publisher: 'NXB Trẻ',
+    quantity: 1,
+    totalAmount: '77.400đ',
+  },
+  {
+    _id: '125',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
+    title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
+    salePrice: '162.000 đ',
+    publisher: 'NXB Dân Trí',
+    quantity: 2,
+    totalAmount: '324.000đ',
+  },
+];
+
 const CartContact = () => {
   //State
   const [updated, setUpdated] = useState(true);
+  const [receiver, setReceiver] = useState({});
+  const [inforDefault, setInforDefault] = useState({});
+  const [cart, setCart] = useState({});
 
   //Hook
   const navigate = useNavigate();
@@ -60,16 +105,6 @@ const CartContact = () => {
   // const onUpdate = () => {
   //   setUpdated(!updated);
   // };
-
-  const onFinish = (values) => {
-    if (updated) {
-      setUpdated(false);
-    } else {
-      form.setFieldsValue({ ...values });
-      setUpdated(true);
-      console.log(values);
-    }
-  };
   // const onChange = (values, allValues) => {
   //   console.log(allValues);
   // };
@@ -78,15 +113,31 @@ const CartContact = () => {
   //   form.resetFields();
   // };
 
-  const onFill = () => {
-    form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
-    });
+  const onFinish = (values) => {
+    if (updated) {
+      setUpdated(false);
+    } else {
+      //set session receiver information:
+      setReceiverInforSession(values)
+        .then((result) => {
+          //Set state and form
+          form.setFieldsValue(values);
+          setUpdated(true);
+          setReceiver(values);
+        })
+        .catch((error) => {
+          message.error(`${error.response.data.error}`);
+        });
+    }
+  };
+  const onReset = () => form.setFieldsValue(inforDefault);
+  const onClickConfirm = async () => {
+    try {
+      const order = await createOrder();
+      console.log(order);
+    } catch (error) {
+      message.error(error.response.data.error);
+    }
   };
 
   // useEffect
@@ -94,48 +145,26 @@ const CartContact = () => {
     // onFill();
     getReceiverInfor()
       .then((result) => {
-        console.log(result);
+        //Set state for receiver information
+        setReceiver(result);
+        setInforDefault(result);
         form.setFieldsValue(result);
+
+        //Set state for cart item
+        getCartItemList()
+          .then((result) => {
+            setCart(result);
+          })
+          .catch((error) => {
+            console.log(error.response);
+          });
       })
       .catch((error) => console.log(error));
   }, []);
 
-  // data
-  const orderData = [
-    {
-      _id: '123',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-      title:
-        'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
-      salePrice: '26.000.200đ',
-      publisher: 'NXB Trẻ',
-      quantity: 2,
-      totalAmount: '40.400đ',
-    },
-    {
-      _id: '124',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
-      title:
-        'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
-      salePrice: '77.000 đ',
-      publisher: 'NXB Trẻ',
-      quantity: 1,
-      totalAmount: '77.400đ',
-    },
-    {
-      _id: '125',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
-      title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
-      salePrice: '162.000 đ',
-      publisher: 'NXB Dân Trí',
-      quantity: 2,
-      totalAmount: '324.000đ',
-    },
-  ];
-
+  console.log(receiver);
+  console.log(inforDefault);
+  console.log(cart);
   return (
     <StoreLayoutContainer>
       <WrapperConentContainer>
@@ -194,9 +223,9 @@ const CartContact = () => {
                     allowClear
                     disabled={updated}
                   >
-                    <Option value="male">male</Option>
-                    <Option value="female">female</Option>
-                    <Option value="other">other</Option>
+                    <Option value="M">male</Option>
+                    <Option value="F">female</Option>
+                    <Option value="D">other</Option>
                   </Select>
                 </Form.Item>
                 <Form.Item
@@ -244,7 +273,7 @@ const CartContact = () => {
                     type="link"
                     disabled={updated}
                     htmlType="button"
-                    onClick={onFill}
+                    onClick={onReset}
                   >
                     Đặt lại
                   </Button>
@@ -281,7 +310,7 @@ const CartContact = () => {
               </h2>
             </Row>
             <Divider style={{ margin: '18px 0' }} />
-            {orderData.map((item) => (
+            {cart.items?.map((item) => (
               <div className="cart-value">
                 <Row
                   className="cart-form"
@@ -289,14 +318,16 @@ const CartContact = () => {
                   align="middle"
                 >
                   <Col span={2} className="cart-detail-container">
-                    <img className="cart-img" src={item.imgLink} />
+                    <img className="cart-img" src={item.product.thumbnail} />
                   </Col>
                   <Col span={10}>
                     <Typography.Text ellipsis={true} className="cart-title">
                       {item.title}
                     </Typography.Text>
-                    <p className="cart-pushlisher">{item.publisher}</p>
-                    <p className="cart-price">{item.salePrice}</p>
+                    <p className="cart-pushlisher">
+                      {item.product.briefInformation.publisher}
+                    </p>
+                    <p className="cart-price">{item.amount}</p>
                   </Col>
                   <Col
                     style={{ textAlign: 'center', fontSize: '27px' }}
@@ -311,7 +342,7 @@ const CartContact = () => {
                     span={4}
                     offset={1}
                   >
-                    {item.salePrice}
+                    {item.totalAmount}
                   </Col>
                 </Row>
               </div>
@@ -330,8 +361,26 @@ const CartContact = () => {
           <Col span={8} offset={16}>
             <div className="cart-money">
               <div className="cart-cost">
+                <p>Tổng tiền</p>
+                <p
+                  className="total-price"
+                  style={{ fontSize: '16px', fontWeight: '600' }}
+                >
+                  {cart.totalCost} đ
+                </p>
+              </div>
+              <div className="cart-cost">
+                <p>Tiền ship</p>
+                <p
+                  className="total-price"
+                  style={{ fontSize: '16px', fontWeight: '600' }}
+                >
+                  {0} đ
+                </p>
+              </div>
+              <div className="cart-cost">
                 <p>Thành tiền</p>
-                <p className="total-price">468.800 đ</p>
+                <p className="total-price">{cart.totalCost} đ</p>
               </div>
             </div>
           </Col>
@@ -344,8 +393,8 @@ const CartContact = () => {
           </Col>
           <Col span={8} offset={8}>
             <div className="cart-money">
-              <button>
-                <a href="">Xác nhận thanh toán</a>
+              <button onClick={onClickConfirm} style={{ color: 'white' }}>
+                Xác nhận thanh toán
               </button>
             </div>
           </Col>
