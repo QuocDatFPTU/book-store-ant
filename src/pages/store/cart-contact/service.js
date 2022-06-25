@@ -1,5 +1,6 @@
 const { default: axiosClient } = require('util/axiosClient');
 
+//------------------------CUSTOMER
 //get user from session. If not, get from user profile
 export const getReceiverInfor = async (params) => {
   const url = `/checkout/receive-information`;
@@ -21,5 +22,24 @@ export const getCartItemList = async (params) => {
 //
 export const createOrder = async (params) => {
   const url = '/checkout/confirm';
+  return axiosClient.post(url, { params });
+};
+
+//--------------------GUEST
+//get user from sessio
+export const getReceiverInforGuest = async (params) => {
+  const url = `/checkout/receive-information/guest`;
+  return axiosClient.get(url, { params });
+};
+
+//Get all cart items
+export const getCartItemListGuest = async (params) => {
+  const url = '/cart/guest';
+  return axiosClient.get(url, { params });
+};
+
+//create order overiew
+export const createOrderGuest = async (params) => {
+  const url = '/checkout/confirm/guest';
   return axiosClient.post(url, { params });
 };

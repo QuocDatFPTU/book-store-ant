@@ -7,9 +7,14 @@ export const getProductDetailById = async (params) => {
   return axiosClient.get(url, { params });
 };
 
-// Get all products
+// Add to cart: customer
 export const addProudctToCart = async (params) => {
-  // eslint-disable-next-line quotes
   const url = '/cart';
+  return axiosClient.post(url, { ...params });
+};
+
+// Add to cart: guest
+export const addProudctToCartGuest = async (params) => {
+  const url = '/cart/guest';
   return axiosClient.post(url, { ...params });
 };

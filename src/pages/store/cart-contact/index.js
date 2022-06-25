@@ -7,89 +7,56 @@ import {
   Select,
   Form,
   Input,
-  message
-} from "antd";
+  message,
+} from 'antd';
 
 import {
   InfoCircleOutlined,
   QuestionOutlined,
-  ArrowLeftOutlined
-} from "@ant-design/icons";
-import { useEffect, useState } from "react";
-import "./styles.less";
-import StoreLayoutContainer from "layouts/store/store.layout";
-import WrapperConentContainer from "layouts/store/wrapper.content";
-import { useNavigate } from "react-router-dom";
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import './styles.less';
+import StoreLayoutContainer from 'layouts/store/store.layout';
+import WrapperConentContainer from 'layouts/store/wrapper.content';
+import { useNavigate } from 'react-router-dom';
 import {
   createOrder,
+  createOrderGuest,
   getCartItemList,
+  getCartItemListGuest,
   getReceiverInfor,
-  setReceiverInforSession
-} from "./service";
-import axiosClient from "util/axiosClient";
+  getReceiverInforGuest,
+  setReceiverInforSession,
+} from './service';
+import axiosClient from 'util/axiosClient';
 const { Option } = Select;
 
 const layout = {
   labelCol: {
-    span: 6
+    span: 6,
   },
   wrapperCol: {
-    span: 18
-  }
+    span: 18,
+  },
 };
 const tailLayout = {
   wrapperCol: {
     offset: 6,
-    span: 18
-  }
+    span: 18,
+  },
 };
 
 const validateMessages = {
-  required: "Nhập ${label}!",
+  required: 'Nhập ${label}!',
   types: {
-    email: "${label} không hợp lệ!",
-    number: "${label} is not a valid number!"
+    email: '${label} không hợp lệ!',
+    number: '${label} is not a valid number!',
   },
   number: {
-    range: "${label} must be between ${min} and ${max}"
-  }
+    range: '${label} must be between ${min} and ${max}',
+  },
 };
-
-// data
-const orderData = [
-  {
-    _id: "123",
-    imgLink:
-      "https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg",
-    title:
-      "Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l",
-    salePrice: "26.000.200đ",
-    publisher: "NXB Trẻ",
-    quantity: 2,
-    totalAmount: "40.400đ"
-  },
-  {
-    _id: "124",
-    imgLink:
-      "https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg",
-    title:
-      "Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard",
-    salePrice: "77.000 đ",
-    publisher: "NXB Trẻ",
-    quantity: 1,
-    totalAmount: "77.400đ"
-  },
-  {
-    _id: "125",
-    imgLink:
-      "https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg",
-    title: "Siêu Nhí Hỏi Nhà Khoa Học Trả Lời",
-    salePrice: "162.000 đ",
-    publisher: "NXB Dân Trí",
-    quantity: 2,
-    totalAmount: "324.000đ"
-  }
-];
 
 const CartContact = () => {
   // State
@@ -113,7 +80,7 @@ const CartContact = () => {
           // Set state and form
           form.setFieldsValue(values);
           setUpdated(true);
-          setReceiver(values);
+          // setReceiver(values);
         })
         .catch((error) => {
           message.error(`${error.response.data.error}`);
@@ -124,15 +91,24 @@ const CartContact = () => {
 
   const onClickConfirm = async () => {
     try {
-      // Create order
-      const order = await createOrder();
-      // console.log(order);
+      if (localStorage.getItem('__role') === 'R02') {
+        // Create order
+        const order = await createOrderGuest();
+        console.log(order);
 
-      // Empty alot
-      await axiosClient.patch("/checkout/confirm");
+        // Empty alot
+        await axiosClient.patch('/checkout/confirm/guest');
+      } else {
+        // Create order
+        const order = await createOrder();
+        console.log(order);
+
+        // Empty alot
+        await axiosClient.patch('/checkout/confirm');
+      }
     } catch (error) {
       // Dù lỗi gì thì redirect car-contact
-      navigate("/cart");
+      navigate('/cart');
 
       // Anounce error message
       console.log(error.reponse);
@@ -144,7 +120,7 @@ const CartContact = () => {
             </div>
           ))
         : dataError;
-      console.log(msgError);
+
       message.error(msgError, 5);
       setCart(cart);
     }
@@ -152,24 +128,54 @@ const CartContact = () => {
 
   // useEffect
   useEffect(() => {
-    // onFill();
-    getReceiverInfor()
-      .then((result) => {
-        // Set state for receiver information
-        setReceiver(result);
-        setInforDefault(result);
-        form.setFieldsValue(result);
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
+      });
+    }
 
-        // Set state for cart item
-        getCartItemList()
-          .then((result) => {
-            setCart(result);
-          })
-          .catch((error) => {
-            console.log(error.response);
-          });
-      })
-      .catch((error) => console.log(error));
+    //Guest or Customer
+    if (localStorage.getItem('__role') === 'R02') {
+      // onFill();
+      getReceiverInforGuest()
+        .then((result) => {
+          // Set state for receiver information
+          if (Object.keys(result).length === 0) setUpdated(false);
+          setReceiver(result);
+          setInforDefault(result);
+          form.setFieldsValue(result);
+
+          // Set state for cart item
+          getCartItemListGuest()
+            .then((result) => {
+              setCart(result);
+            })
+            .catch((error) => {
+              console.log(error.response);
+            });
+        })
+        .catch((error) => console.log(error));
+    } else {
+      // onFill();
+      getReceiverInfor()
+        .then((result) => {
+          // Set state for receiver information
+          setInforDefault(result);
+          form.setFieldsValue(result);
+          // setReceiver(result);
+
+          // Set state for cart item
+          getCartItemList()
+            .then((result) => {
+              setCart(result);
+            })
+            .catch((error) => {
+              console.log(error.response);
+            });
+        })
+        .catch((error) => console.log(error));
+    }
   }, []);
 
   return (
@@ -178,21 +184,21 @@ const CartContact = () => {
         <div className="contact-infor">
           <h2
             style={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "22px"
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '22px',
             }}
           >
             <InfoCircleOutlined
               style={{
-                fontSize: "28px",
-                marginRight: "5px",
-                color: "red"
+                fontSize: '28px',
+                marginRight: '5px',
+                color: 'red',
               }}
             />
             Thông tin nhận hàng
           </h2>
-          <Divider style={{ margin: "18px 0" }} />
+          <Divider style={{ margin: '18px 0' }} />
           <Row className="form-contact-container" justify="space-evenly">
             <Col span={14}>
               <Form
@@ -210,8 +216,8 @@ const CartContact = () => {
                   label="Họ và tên"
                   rules={[
                     {
-                      required: true
-                    }
+                      required: true,
+                    },
                   ]}
                 >
                   <Input disabled={updated} />
@@ -221,8 +227,8 @@ const CartContact = () => {
                   label="Giới tính"
                   rules={[
                     {
-                      required: true
-                    }
+                      required: true,
+                    },
                   ]}
                 >
                   <Select
@@ -240,9 +246,9 @@ const CartContact = () => {
                   label="Email"
                   rules={[
                     {
-                      required: "true",
-                      type: "email"
-                    }
+                      required: 'true',
+                      type: 'email',
+                    },
                   ]}
                 >
                   <Input disabled={updated} />
@@ -252,8 +258,8 @@ const CartContact = () => {
                   label="Số điện thoại"
                   rules={[
                     {
-                      required: "true"
-                    }
+                      required: 'true',
+                    },
                   ]}
                 >
                   <Input disabled={updated} />
@@ -263,8 +269,8 @@ const CartContact = () => {
                   label="Địa chỉ"
                   rules={[
                     {
-                      required: "true"
-                    }
+                      required: 'true',
+                    },
                   ]}
                 >
                   <Input disabled={updated} />
@@ -274,7 +280,7 @@ const CartContact = () => {
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                   <Button type="primary" htmlType="submit">
-                    {updated ? "Cập nhật" : "Lưu lại"}
+                    {updated ? 'Cập nhật' : 'Lưu lại'}
                   </Button>
                   <Button
                     type="link"
@@ -295,33 +301,33 @@ const CartContact = () => {
         </div>
       </WrapperConentContainer>
       <WrapperConentContainer>
-        <Row style={{ backgroundColor: "white", padding: "10px" }}>
+        <Row style={{ backgroundColor: 'white', padding: '10px' }}>
           <Col span={24}>
             <Row>
               <Col span={24}></Col>
               <h2
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: "22px"
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '22px',
                 }}
               >
                 <QuestionOutlined
                   style={{
-                    fontSize: "28px",
-                    marginRight: "5px",
-                    color: "red"
+                    fontSize: '28px',
+                    marginRight: '5px',
+                    color: 'red',
                   }}
                 />
                 Kiểm tra lại đơn hàng
               </h2>
             </Row>
-            <Divider style={{ margin: "18px 0" }} />
+            <Divider style={{ margin: '18px 0' }} />
             {cart.items?.map((item) => (
               <div className="cart-value">
                 <Row
                   className="cart-form"
-                  style={{ width: "100%" }}
+                  style={{ width: '100%' }}
                   align="middle"
                 >
                   <Col span={2} className="cart-detail-container">
@@ -337,7 +343,7 @@ const CartContact = () => {
                     <p className="cart-price">{item.amount}</p>
                   </Col>
                   <Col
-                    style={{ textAlign: "center", fontSize: "27px" }}
+                    style={{ textAlign: 'center', fontSize: '27px' }}
                     span={4}
                     offset={1}
                   >
@@ -345,7 +351,7 @@ const CartContact = () => {
                   </Col>
                   <Col
                     className="cart-productitem-saleprice"
-                    style={{ textAlign: "center" }}
+                    style={{ textAlign: 'center' }}
                     span={4}
                     offset={1}
                   >
@@ -360,9 +366,9 @@ const CartContact = () => {
       <WrapperConentContainer>
         <Row
           style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "10px"
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '10px',
           }}
         >
           <Col span={8} offset={16}>
@@ -371,7 +377,7 @@ const CartContact = () => {
                 <p>Tổng tiền</p>
                 <p
                   className="total-price"
-                  style={{ fontSize: "16px", fontWeight: "600" }}
+                  style={{ fontSize: '16px', fontWeight: '600' }}
                 >
                   {cart.totalCost} đ
                 </p>
@@ -380,7 +386,7 @@ const CartContact = () => {
                 <p>Tiền ship</p>
                 <p
                   className="total-price"
-                  style={{ fontSize: "16px", fontWeight: "600" }}
+                  style={{ fontSize: '16px', fontWeight: '600' }}
                 >
                   {0} đ
                 </p>
@@ -391,16 +397,16 @@ const CartContact = () => {
               </div>
             </div>
           </Col>
-          <Divider style={{ margin: "5px 0 5px 0" }} />
+          <Divider style={{ margin: '5px 0 5px 0' }} />
           <Col span={8}>
-            <Button type="link" size="large" onClick={() => navigate("/cart")}>
+            <Button type="link" size="large" onClick={() => navigate('/cart')}>
               <ArrowLeftOutlined />
               Trở về giỏ hàng
             </Button>
           </Col>
           <Col span={8} offset={8}>
             <div className="cart-money">
-              <button onClick={onClickConfirm} style={{ color: "white" }}>
+              <button onClick={onClickConfirm} style={{ color: 'white' }}>
                 Xác nhận thanh toán
               </button>
             </div>

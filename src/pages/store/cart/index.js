@@ -1,133 +1,88 @@
 import {
-  Button,
   Col,
-  Input,
   InputNumber,
   Row,
   Typography,
   Checkbox,
-  Divider,
   Modal,
   message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
-
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import {
   CloseCircleOutlined,
   DeleteOutlined,
-  ExclamationCircleOutlined,
   MinusOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import {
   deleteCartItem,
+  deleteCartItemGuest,
   getCartItemList,
-  getProductById,
+  getCartItemListGuest,
   onCheckout,
+  onCheckoutGuest,
   updateCartItemQuantity,
+  updateCartItemQuantityGuest,
 } from './service';
 import axiosClient from 'util/axiosClient';
 import { useNavigate } from 'react-router-dom';
-const CheckboxGroup = Checkbox.Group;
 const { confirm } = Modal;
-const plainOptions = ['123', '124', '125'];
-const defaultCheckedList = [];
-
-// data
-const orderData = [
-  {
-    _id: '123',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-    title:
-      'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
-    salePrice: '26.000.200đ',
-    publisher: 'NXB Trẻ',
-    quantity: 2,
-    totalAmount: '40.400đ',
-  },
-  {
-    _id: '124',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
-    title:
-      'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
-    salePrice: '77.000 đ',
-    publisher: 'NXB Trẻ',
-    quantity: 1,
-    totalAmount: '77.400đ',
-  },
-  {
-    _id: '125',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
-    title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
-    salePrice: '162.000 đ',
-    publisher: 'NXB Dân Trí',
-    quantity: 2,
-    totalAmount: '324.000đ',
-  },
-];
 
 const Cart = () => {
   // state
   const navigate = useNavigate();
-  const [checkedList, setCheckedList] = useState(defaultCheckedList);
-  const [checkAll, setCheckAll] = useState(false);
-  const [qProduct, setQProduct] = useState(1);
   const [cart, setCart] = useState({});
 
   //Hook
   useEffect(() => {
-    getCartItemList()
-      .then((result) => {
-        setCart(result);
-      })
-      .catch((error) => {
-        console.log(error.response);
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
       });
+    }
+
+    //Get all cart item of customer or guest
+    if (localStorage.getItem('__role') === 'R02') {
+      getCartItemListGuest()
+        .then((result) => {
+          setCart(result);
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    } else {
+      getCartItemList()
+        .then((result) => {
+          setCart(result);
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+    }
   }, []);
 
   //Method
   const onClickCheckout = async () => {
-    onCheckout()
-      .then((result) => {
-        console.log(result);
-        navigate('/cart-contact');
-      })
-      .catch((error) => {
-        const msgError = error.response.data.error.map((error) => (
-          <div>
-            {error} <br />
-          </div>
-        ));
-        message.error(msgError, 5);
-        setCart(cart);
-      });
-  };
-  const onChange = (list) => {
-    console.log(list);
-    setCheckedList(list);
-    setCheckAll(list.length === plainOptions.length);
-  };
-  const onCheckAllChange = (e) => {
-    setCheckedList(e.target.checked ? plainOptions : []);
-    setCheckAll(e.target.checked);
-  };
-  const onClickMinus = () => {
-    setQProduct((q) => --q);
-  };
-  const onClickPlus = () => {
-    setQProduct((q) => ++q);
+    try {
+      if (localStorage.getItem('__role') === 'R02') await onCheckoutGuest();
+      else await onCheckout();
+      console.log('Sucess==============');
+      navigate('/cart-contact');
+    } catch (error) {
+      const msgError = error.response.data.error.map((error) => (
+        <div>
+          {error} <br />
+        </div>
+      ));
+      message.error(msgError, 5);
+      setCart(cart);
+    }
   };
 
-  //Test
-  console.log(checkedList);
-  console.log(checkAll);
-  console.log(cart);
   console.log(cart);
 
   return (
@@ -170,6 +125,7 @@ const Cart = () => {
             > */}
             {cart.items?.map((item) => (
               <div className="cart-value">
+                <span style={{ color: 'red' }}>{item.product.quantity}</span>
                 <Row className="cart-form" align="middle">
                   {/* <Col span={1}>
                       <Checkbox value={item._id} />
@@ -207,16 +163,23 @@ const Cart = () => {
 
                           //Update:
                           try {
-                            await updateCartItemQuantity({
-                              cartItemId: item._id,
-                              quantity: value,
-                            });
-                            const cart = await getCartItemList();
-                            setCart(cart);
-                            console.log(cart);
+                            if (localStorage.getItem('__role') === 'R02') {
+                              await updateCartItemQuantityGuest({
+                                cartItemId: item._id,
+                                quantity: value,
+                              });
+                            } else {
+                              await updateCartItemQuantity({
+                                cartItemId: item._id,
+                                quantity: value,
+                              });
+                            }
                           } catch (error) {
                             message.error(`${error.response.data.error}`, 5);
                           }
+                          const cart = await getCartItemList();
+                          setCart(cart);
+                          console.log(cart);
                         }}
                         style={{
                           marginLeft: '20px',
@@ -257,15 +220,28 @@ const Cart = () => {
                           onOk() {
                             console.log('Xác nhận');
 
-                            deleteCartItem(item._id)
-                              .then(async () => {
-                                const cart = await getCartItemList();
-                                setCart(cart);
-                                console.log(cart);
-                              })
-                              .catch((error) => {
-                                console.log(error.response.data);
-                              });
+                            if (localStorage.getItem('__role') === 'R02') {
+                              console.log('hello, delete from guest');
+                              deleteCartItemGuest(item._id)
+                                .then(async () => {
+                                  const cart = await getCartItemListGuest();
+                                  setCart(cart);
+                                  console.log(cart);
+                                })
+                                .catch((error) => {
+                                  console.log(error.response.data);
+                                });
+                            } else {
+                              deleteCartItem(item._id)
+                                .then(async () => {
+                                  const cart = await getCartItemList();
+                                  setCart(cart);
+                                  console.log(cart);
+                                })
+                                .catch((error) => {
+                                  console.log(error.response.data);
+                                });
+                            }
                           },
 
                           onCancel() {

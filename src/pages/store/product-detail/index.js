@@ -33,7 +33,11 @@ import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { addProudctToCart, getProductDetailById } from './service';
+import {
+  addProudctToCart,
+  addProudctToCartGuest,
+  getProductDetailById,
+} from './service';
 import axiosClient from 'util/axiosClient';
 
 const ProductDetail = () => {
@@ -153,7 +157,14 @@ const ProductDetail = () => {
       productId: productDetail._id,
     };
     try {
-      const cart = await addProudctToCart(cartItem);
+      let cart = {};
+
+      //Guest and customer
+      if (localStorage.getItem('__role') === 'R02')
+        cart = await addProudctToCartGuest(cartItem);
+      else cart = await addProudctToCart(cartItem);
+
+      console.log(cart);
       message.success('Thêm vào giỏ hàng thành công', 5);
     } catch (error) {
       message.error(`${error.response.data.error}`, 5);
@@ -166,6 +177,12 @@ const ProductDetail = () => {
   //RUN
   const { id } = useParams();
   useEffect(() => {
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
+      });
+    }
     form.setFieldsValue({ quantityNeed: 1 });
     getProductDetailById(id)
       .then((result) => {
