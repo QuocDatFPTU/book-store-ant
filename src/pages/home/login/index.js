@@ -29,7 +29,7 @@ const Login = (props) => {
     const { username, password } = value;
     await dispatch(loginInitiate(username, password))
       .then((result) => {
-        //Move to User homepage
+        // Move to User homepage
         message.success('Đăng nhập thành công');
         setLoading(true);
         setTimeout(() => {

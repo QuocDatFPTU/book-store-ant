@@ -1,16 +1,16 @@
-import { Col, Divider, List, Row, Typography } from 'antd';
-import Item from 'antd/lib/list/Item';
-import StoreLayoutContainer from 'layouts/store/store.layout';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getOrderList } from './service';
-import './styles.less';
+import { Col, Divider, List, Row, Typography } from "antd";
+import Item from "antd/lib/list/Item";
+import StoreLayoutContainer from "layouts/store/store.layout";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getOrderList } from "./service";
+import "./styles.less";
 const OrderList = () => {
   // State
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  //Use Effect
+  // Use Effect
   useEffect(() => {
     getOrderList()
       .then((lstOrders) => {
@@ -57,7 +57,7 @@ const OrderList = () => {
                   {item.status}
                 </Col>
               </Row>
-              <Divider style={{ margin: '15px 0 ' }} />
+              <Divider style={{ margin: "15px 0 " }} />
               {item.items.map((orderItem) => (
                 <Row className="order-products" align="middle">
                   <Col
@@ -65,7 +65,7 @@ const OrderList = () => {
                     span={12}
                     offset={4}
                   >
-                    <Row style={{ width: '100%' }}>
+                    <Row style={{ width: "100%" }}>
                       <Col span={4}>
                         <img
                           className="product-img"
@@ -75,7 +75,7 @@ const OrderList = () => {
                       <Col className="product-detail" span={20}>
                         <Typography.Paragraph
                           ellipsis={{
-                            rows: 1,
+                            rows: 1
                             // expandable: true,
                           }}
                           className="product-title"

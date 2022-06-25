@@ -1,7 +1,7 @@
-import axiosClient from 'util/axiosClient';
+import axiosClient from "util/axiosClient";
 
-//Update new passord
+// Update new passord
 export const updateNewPassword = async (params) => {
-  const url = `/user/new-password`;
+  const url = "/user/new-password";
   return axiosClient.patch(url, { ...params });
 };

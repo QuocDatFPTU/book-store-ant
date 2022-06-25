@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
-import { loginInitiate } from 'redux/action';
+import { loginInitiate, registerInitiate } from 'redux/action';
 import './styles.less';
 
 // SHOW MESSAGE ANNOUNCE: VERIFY EMAIL
@@ -37,12 +37,28 @@ const validateMessages = {
 
 const Register = (props) => {
   const [loading, setLoading] = useState(false);
-  // const navigate = useNavigate();
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  //Redux
+  const user = useSelector((state) => state.user);
+  console.log(user);
+
   async function handleSubmit(value) {
-    console.log(value);
+    setLoading(true);
+    await dispatch(registerInitiate(value))
+      .then((result) => {
+        // Move to User homepage
+        message.success('Đăng ký thành công');
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+        return true;
+      })
+      .catch((error) => {
+        setLoading(false);
+        message.error(error.message);
+      });
     // await dispatch(loginInitiate(username, password));
     // .then((result) => {
     // 	if (!result?.error) {
@@ -57,13 +73,13 @@ const Register = (props) => {
     // 	}
     // })
     // .catch((error) => message.error(error));
-    message.success('Register success');
-    setLoading(true);
+
+    // message.success('Register success');
+    // setLoading(true);
     return true;
   }
 
   // Listen to the Firebase Auth state and set the local state.
-
   return (
     <div className="login-page">
       <Row justify="space-between" style={{ height: window.innerHeight }}>
@@ -135,7 +151,7 @@ const Register = (props) => {
                   />
                 </Form.Item>
                 <Form.Item
-                  name="phoneNumber"
+                  name="phone"
                   rules={[
                     {
                       required: 'true',
@@ -164,7 +180,10 @@ const Register = (props) => {
                 </Form.Item>
                 <Form.Item
                   name="password"
-                  rules={[{ required: true, message: 'Nhập mật khẩu!' }]}
+                  rules={[
+                    { required: true, message: 'Nhập mật khẩu!' },
+                    { min: 8, message: 'Mật khẩu phải có ít nhất độ dài là 8' },
+                  ]}
                 >
                   <Input
                     prefix={<LockOutlined className="site-form-item-icon" />}
@@ -183,9 +202,9 @@ const Register = (props) => {
                   ]}
                 >
                   <Select placeholder="Giới tính" allowClear>
-                    <Select.Option value="male">male</Select.Option>
-                    <Select.Option value="female">female</Select.Option>
-                    <Select.Option value="other">other</Select.Option>
+                    <Select.Option value="M">male</Select.Option>
+                    <Select.Option value="F">female</Select.Option>
+                    <Select.Option value="D">other</Select.Option>
                   </Select>
                 </Form.Item>
                 <Form.Item>
@@ -199,7 +218,10 @@ const Register = (props) => {
                   </Button>
                 </Form.Item>
                 <p style={{ textAlign: 'center' }}>
-                  Quay lại<Typography.Link> đăng nhập</Typography.Link>
+                  Quay lại <span> </span>
+                  <Typography.Link onClick={() => navigate('/login')}>
+                    đăng nhập
+                  </Typography.Link>
                 </p>
               </Form>
             </Col>

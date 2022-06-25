@@ -15,8 +15,13 @@ import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import { getCategoyList, getProductList } from './service';
+import { useSelector } from 'react-redux';
 
 const HomePage = () => {
+  //redux
+  const user = useSelector((state) => state.user);
+  console.log(user);
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const getProducts = () => {
