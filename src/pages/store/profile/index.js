@@ -1,62 +1,30 @@
 import {
-  Comment,
-  Affix,
   Button,
-  Card,
-  Carousel,
-  Checkbox,
   Col,
-  Divider,
-  Image,
   Layout,
-  Menu,
-  Rate,
   Row,
-  Typography,
-  Breadcrumb,
   Select,
-  Pagination,
-  Descriptions,
-  InputNumber,
-  Tooltip,
   Avatar,
-  List,
-  Cascader,
   DatePicker,
   Form,
   Input,
-  Radio,
-  Switch,
-  TreeSelect,
+  message,
 } from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+
 import {
-  AntDesignOutlined,
-  FireOutlined,
   HomeOutlined,
-  ShoppingCartOutlined,
-  MessageOutlined,
-  PlusOutlined,
-  MinusOutlined,
-  DislikeFilled,
-  DislikeOutlined,
-  LikeFilled,
-  LikeOutlined,
   UserOutlined,
-  BookOutlined,
-  CommentOutlined,
-  InfoCircleOutlined,
   GoogleOutlined,
   PhoneOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import StoreLayoutContainer from 'layouts/store/store.layout';
+import { getUserInformation, updateUserInformation } from './service';
 // import './styles.less';
 const { Option } = Select;
-const { Header, Content, Footer } = Layout;
+
 const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 const layout = {
   labelCol: {
@@ -87,29 +55,33 @@ const validateMessages = {
 const ProfilePage = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log(values);
-  };
-
-  const onReset = () => {
-    form.resetFields();
-  };
-
-  const onFill = () => {
-    form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
-    });
-  };
+  // State
+  const naviage = useNavigate();
+  const [profile, setProfile] = useState({});
 
   // useEffect
+  const onFinish = async (values) => {
+    try {
+      const { email, ...userUpdate } = values;
+      const user = await updateUserInformation(userUpdate);
+      message.success('Cập nhật thành công');
+      console.log(user);
+    } catch (error) {
+      message.error(error.response.data.error);
+    }
+  };
+
   useEffect(() => {
-    onFill();
-  });
+    getUserInformation()
+      .then((result) => {
+        const { address, email, fullName, gender, phone } = result.user;
+        const user = { address, email, fullName, gender, phone };
+        form.setFieldsValue({ ...user });
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }, []);
 
   return (
     <StoreLayoutContainer>
@@ -118,6 +90,7 @@ const ProfilePage = () => {
           backgroundColor: 'white',
           padding: '10px',
           borderRadius: '10px',
+          marginTop: '100px',
         }}
         span={16}
         offset={4}
@@ -183,26 +156,27 @@ const ProfilePage = () => {
                       placeholder="Select a option and change input text above"
                       allowClear
                     >
-                      <Option value="male">male</Option>
-                      <Option value="female">female</Option>
-                      <Option value="other">other</Option>
+                      <Option value="M">male</Option>
+                      <Option value="F">female</Option>
+                      <Option value="D">other</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item {...tailLayout}>
-                    <Button type="link" htmlType="button" onClick={onFill}>
-                      Hủy
-                    </Button>
                     <Button type="primary" htmlType="submit">
                       Cập nhật
                     </Button>
-                    <Button style={{ marginLeft: '20px' }} type="ghost">
+                    <Button
+                      onClick={() => naviage('/change-password')}
+                      style={{ marginLeft: '20px' }}
+                      type="ghost"
+                    >
                       Đổi mật khẩu
                     </Button>
                   </Form.Item>
                 </Col>
                 <Col span={12} offset={2}>
                   <Form.Item
-                    name="phoneNumber"
+                    name="phone"
                     label="Số điện thoại"
                     rules={[
                       {

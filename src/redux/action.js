@@ -1,33 +1,33 @@
-import jwt from "jsonwebtoken";
-import axiosClient from "util/axiosClient";
+import jwt from 'jsonwebtoken';
+import axiosClient from 'util/axiosClient';
 // import axiosClient from "../util/axiosClient";
-import * as types from "./actionTypes";
+import * as types from './actionTypes';
 
 const loginStart = () => ({
-  type: types.LOGIN_START
+  type: types.LOGIN_START,
 });
 
 const loginSuccess = (user) => ({
   type: types.LOGIN_SUCCESS,
-  payload: user
+  payload: user,
 });
 
 const loginFail = (error) => ({
   type: types.LOGIN_FAIL,
-  payload: error
+  payload: error,
 });
 
 const logoutStart = () => ({
-  type: types.LOGOUT_START
+  type: types.LOGOUT_START,
 });
 
 const logoutSuccess = () => ({
-  type: types.LOGOUT_SUCCESS
+  type: types.LOGOUT_SUCCESS,
 });
 
 const logoutFail = (error) => ({
   type: types.LOGOUT_FAIL,
-  payload: error
+  payload: error,
 });
 
 //  return function(dispatch) {
@@ -58,17 +58,21 @@ export const loginInitiate = (email, password) => async (dispatch) => {
   dispatch(loginStart);
   try {
     const auth_token = await axiosClient.post(
-      "user/login",
+      '/user/login',
       { email, password },
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { 'Content-Type': 'application/json' } }
     );
+    console.log(auth_token);
     const decode_token = jwt.decode(auth_token.token);
     const user = { ...decode_token };
-    localStorage.setItem("__token", auth_token?.token);
-    localStorage.setItem("__role", user.role);
+    localStorage.setItem('__token', auth_token?.token);
+    localStorage.setItem('__role', user.role);
     dispatch(loginSuccess(user));
+
+    return 'Đăng nhập thành công';
   } catch (error) {
-    dispatch(loginFail(error.message));
+    dispatch(loginFail(error.response.data.error));
+    throw new Error(error.response.data.error);
   }
   //  return function(dispatch) {
   //     dispatch(loginStart());
@@ -116,9 +120,9 @@ export const logoutInitiate = () => {
   return async function (dispatch) {
     dispatch(logoutStart());
     await axiosClient.post(
-      "user/logoutAll",
+      'user/logoutAll',
       {},
-      { headers: { "content-type": "application/json-patch+json" } }
+      { headers: { 'content-type': 'application/json-patch+json' } }
     );
   };
 };

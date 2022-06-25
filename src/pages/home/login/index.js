@@ -8,6 +8,17 @@ import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 
+// if (!result?.error) {
+// 	let role = localStorage.getItem("__role");
+// 	if (role === "SystemAdministrator") {
+// 		navigate("/admin");
+// 	} else if (role === "SchoolAdmin") {
+// 		navigate("/dashboard");
+// 	} else if (role === "ClubAdmin") {
+// 		navigate("/club");
+// 	}
+// }
+
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,28 +27,20 @@ const Login = (props) => {
 
   async function handleSubmit(value) {
     const { username, password } = value;
-    await dispatch(loginInitiate(username, password));
-    // .then((result) => {
-    // 	if (!result?.error) {
-    // 		let role = localStorage.getItem("__role");
-    // 		if (role === "SystemAdministrator") {
-    // 			navigate("/admin");
-    // 		} else if (role === "SchoolAdmin") {
-    // 			navigate("/dashboard");
-    // 		} else if (role === "ClubAdmin") {
-    // 			navigate("/club");
-    // 		}
-    // 	}
-    // })
-    // .catch((error) => message.error(error));
-
-    //Move to User homepage
-    message.success('Login success');
-    setLoading(true);
-    setTimeout(() => {
-      navigate('/');
-    }, 3000);
-    return true;
+    await dispatch(loginInitiate(username, password))
+      .then((result) => {
+        //Move to User homepage
+        message.success('Đăng nhập thành công');
+        setLoading(true);
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+        return true;
+      })
+      .catch((error) => {
+        console.log(error.message);
+        message.error('Đăng nhập không thành công');
+      });
   }
 
   // Listen to the Firebase Auth state and set the local state.

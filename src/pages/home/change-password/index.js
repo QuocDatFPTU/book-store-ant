@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
+import { updateNewPassword } from './service';
 
 const validateMessages = {
   required: 'Nhập ${label}!',
@@ -17,34 +18,24 @@ const validateMessages = {
   //   },
 };
 
-//CHECK DATABASE CÓ EMAIL NHƯ VẬY KHÔNG VÀ GỬI GMAIL
-
 const ChangePassword = (props) => {
   const [loading, setLoading] = useState(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const dispatch = useDispatch();
-
-  async function handleSubmit(value) {
+  const handleSubmit = async (value) => {
     console.log(value);
-    // await dispatch(loginInitiate(username, password));
-    // .then((result) => {
-    // 	if (!result?.error) {
-    // 		let role = localStorage.getItem("__role");
-    // 		if (role === "SystemAdministrator") {
-    // 			navigate("/admin");
-    // 		} else if (role === "SchoolAdmin") {
-    // 			navigate("/dashboard");
-    // 		} else if (role === "ClubAdmin") {
-    // 			navigate("/club");
-    // 		}
-    // 	}
-    // })
-    // .catch((error) => message.error(error));
-    message.success('Đổi mật khẩu thành công');
     setLoading(true);
+    try {
+      const user = await updateNewPassword(value);
+      console.log(user);
+      navigate('/profile');
+      message.success('Đổi mật khẩu thành công');
+    } catch (error) {
+      setLoading(false);
+      message.error(error.response.data.error);
+    }
     return true;
-  }
+  };
 
   // Listen to the Firebase Auth state and set the local state.
 
@@ -105,7 +96,7 @@ const ChangePassword = (props) => {
                     validateMessages={validateMessages}
                   >
                     <Form.Item
-                      name="oldPassword"
+                      name="currPassword"
                       label="Mật khẩu cũ"
                       rules={[
                         {
@@ -121,7 +112,7 @@ const ChangePassword = (props) => {
                     </Form.Item>
 
                     <Form.Item
-                      name="password"
+                      name="newPassword"
                       label="Mật khẩu"
                       rules={[
                         {
@@ -141,18 +132,24 @@ const ChangePassword = (props) => {
                     <Form.Item
                       name="confirm"
                       label="Nhập lại mật khẩu"
-                      dependencies={['password']}
+                      dependencies={['newPassword']}
                       hasFeedback
                       rules={[
                         {
                           required: true,
                           message: 'Nhập lại mật khẩu!',
                         },
+                        {
+                          min: 8,
+                          message: 'Mật khẩu phải có ít nhất độ dài là 8',
+                        },
                         ({ getFieldValue }) => ({
                           validator(_, value) {
-                            if (!value || getFieldValue('password') === value) {
+                            if (
+                              !value ||
+                              getFieldValue('newPassword') === value
+                            )
                               return Promise.resolve();
-                            }
 
                             return Promise.reject(
                               new Error(
@@ -180,7 +177,10 @@ const ChangePassword = (props) => {
                       </Button>
                     </Form.Item>
                     <p style={{ textAlign: 'center' }}>
-                      Quay lại<Typography.Link> Trang chủ</Typography.Link>
+                      Quay lại <span> </span>
+                      <Typography.Link onClick={() => navigate('/')}>
+                        Trang chủ
+                      </Typography.Link>
                     </p>
                   </Form>
                 </Col>

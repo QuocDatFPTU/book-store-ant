@@ -26,6 +26,7 @@ import {
   getReceiverInfor,
   setReceiverInforSession,
 } from './service';
+import axiosClient from 'util/axiosClient';
 const { Option } = Select;
 
 const layout = {
@@ -102,17 +103,6 @@ const CartContact = () => {
   const [form] = Form.useForm();
 
   //Method
-  // const onUpdate = () => {
-  //   setUpdated(!updated);
-  // };
-  // const onChange = (values, allValues) => {
-  //   console.log(allValues);
-  // };
-
-  // const onReset = () => {
-  //   form.resetFields();
-  // };
-
   const onFinish = (values) => {
     if (updated) {
       setUpdated(false);
@@ -131,17 +121,21 @@ const CartContact = () => {
     }
   };
   const onReset = () => form.setFieldsValue(inforDefault);
+
   const onClickConfirm = async () => {
     try {
+      //Create order
       const order = await createOrder();
-      console.log(order);
-      console.log('--------------------');
+      // console.log(order);
+
+      //Empty alot
+      await axiosClient.patch('/checkout/confirm');
     } catch (error) {
-      console.log(123);
       //Dù lỗi gì thì redirect car-contact
       navigate('/cart');
 
       //Anounce error message
+      console.log(error.reponse);
       const dataError = error.response.data.error;
       const msgError = Array.isArray(dataError)
         ? dataError.map((error) => (
@@ -150,7 +144,7 @@ const CartContact = () => {
             </div>
           ))
         : dataError;
-      console.log(msgError, '=================');
+      console.log(msgError);
       message.error(msgError, 5);
       setCart(cart);
     }
@@ -178,9 +172,6 @@ const CartContact = () => {
       .catch((error) => console.log(error));
   }, []);
 
-  console.log(receiver);
-  console.log(inforDefault);
-  console.log(cart);
   return (
     <StoreLayoutContainer>
       <WrapperConentContainer>
