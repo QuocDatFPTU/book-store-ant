@@ -14,6 +14,9 @@ import {
   InputNumber,
   Avatar,
   List,
+  Form,
+  message,
+  Result,
 } from 'antd';
 import {
   FireOutlined,
@@ -30,8 +33,16 @@ import { useState } from 'react';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProductDetailById } from './service';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  addProudctToCart,
+  addProudctToCartGuest,
+  getCategoyById,
+  getProductDetailById,
+  getProductListFearture,
+} from './service';
+import axiosClient from 'util/axiosClient';
+import { DateFormat, MoneyFormat } from 'components/format';
 
 const ProductDetail = () => {
   //data
@@ -134,135 +145,246 @@ const ProductDetail = () => {
     },
   ];
 
-  //State
+  //Hook
+  const [form] = Form.useForm();
   const [btnExpand, setBtnExpand] = useState(true);
   const [productDetail, setProductDetail] = useState({});
+  const [moreProductDetail, setMoreProductDetail] = useState({});
+  const [categoryName, setCategoryName] = useState('');
+  const [products, setProducts] = useState([]);
+  const navigate = useNavigate('/cart');
+  const { id } = useParams();
 
   //Method
   const onClickNotExpand = () => {
     setBtnExpand((val) => !val);
   };
-  const onChange = (checkedValues) => {
-    console.log('checked = ', checkedValues);
-  };
-  const [visible, setVisible] = useState(false);
+  const addToCart = async (isToCart) => {
+    const cartItem = {
+      quantity: form.getFieldValue('quantityNeed'),
+      productId: productDetail._id,
+    };
+    try {
+      let cart = {};
 
-  //RUN
-  const { id } = useParams();
-  useEffect(() => {
-    getProductDetailById(id)
-      .then((result) => {
-        console.log(result);
-        setProductDetail(result);
+      //Guest and customer
+      if (localStorage.getItem('__role') === 'R02')
+        cart = await addProudctToCartGuest(cartItem);
+      else cart = await addProudctToCart(cartItem);
+
+      console.log(cart);
+
+      //Go to cart or not
+      if (isToCart) navigate('/cart');
+      else message.success('Thêm vào giỏ hàng thành công', 5);
+    } catch (error) {
+      message.error(`${error.response.data.error}`, 5);
+    }
+  };
+  const getProductById = (productId) => {
+    getProductDetailById(productId)
+      .then((res) => {
+        //Set product detail
+        console.log(res);
+        setProductDetail(res);
+        const { author, publisher, publicDate, language, pages } =
+          res.briefInformation;
+        setMoreProductDetail({
+          'Mã hàng': res._id,
+          'NXB ': publisher,
+          'Năm xuất bản': <DateFormat>{publicDate}</DateFormat>,
+          'Tác giả': author,
+          'Số trang': pages,
+          language,
+        });
+
+        //Set product category
+        getCategoryName(res.category);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
-  console.log(productDetail.briefInformation);
+  };
+  const getCategoryName = (categoryId) => {
+    getCategoyById(categoryId)
+      .then((result) => {
+        setCategoryName(result.name);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getProducts = () => {
+    getProductListFearture()
+      .then((result) => {
+        console.log(result);
+        setProducts(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  //RUN
+  useEffect(() => {
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
+      });
+    }
+    form.setFieldsValue({ quantityNeed: 1 });
+    getProductById(id);
+    getProducts();
+  }, [id]);
 
-  return (
+  return productDetail.status === false ? (
+    <StoreLayoutContainer>
+      <WrapperConentContainer>
+        <Result
+          status="404"
+          // title="404"
+          subTitle="Aaaa không tìm thấy rồi á đồ ngốc này :(((("
+          extra={
+            <Button onClick={() => navigate(-1)} type="primary">
+              {'Quay lại trang trước đi nha <3'}
+            </Button>
+          }
+        />
+      </WrapperConentContainer>
+    </StoreLayoutContainer>
+  ) : (
     <StoreLayoutContainer>
       <WrapperConentContainer className="proudcts-detail-link">
         <Breadcrumb>
           <Breadcrumb.Item href="/">
             <HomeOutlined />
           </Breadcrumb.Item>
-          <Breadcrumb.Item href="/product-list">THỂ LOẠI</Breadcrumb.Item>
+          <Breadcrumb.Item>THỂ LOẠI</Breadcrumb.Item>
+          <Breadcrumb.Item
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate(`/product-list/${productDetail.category}`)}
+          >
+            {categoryName}
+          </Breadcrumb.Item>
           <Breadcrumb.Item>{productDetail.title}</Breadcrumb.Item>
         </Breadcrumb>
       </WrapperConentContainer>
       <WrapperConentContainer className="products-detail-intro">
-        <Row style={{ padding: '20px', backgroundColor: 'white' }}>
-          <Col className="detail-images" span={10}>
-            <Row>
-              <Col span={3}>
-                <Image.PreviewGroup>
-                  {[
-                    'https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_2-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_3-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_7-390x510.jpg',
-                    'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_9-390x510.jpg',
-                  ].map((item) => (
-                    <div className="image-preview">
-                      <Image
-                        style={{ cursor: 'pointer' }}
-                        preview={true}
-                        width="100%"
-                        src={item}
-                      />
-                    </div>
-                  ))}
-                </Image.PreviewGroup>
-              </Col>
-              <Col style={{ textAlign: 'center' }} span={21}>
-                <Image
-                  height={'34vh'}
-                  preview={false}
-                  src={productDetail.thumbnail}
-                />
-              </Col>
-            </Row>
-            <Row
-              justify="center"
-              style={{ marginTop: '10px', marginBottom: '10px' }}
-            >
-              <button className="btn-cart">
-                <ShoppingCartOutlined style={{ fontSize: '25px' }} /> Thêm vào
-                giỏ hàng
-              </button>
-              <button className="btn-buy">Mua ngay</button>
-            </Row>
-          </Col>
-          <Col className="detail-info" span={14}>
-            <h1>{productDetail.title}</h1>
-            <Descriptions column={2}>
-              <Descriptions.Item span={1} label="Nhà xuất bản">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.publisher}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Tác giả">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.author}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Ngày phát hành">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.publicDate}
-                </div>
-              </Descriptions.Item>
-              <Descriptions.Item span={1} label="Số trang">
-                <div className="infor-text">
-                  {productDetail?.briefInformation?.pages}
-                </div>
-              </Descriptions.Item>
-            </Descriptions>
-            <Rate style={{ fontSize: '15px' }} defaultValue={4} />
-            <div className="detail-sale">
-              {productDetail.salePrice} đ
-              <span className="detail-price"> {productDetail.listPrice} đ</span>
-            </div>
+        <Form form={form}>
+          <Row style={{ padding: '20px', backgroundColor: 'white' }}>
+            <Col className="detail-images" span={10}>
+              <Row>
+                <Col span={3}>
+                  <Image.PreviewGroup>
+                    {[
+                      'https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_2-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_3-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_7-390x510.jpg',
+                      'https://cdn0.fahasa.com/media/flashmagazine/images/page_images/toi_ve___phuong_phap_tu_hoc_ve_truyen_tranh/2019_09_19_10_47_12_9-390x510.jpg',
+                    ].map((item) => (
+                      <div className="image-preview">
+                        <Image
+                          style={{ cursor: 'pointer' }}
+                          preview={true}
+                          width="100%"
+                          src={item}
+                        />
+                      </div>
+                    ))}
+                  </Image.PreviewGroup>
+                </Col>
+                <Col style={{ textAlign: 'center' }} span={21}>
+                  <Image
+                    height={'34vh'}
+                    preview={false}
+                    src={productDetail.thumbnail}
+                  />
+                </Col>
+              </Row>
+              <Row
+                justify="center"
+                style={{ marginTop: '10px', marginBottom: '10px' }}
+              >
+                <Col span={12} style={{ textAlign: 'center' }}>
+                  <Form.Item style={{ width: '100%', textAlign: 'center' }}>
+                    <button
+                      style={{ width: '80%' }}
+                      className="btn-cart"
+                      onClick={() => addToCart(false)}
+                    >
+                      <ShoppingCartOutlined style={{ fontSize: '25px' }} /> Thêm
+                      vào giỏ hàng
+                    </button>
+                  </Form.Item>
+                </Col>
+                <Col span={12} style={{ textAlign: 'center' }}>
+                  <Form.Item style={{ width: '100%' }}>
+                    <button
+                      style={{ width: '80%' }}
+                      onClick={() => addToCart(true)}
+                      className="btn-buy"
+                    >
+                      Mua ngay
+                    </button>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Col>
+            <Col className="detail-info" span={14}>
+              <h1>{productDetail.title}</h1>
+              <Descriptions column={2}>
+                <Descriptions.Item span={1} label="Nhà xuất bản">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.publisher}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Tác giả">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.author}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Ngày phát hành">
+                  <div className="infor-text">
+                    <DateFormat>
+                      {productDetail?.briefInformation?.publicDate}
+                    </DateFormat>
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item span={1} label="Số trang">
+                  <div className="infor-text">
+                    {productDetail?.briefInformation?.pages}
+                  </div>
+                </Descriptions.Item>
+              </Descriptions>
+              <Rate style={{ fontSize: '15px' }} defaultValue={4} />
+              <div className="detail-sale">
+                <MoneyFormat>{productDetail.salePrice}</MoneyFormat>
+                <span className="detail-price">
+                  <MoneyFormat>{productDetail.listPrice}</MoneyFormat>
+                </span>
+              </div>
 
-            <div className="detail-quantity">
-              Số lượng:
-              <InputNumber
-                style={{
-                  marginLeft: '20px',
-                  fontSize: '30px',
-                }}
-                controls={{
-                  upIcon: <PlusOutlined style={{ fontSize: '30px' }} />,
-                  downIcon: <MinusOutlined style={{ fontSize: '30px' }} />,
-                }}
-                min={1}
-                max={productDetail.quantity}
-                defaultValue={1}
-              />
-            </div>
-          </Col>
-        </Row>
+              <div className="detail-quantity">
+                Số lượng:
+                <Form.Item name="quantityNeed">
+                  <InputNumber
+                    onChange={(value) =>
+                      form.setFieldsValue({ quantityNeed: value })
+                    }
+                    name="quantityNeed"
+                    style={{
+                      marginLeft: '20px',
+                      fontSize: '30px',
+                    }}
+                    controls={{
+                      upIcon: <PlusOutlined style={{ fontSize: '30px' }} />,
+                      downIcon: <MinusOutlined style={{ fontSize: '30px' }} />,
+                    }}
+                    min={1}
+                    max={productDetail.quantity}
+                  />
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+        </Form>
       </WrapperConentContainer>
       <WrapperConentContainer>
         <Col className="products-content">
@@ -283,7 +405,7 @@ const ProductDetail = () => {
                 borderRadius: '100%',
               }}
             />
-            Sách cùng thể loại
+            Sản phẩm đang hot
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
@@ -345,16 +467,16 @@ const ProductDetail = () => {
             Thông tin sản phẩm
           </h2>
           <Row className="products-description-briefs">
-            {Object.entries(productDetail).map((item, index) => (
+            {Object.entries(moreProductDetail).map((item) => (
               <Row
                 style={{ marginBottom: '10px' }}
                 className="products-description-briefs"
               >
-                <Col style={{ color: '#8c8c8c' }} span={7}>
+                <Col style={{ color: '#8c8c8c' }} span={5}>
                   {item[0]}
                 </Col>
-                <Col style={{ color: 'black' }} span={17}>
-                  {/* {item[1]} */}
+                <Col style={{ color: 'black' }} span={19}>
+                  {item[1]}
                 </Col>
               </Row>
             ))}

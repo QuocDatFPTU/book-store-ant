@@ -14,13 +14,105 @@ import './styles.less';
 import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import StoreLayoutContainer from 'layouts/store/store.layout';
-import { getCategoyList, getProductList } from './service';
+import { getCategoyList, getProductListFearture } from './service';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { MoneyFormat } from 'components/format';
+
+const dataPostFeature = [
+  {
+    title:
+      'Sếp lớn Microsoft từ chức vì bị cáo buộc xem “phim heo VR” khi đang làm việc và cả quay tay',
+    date: '14/06/2022',
+    author: 'Hoàng Anh',
+    imgLink: 'https://gstatic.gvn360.com/2022/06/61fb127c75a1f5001890a621.jpg',
+  },
+  {
+    title: 'Tiếng chuông gọi người tình trở về – Ngân lên trong vô vọng!',
+    date: '11/06/2022',
+    author: 'Hải Yến',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/05/reviewsachonly-Tieng-chuong-goi-nguoi-tinh-tro-ve.jpg',
+  },
+  {
+    title: 'Cho tôi xin một vé về tuổi thơ – tấm vé dành cho sự trưởng thành',
+    date: '22/06/2022',
+    author: 'Asu',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-cho-toi-xin-mot-ve-tuoi-tho.jpeg',
+  },
+  {
+    title: 'Tình khờ – Khi cái đẹp đồng hóa cùng quỷ dữ (Tanizaki Junichiro)',
+    date: '30/06/2022',
+    author: 'Lê Đức',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-tinh-kho-by-reviewsachl.net_.jpeg',
+  },
+];
+const dataListCates = [
+  {
+    name: 'Sách tham khảo',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
+  },
+  {
+    name: 'Sách học ngoại ngữ',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
+  },
+  {
+    name: 'Văn học',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
+  },
+  {
+    name: 'Thiếu nhi',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+  },
+  {
+    name: 'Tâm lý kỹ năng',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
+  },
+  {
+    name: 'Kinh tế',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
+  },
+  {
+    name: 'Sách giáo khoa',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
+  },
+  {
+    name: 'Foreigns Books',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
+  },
+  {
+    name: 'Văn phòng phẩm',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
+  },
+  {
+    name: 'Đồ chơi',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
+  },
+];
 
 const HomePage = () => {
+  //redux
+  const user = useSelector((state) => state.user);
+  console.log(user);
+
+  //Hook
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
+
+  //Method
   const getProducts = () => {
-    getProductList()
+    getProductListFearture()
       .then((result) => {
         console.log(result);
         setProducts(result);
@@ -38,93 +130,11 @@ const HomePage = () => {
       });
   };
 
+  //Effect
   useEffect(() => {
     getProducts();
     getCategories();
   }, []);
-
-  const onSearch = (value) => console.log(value);
-  const dataPostFeature = [
-    {
-      title:
-        'Sếp lớn Microsoft từ chức vì bị cáo buộc xem “phim heo VR” khi đang làm việc và cả quay tay',
-      date: '14/06/2022',
-      author: 'Hoàng Anh',
-      imgLink:
-        'https://gstatic.gvn360.com/2022/06/61fb127c75a1f5001890a621.jpg',
-    },
-    {
-      title: 'Tiếng chuông gọi người tình trở về – Ngân lên trong vô vọng!',
-      date: '11/06/2022',
-      author: 'Hải Yến',
-      imgLink:
-        'https://reviewsach.net/wp-content/uploads/2022/05/reviewsachonly-Tieng-chuong-goi-nguoi-tinh-tro-ve.jpg',
-    },
-    {
-      title: 'Cho tôi xin một vé về tuổi thơ – tấm vé dành cho sự trưởng thành',
-      date: '22/06/2022',
-      author: 'Asu',
-      imgLink:
-        'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-cho-toi-xin-mot-ve-tuoi-tho.jpeg',
-    },
-    {
-      title: 'Tình khờ – Khi cái đẹp đồng hóa cùng quỷ dữ (Tanizaki Junichiro)',
-      date: '30/06/2022',
-      author: 'Lê Đức',
-      imgLink:
-        'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-tinh-kho-by-reviewsachl.net_.jpeg',
-    },
-  ];
-  const dataListCates = [
-    {
-      name: 'Sách tham khảo',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
-    },
-    {
-      name: 'Sách học ngoại ngữ',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-    },
-    {
-      name: 'Văn học',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
-    },
-    {
-      name: 'Thiếu nhi',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-    },
-    {
-      name: 'Tâm lý kỹ năng',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-    },
-    {
-      name: 'Kinh tế',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-    },
-    {
-      name: 'Sách giáo khoa',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-    },
-    {
-      name: 'Foreigns Books',
-      imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
-    },
-    {
-      name: 'Văn phòng phẩm',
-      imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
-    },
-    {
-      name: 'Đồ chơi',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
-    },
-  ];
 
   return (
     <StoreLayoutContainer>
@@ -245,7 +255,7 @@ const HomePage = () => {
           <Row justify="space-evenly" style={{ width: '100%' }}>
             {categories.map((item, index) => (
               <Col span={2}>
-                <a href={`/product-list/${item._id}`}>
+                <a onClick={() => navigate(`/product-list/${item._id}`)}>
                   <Card
                     className="custom-card"
                     hoverable={false}
@@ -295,13 +305,13 @@ const HomePage = () => {
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
             {products.map((item) => (
-              <Col flex={'19%'} style={{ marginBottom: '30px' }}>
+              <Col flex={'22%'} style={{ marginBottom: '30px' }}>
                 <Card
                   className="product-card"
                   hoverable={false}
                   bordered={false}
                   cover={
-                    <a href={`/product-detail/${item._id}`}>
+                    <a onClick={() => navigate(`/product-detail/${item._id}`)}>
                       <img
                         style={{
                           width: '100%',
@@ -322,21 +332,23 @@ const HomePage = () => {
                       // expandable: true,
                     }}
                   >
-                    <a href="/product-detail">{item.title}</a>
+                    <a onClick={() => navigate(`/product-detail/${item._id}`)}>
+                      {item.title}
+                    </a>
                   </Typography.Paragraph>
                   <Typography.Text className="product-price">
-                    {item.salePrice}đ
+                    <MoneyFormat>{item.salePrice}</MoneyFormat>
                   </Typography.Text>
                   <Rate className="product-rate" value={4} />
                 </Card>
               </Col>
             ))}
           </Row>
-          <Row style={{ width: '100%' }}>
+          {/* <Row style={{ width: '100%' }}>
             <Col style={{ textAlign: 'center' }} span={24}>
               <Button danger>Xem thêm</Button>
             </Col>
-          </Row>
+          </Row> */}
         </Row>
       </WrapperConentContainer>
     </StoreLayoutContainer>

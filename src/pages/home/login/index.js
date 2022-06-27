@@ -7,6 +7,18 @@ import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
+import axiosClient from 'util/axiosClient';
+
+// if (!result?.error) {
+// 	let role = localStorage.getItem("__role");
+// 	if (role === "SystemAdministrator") {
+// 		navigate("/admin");
+// 	} else if (role === "SchoolAdmin") {
+// 		navigate("/dashboard");
+// 	} else if (role === "ClubAdmin") {
+// 		navigate("/club");
+// 	}
+// }
 
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
@@ -16,28 +28,50 @@ const Login = (props) => {
 
   async function handleSubmit(value) {
     const { username, password } = value;
-    await dispatch(loginInitiate(username, password));
-    // .then((result) => {
-    // 	if (!result?.error) {
-    // 		let role = localStorage.getItem("__role");
-    // 		if (role === "SystemAdministrator") {
-    // 			navigate("/admin");
-    // 		} else if (role === "SchoolAdmin") {
-    // 			navigate("/dashboard");
-    // 		} else if (role === "ClubAdmin") {
-    // 			navigate("/club");
-    // 		}
-    // 	}
-    // })
-    // .catch((error) => message.error(error));
+    await dispatch(loginInitiate(username, password))
+      //LOGIN SUCESS
+      .then(async (result) => {
+        if (localStorage.getItem('__role') === 'R01') {
+          console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
+          try {
+            //Take all cart item of guest to customer
+            const cartGuest = await axiosClient.get('/cart/guest');
+            console.log('CART CỦA GUEST NÀY---------------');
+            console.log(cartGuest);
+            for (let i = 0; i < cartGuest.items.length; i++) {
+              const productId = cartGuest.items[i].product._id;
+              const quantity = cartGuest.items[i].quantity;
+              console.log(productId, quantity, '------------');
 
-    //Move to User homepage
-    message.success('Login success');
-    setLoading(true);
-    setTimeout(() => {
-      navigate('/');
-    }, 3000);
-    return true;
+              //Update lại cart item của customer:
+              try {
+                await axiosClient.post('/cart', { productId, quantity });
+              } catch (error) {
+                console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
+                console.log(error);
+                console.log('++++++++++++++++++++');
+              }
+            }
+          } catch (error) {
+            console.log(error.response);
+          }
+          //Delete session: dù fail hoặc sucess lấy cart item
+          await axiosClient.delete('/session');
+        }
+
+        // Move to User homepage
+        message.success('Đăng nhập thành công');
+        setLoading(true);
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+        return true;
+      })
+      //LOGIN FAIL
+      .catch((error) => {
+        console.log(error.message);
+        message.error('Đăng nhập không thành công');
+      });
   }
 
   // Listen to the Firebase Auth state and set the local state.
@@ -52,12 +86,14 @@ const Login = (props) => {
           lg={{ span: 12 }}
         >
           <div className="login-logo">
-            <img
-              src={logo}
-              alt="logo"
-              className="logo"
-              style={{ height: 80 }}
-            />
+            <a onClick={() => navigate('/')}>
+              <img
+                src={logo}
+                alt="logo"
+                className="logo"
+                style={{ height: 80 }}
+              />
+            </a>
           </div>
           <h3
             className="logo-title"
@@ -103,12 +139,14 @@ const Login = (props) => {
                     allowClear
                   />
                 </Form.Item>
-                <Form.Item>
-                  <a className="login-form-forgot" href="">
-                    Quên mật khẩu
+                <Form.Item style={{ marginBottom: '10px' }}>
+                  <a
+                    className="login-form-forgot"
+                    onClick={() => navigate('/forget-password')}
+                  >
+                    Quên mật khẩu?
                   </a>
                 </Form.Item>
-
                 <Form.Item>
                   <Button
                     type="primary"
@@ -118,6 +156,14 @@ const Login = (props) => {
                   >
                     Đăng nhập
                   </Button>
+                </Form.Item>
+                <Form.Item style={{ textAlign: 'center' }}>
+                  <a
+                    style={{ color: 'black', fontWeight: '500' }}
+                    onClick={() => navigate('/register')}
+                  >
+                    Chưa có tài khoản?
+                  </a>
                 </Form.Item>
               </Form>
             </Col>

@@ -1,51 +1,16 @@
 import {
-  Comment,
-  Affix,
   Button,
-  Card,
-  Carousel,
-  Checkbox,
   Col,
   Divider,
-  Image,
-  Layout,
-  Menu,
-  Rate,
   Row,
   Typography,
-  Breadcrumb,
   Select,
-  Pagination,
-  Descriptions,
-  InputNumber,
-  Tooltip,
-  Avatar,
-  List,
-  Cascader,
-  DatePicker,
   Form,
   Input,
-  Radio,
-  Switch,
-  TreeSelect,
+  message,
 } from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+
 import {
-  AntDesignOutlined,
-  FireOutlined,
-  HomeOutlined,
-  ShoppingCartOutlined,
-  MessageOutlined,
-  PlusOutlined,
-  MinusOutlined,
-  DislikeFilled,
-  DislikeOutlined,
-  LikeFilled,
-  LikeOutlined,
-  UserOutlined,
-  BookOutlined,
-  CommentOutlined,
   InfoCircleOutlined,
   QuestionOutlined,
   ArrowLeftOutlined,
@@ -54,10 +19,19 @@ import { useEffect, useState } from 'react';
 import './styles.less';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
+import { useNavigate } from 'react-router-dom';
+import {
+  createOrder,
+  createOrderGuest,
+  getCartItemList,
+  getCartItemListGuest,
+  getReceiverInfor,
+  getReceiverInforGuest,
+  setReceiverInforSession,
+} from './service';
+import axiosClient from 'util/axiosClient';
+import { MoneyFormat } from 'components/format';
 const { Option } = Select;
-const { Header, Content, Footer } = Layout;
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 const layout = {
   labelCol: {
@@ -69,8 +43,8 @@ const layout = {
 };
 const tailLayout = {
   wrapperCol: {
-    offset: 8,
-    span: 16,
+    offset: 6,
+    span: 18,
   },
 };
 
@@ -86,67 +60,140 @@ const validateMessages = {
 };
 
 const CartContact = () => {
+  // State
+  const [updated, setUpdated] = useState(true);
+  const [receiver, setReceiver] = useState({});
+  const [inforDefault, setInforDefault] = useState({});
+  const [cart, setCart] = useState({});
+
+  // Hook
+  const navigate = useNavigate();
   const [form] = Form.useForm();
 
+  // Method
   const onFinish = (values) => {
-    console.log(values);
+    if (updated) {
+      setUpdated(false);
+    } else {
+      // set session receiver information:
+      setReceiverInforSession(values)
+        .then((result) => {
+          // Set state and form
+          form.setFieldsValue(values);
+          setUpdated(true);
+          // setReceiver(values);
+        })
+        .catch((error) => {
+          message.error(`${error.response.data.error}`);
+        });
+    }
   };
+  const onReset = () => form.setFieldsValue(inforDefault);
 
-  const onReset = () => {
-    form.resetFields();
-  };
+  const onClickConfirm = async () => {
+    try {
+      if (localStorage.getItem('__role') === 'R02') {
+        // Create order
+        const order = await createOrderGuest();
+        console.log(order);
 
-  const onFill = () => {
-    form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
-    });
+        message.loading('Đang kiểm tra...', 1.5);
+
+        // Empty alot
+        await axiosClient.patch('/checkout/confirm/guest');
+        setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
+
+        //naviage
+        setTimeout(() => {
+          navigate(`/cart-completion/${order._id}`);
+        }, 2500);
+      } else {
+        // Create order
+        const order = await createOrder();
+        console.log(order);
+
+        message.loading('Đang kiểm tra...', 1.5);
+
+        // Empty a lot
+        await axiosClient.patch('/checkout/confirm');
+        setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
+
+        //naviage
+        setTimeout(() => {
+          navigate(`/cart-completion/${order._id}`);
+        }, 2500);
+      }
+    } catch (error) {
+      // Dù lỗi gì thì redirect car-contact
+      navigate('/cart');
+
+      // Anounce error message
+      console.log(error.reponse);
+      const dataError = error.response.data.error;
+      const msgError = Array.isArray(dataError)
+        ? dataError.map((error) => (
+            <div>
+              {error} <br />
+            </div>
+          ))
+        : dataError;
+
+      message.error(msgError, 5);
+      setCart(cart);
+    }
   };
 
   // useEffect
   useEffect(() => {
-    onFill();
-  });
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
+      });
+    }
 
-  //data
-  const orderData = [
-    {
-      _id: '123',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-      title:
-        'Miền đất hứa sẽ đưa chúng ta đến khoái lạc ta đến khoái lta đến khoái lta đến khoái lta đến khoái l',
-      salePrice: '26.000.200đ',
-      publisher: 'NXB Trẻ',
-      quantity: 2,
-      totalAmount: '40.400đ',
-    },
-    {
-      _id: '124',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/d/r/dragon-ball-full-color---phan-bon---frieza-dai-de-_-tap-2_1.jpg',
-      title:
-        'Dragon Ball Full Color - Phần Bốn: Frieza Đại Đế - Tập 2 - Tặng Kèm Ngẫu Nhiên 1 Trong 2 Mẫu Postcard',
-      salePrice: '77.000 đ',
-      publisher: 'NXB Trẻ',
-      quantity: 1,
-      totalAmount: '77.400đ',
-    },
-    {
-      _id: '125',
-      imgLink:
-        'https://cdn0.fahasa.com/media/catalog/product/b/i/bia-sieu-nhi-hoi-nha-khoa-hoc-tra-loi---b_a-full_2.jpg',
-      title: 'Siêu Nhí Hỏi Nhà Khoa Học Trả Lời',
-      salePrice: '162.000 đ',
-      publisher: 'NXB Dân Trí',
-      quantity: 2,
-      totalAmount: '324.000đ',
-    },
-  ];
+    //Guest or Customer
+    if (localStorage.getItem('__role') === 'R02') {
+      // onFill();
+      getReceiverInforGuest()
+        .then((result) => {
+          // Set state for receiver information
+          if (Object.keys(result).length === 0) setUpdated(false);
+          setReceiver(result);
+          setInforDefault(result);
+          form.setFieldsValue(result);
+
+          // Set state for cart item
+          getCartItemListGuest()
+            .then((result) => {
+              setCart(result);
+            })
+            .catch((error) => {
+              console.log(error.response);
+            });
+        })
+        .catch((error) => console.log(error));
+    } else {
+      // onFill();
+      getReceiverInfor()
+        .then((result) => {
+          // Set state for receiver information
+          setInforDefault(result);
+          form.setFieldsValue(result);
+          // setReceiver(result);
+
+          // Set state for cart item
+          getCartItemList()
+            .then((result) => {
+              setCart(result);
+            })
+            .catch((error) => {
+              console.log(error.response);
+            });
+        })
+        .catch((error) => console.log(error));
+    }
+  }, []);
 
   return (
     <StoreLayoutContainer>
@@ -172,6 +219,7 @@ const CartContact = () => {
           <Row className="form-contact-container" justify="space-evenly">
             <Col span={14}>
               <Form
+                // onValuesChange={onChange}
                 size="middle"
                 {...layout}
                 form={form}
@@ -180,6 +228,7 @@ const CartContact = () => {
                 onFinish={onFinish}
               >
                 <Form.Item
+                  // hidden={true}
                   name="fullName"
                   label="Họ và tên"
                   rules={[
@@ -188,7 +237,7 @@ const CartContact = () => {
                     },
                   ]}
                 >
-                  <Input />
+                  <Input disabled={updated} />
                 </Form.Item>
                 <Form.Item
                   name="gender"
@@ -202,10 +251,11 @@ const CartContact = () => {
                   <Select
                     placeholder="Select a option and change input text above"
                     allowClear
+                    disabled={updated}
                   >
-                    <Option value="male">male</Option>
-                    <Option value="female">female</Option>
-                    <Option value="other">other</Option>
+                    <Option value="M">male</Option>
+                    <Option value="F">female</Option>
+                    <Option value="D">other</Option>
                   </Select>
                 </Form.Item>
                 <Form.Item
@@ -218,10 +268,10 @@ const CartContact = () => {
                     },
                   ]}
                 >
-                  <Input />
+                  <Input disabled={updated} />
                 </Form.Item>
                 <Form.Item
-                  name="phoneNumber"
+                  name="phone"
                   label="Số điện thoại"
                   rules={[
                     {
@@ -229,7 +279,7 @@ const CartContact = () => {
                     },
                   ]}
                 >
-                  <Input />
+                  <Input disabled={updated} />
                 </Form.Item>
                 <Form.Item
                   name="address"
@@ -240,22 +290,28 @@ const CartContact = () => {
                     },
                   ]}
                 >
-                  <Input />
+                  <Input disabled={updated} />
                 </Form.Item>
                 <Form.Item name="note" label="Ghi chú">
-                  <Input />
+                  <Input disabled={updated} />
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                   <Button type="primary" htmlType="submit">
-                    Submit
+                    {updated ? 'Cập nhật' : 'Lưu lại'}
                   </Button>
-                  <Button htmlType="button" onClick={onReset}>
-                    Reset
-                  </Button>
-                  <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
+                  <Button
+                    type="link"
+                    disabled={updated}
+                    htmlType="button"
+                    onClick={onReset}
+                  >
+                    Đặt lại
                   </Button>
                 </Form.Item>
+                {/* <Button htmlType="button" onClick={onReset}>
+                  Reset
+                </Button> */}
+                {/* <Button onClick={onUpdate}>Cập nhật</Button> */}
               </Form>
             </Col>
           </Row>
@@ -284,7 +340,7 @@ const CartContact = () => {
               </h2>
             </Row>
             <Divider style={{ margin: '18px 0' }} />
-            {orderData.map((item) => (
+            {cart.items?.map((item) => (
               <div className="cart-value">
                 <Row
                   className="cart-form"
@@ -292,14 +348,25 @@ const CartContact = () => {
                   align="middle"
                 >
                   <Col span={2} className="cart-detail-container">
-                    <img className="cart-img" src={item.imgLink} />
+                    <img className="cart-img" src={item.product.thumbnail} />
                   </Col>
                   <Col span={10}>
-                    <Typography.Text ellipsis={true} className="cart-title">
+                    <Typography.Text
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        navigate(`/product-detail/${item.product._id}`)
+                      }
+                      ellipsis={true}
+                      className="cart-title"
+                    >
                       {item.title}
                     </Typography.Text>
-                    <p className="cart-pushlisher">{item.publisher}</p>
-                    <p className="cart-price">{item.salePrice}</p>
+                    <p className="cart-pushlisher">
+                      {item.product.briefInformation.publisher}
+                    </p>
+                    <p className="cart-price">
+                      <MoneyFormat>{item.amount}</MoneyFormat>
+                    </p>
                   </Col>
                   <Col
                     style={{ textAlign: 'center', fontSize: '27px' }}
@@ -314,7 +381,7 @@ const CartContact = () => {
                     span={4}
                     offset={1}
                   >
-                    {item.salePrice}
+                    <MoneyFormat>{item.totalAmount}</MoneyFormat>
                   </Col>
                 </Row>
               </div>
@@ -332,23 +399,43 @@ const CartContact = () => {
         >
           <Col span={8} offset={16}>
             <div className="cart-money">
-              <div class="cart-cost">
+              <div className="cart-cost">
+                <p>Tổng tiền</p>
+                <p
+                  className="total-price"
+                  style={{ fontSize: '16px', fontWeight: '600' }}
+                >
+                  <MoneyFormat>{cart.totalCost}</MoneyFormat>
+                </p>
+              </div>
+              <div className="cart-cost">
+                <p>Tiền ship</p>
+                <p
+                  className="total-price"
+                  style={{ fontSize: '16px', fontWeight: '600' }}
+                >
+                  {0} đ
+                </p>
+              </div>
+              <div className="cart-cost">
                 <p>Thành tiền</p>
-                <p class="total-price">468.800 đ</p>
+                <p className="total-price">
+                  <MoneyFormat>{cart.totalCost}</MoneyFormat>
+                </p>
               </div>
             </div>
           </Col>
           <Divider style={{ margin: '5px 0 5px 0' }} />
           <Col span={8}>
-            <Button type="link" size="large">
+            <Button type="link" size="large" onClick={() => navigate('/cart')}>
               <ArrowLeftOutlined />
               Trở về giỏ hàng
             </Button>
           </Col>
           <Col span={8} offset={8}>
-            <div class="cart-money">
-              <button>
-                <a href="">Xác nhận thanh toán</a>
+            <div className="cart-money">
+              <button onClick={onClickConfirm} style={{ color: 'white' }}>
+                Xác nhận thanh toán
               </button>
             </div>
           </Col>
