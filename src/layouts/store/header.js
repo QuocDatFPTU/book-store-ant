@@ -1,9 +1,11 @@
 import {
   AppstoreAddOutlined,
+  DownOutlined,
+  LoginOutlined,
   LogoutOutlined,
+  RedditOutlined,
   SaveOutlined,
   ShoppingCartOutlined,
-  StepForwardOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import {
@@ -17,6 +19,7 @@ import {
   Space,
   Layout,
   Affix,
+  Button,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
@@ -29,11 +32,12 @@ const { Header } = Layout;
 
 const HeaderContainer = () => {
   //Hook
-  const onSearch = (value) => console.log(value);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [categories, setCategories] = useState([]);
   const [username, setUsername] = useState([]);
+  const [menuItemProduct, setMenuItemProduct] = useState([]);
 
   //Effect
   useEffect(() => {
@@ -48,10 +52,54 @@ const HeaderContainer = () => {
       .then(({ user }) => setUsername(user.fullName));
   }, [username]);
 
+  const onSearch = async (value) => {
+    console.log(value.target.value);
+    try {
+      const lstProduct = await axiosClient.post('/products/search', {
+        searchText: value.target.value,
+      });
+      console.log(lstProduct);
+      let index = 0;
+      let list = [];
+      lstProduct.forEach((item) => {
+        index++;
+        list.push({
+          onClick: () => navigate(`/product-detail/${item._id}`),
+          label: item.title,
+          key: index,
+          icon: <img style={{ width: '50px' }} src={item.thumbnail} />,
+        });
+      });
+      setMenuItemProduct(list);
+      console.log(list);
+    } catch (error) {
+      console.log(error);
+      console.log('Éo search được');
+    }
+  };
   const onLogout = async () => {
     dispatch(logoutInitiate());
     navigate('/login');
   };
+  const menuGuest = (
+    <Menu
+      className="header-custom-menu"
+      theme="dark"
+      style={{ width: 140 }}
+      items={[
+        {
+          icon: <LoginOutlined />,
+          key: '4',
+          label: <a onClick={() => navigate('/login')}>Đăng nhập</a>,
+        },
+        {
+          key: '5',
+          label: <a onClick={() => navigate('/register')}>Đăng ký</a>,
+          icon: <RedditOutlined />,
+        },
+      ]}
+    />
+  );
   const menuUser = (
     <Menu
       className="header-custom-menu"
@@ -128,13 +176,24 @@ const HeaderContainer = () => {
                   span={10}
                   offset={2}
                 >
-                  <Input.Search
-                    style={{ widows: '80%' }}
-                    size="large"
-                    placeholder="Tìm tên sản phẩm"
-                    onSearch={onSearch}
-                    enterButton
-                  />
+                  <Dropdown
+                    overlay={
+                      <Menu
+                        // onClick={handleMenuClick}
+                        items={menuItemProduct}
+                      />
+                    }
+                    placement="bottom"
+                  >
+                    <Input.Search
+                      style={{ widows: '80%' }}
+                      size="large"
+                      placeholder="Tìm tên sản phẩm"
+                      // onSearch={onSearch}
+                      onChange={onSearch}
+                      enterButton
+                    />
+                  </Dropdown>
                 </Col>
                 <Col
                   className="header-item"
@@ -159,13 +218,18 @@ const HeaderContainer = () => {
                       />
                     </Badge>
                   </div>
-                  <Dropdown overlay={menuUser}>
-                    <a onClick={() => navigate(`/profile`)}>
-                      <Space>
-                        {username}
-                        <Avatar src="https://joeschmoe.io/api/v1/random" />
-                      </Space>
-                    </a>
+                  <Dropdown
+                    overlay={
+                      localStorage.getItem('__role') === 'R02' ||
+                      !localStorage.getItem('__role')
+                        ? menuGuest
+                        : menuUser
+                    }
+                  >
+                    <Space style={{ color: 'white' }}>
+                      {username}
+                      <Avatar src="https://joeschmoe.io/api/v1/random" />
+                    </Space>
                   </Dropdown>
                 </Col>
               </Row>

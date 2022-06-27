@@ -231,7 +231,7 @@ const ProductDetail = () => {
     form.setFieldsValue({ quantityNeed: 1 });
     getProductById(id);
     getProducts();
-  }, []);
+  }, [id]);
 
   return productDetail.status === false ? (
     <StoreLayoutContainer>
@@ -239,7 +239,7 @@ const ProductDetail = () => {
         <Result
           status="404"
           // title="404"
-          subTitle="Aaaa đéo tìm thấy vc thật:(((("
+          subTitle="Aaaa không tìm thấy rồi á đồ ngốc này :(((("
           extra={
             <Button onClick={() => navigate(-1)} type="primary">
               {'Quay lại trang trước đi nha <3'}

@@ -14,11 +14,11 @@ import Register from 'pages/home/register';
 import ForgetPassword from 'pages/home/forget-password';
 import ResetPassword from 'pages/home/reset-password';
 import ChangePassword from 'pages/home/change-password';
-import { Button } from 'antd';
 import OrderList from 'pages/store/order-list';
 import Cart from 'pages/store/cart';
 import InformationOrder from 'pages/store/information-order';
 import ScrollToTop from 'components/scroll-to-top';
+import CartCompletion from 'pages/store/cart-completion';
 
 const AppWrapper = () => {
   return (
@@ -41,6 +41,7 @@ const App = () => {
             {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
             <Route path="/cart" element={<Cart />} />
             <Route path="/cart-contact" element={<CartContact />} />
+            <Route path="/cart-completion/:id" element={<CartCompletion />} />
             <Route path="/order-list" element={<OrderList />} />
             <Route
               path="/order-information/:id"
@@ -48,7 +49,6 @@ const App = () => {
             />
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
-
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

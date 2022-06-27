@@ -86,12 +86,14 @@ const Login = (props) => {
           lg={{ span: 12 }}
         >
           <div className="login-logo">
-            <img
-              src={logo}
-              alt="logo"
-              className="logo"
-              style={{ height: 80 }}
-            />
+            <a onClick={() => navigate('/')}>
+              <img
+                src={logo}
+                alt="logo"
+                className="logo"
+                style={{ height: 80 }}
+              />
+            </a>
           </div>
           <h3
             className="logo-title"

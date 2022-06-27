@@ -97,15 +97,31 @@ const CartContact = () => {
         const order = await createOrderGuest();
         console.log(order);
 
+        message.loading('Đang kiểm tra...', 1.5);
+
         // Empty alot
         await axiosClient.patch('/checkout/confirm/guest');
+        setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
+
+        //naviage
+        setTimeout(() => {
+          navigate(`/cart-completion/${order._id}`);
+        }, 2500);
       } else {
         // Create order
         const order = await createOrder();
         console.log(order);
 
-        // Empty alot
+        message.loading('Đang kiểm tra...', 1.5);
+
+        // Empty a lot
         await axiosClient.patch('/checkout/confirm');
+        setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
+
+        //naviage
+        setTimeout(() => {
+          navigate(`/cart-completion/${order._id}`);
+        }, 2500);
       }
     } catch (error) {
       // Dù lỗi gì thì redirect car-contact
