@@ -86,20 +86,17 @@ export const registerInitiate = (registerUser) => async (dispatch) => {
 };
 
 export const logoutInitiate = () => {
-  // return function (dispatch) {
-  // 	dispatch(logoutStart());
-  // 	auth
-  // 		.signOut()
-  // 		.then((res) => dispatch(logoutSuccess()))
-  // 		.catch((error) => dispatch(logoutFail(error.message)));
-  // };
   return async function (dispatch) {
     dispatch(logoutStart());
     await axiosClient.post(
-      'user/logoutAll',
+      '/user/logoutAll',
       {},
       { headers: { 'content-type': 'application/json-patch+json' } }
     );
+
+    //Delete local storeage
+    localStorage.removeItem('__role');
+    localStorage.removeItem('__token');
   };
 };
 

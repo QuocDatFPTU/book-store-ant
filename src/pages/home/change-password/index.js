@@ -179,8 +179,8 @@ const ChangePassword = (props) => {
                     </Form.Item>
                     <p style={{ textAlign: 'center' }}>
                       Quay lại <span> </span>
-                      <Typography.Link onClick={() => navigate('/')}>
-                        Trang chủ
+                      <Typography.Link onClick={() => navigate('/profile')}>
+                        Trang cá nhân
                       </Typography.Link>
                     </p>
                   </Form>

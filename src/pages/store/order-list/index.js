@@ -1,10 +1,11 @@
-import { Col, Divider, List, Row, Typography } from "antd";
-import Item from "antd/lib/list/Item";
-import StoreLayoutContainer from "layouts/store/store.layout";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getOrderList } from "./service";
-import "./styles.less";
+import { Col, Divider, List, Row, Typography } from 'antd';
+import Item from 'antd/lib/list/Item';
+import { DateFormat, MoneyFormat } from 'components/format';
+import StoreLayoutContainer from 'layouts/store/store.layout';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getOrderList } from './service';
+import './styles.less';
 const OrderList = () => {
   // State
   const [orders, setOrders] = useState([]);
@@ -50,14 +51,16 @@ const OrderList = () => {
                   </Typography.Link>
                 </Col>
                 <Col span={4}>{item.receiverName}</Col>
-                <Col span={4}>{item.createdAt}</Col>
+                <Col span={4}>
+                  <DateFormat>{item.createdAt}</DateFormat>
+                </Col>
                 <Col span={4}>{item.address}</Col>
                 <Col span={4}>{item.phone}</Col>
                 <Col className="order-status" span={4}>
                   {item.status}
                 </Col>
               </Row>
-              <Divider style={{ margin: "15px 0 " }} />
+              <Divider style={{ margin: '15px 0 ' }} />
               {item.items.map((orderItem) => (
                 <Row className="order-products" align="middle">
                   <Col
@@ -65,7 +68,7 @@ const OrderList = () => {
                     span={12}
                     offset={4}
                   >
-                    <Row style={{ width: "100%" }}>
+                    <Row style={{ width: '100%' }}>
                       <Col span={4}>
                         <img
                           className="product-img"
@@ -73,19 +76,27 @@ const OrderList = () => {
                         />
                       </Col>
                       <Col className="product-detail" span={20}>
-                        <Typography.Paragraph
-                          ellipsis={{
-                            rows: 1
-                            // expandable: true,
-                          }}
-                          className="product-title"
+                        <a
+                          onClick={() =>
+                            navigate(`/product-detail/${orderItem.product._id}`)
+                          }
                         >
-                          {orderItem.title}
-                        </Typography.Paragraph>
+                          <Typography.Paragraph
+                            ellipsis={{
+                              rows: 1,
+                              // expandable: true,
+                            }}
+                            className="product-title"
+                          >
+                            {orderItem.title}
+                          </Typography.Paragraph>
+                        </a>
                         <p className="product-pushlisher">
                           {orderItem.product.briefInformation.publisher}
                         </p>
-                        <p className="product-price">{orderItem.amount}</p>
+                        <p className="product-price">
+                          <MoneyFormat>{orderItem.amount}</MoneyFormat>
+                        </p>
                       </Col>
                     </Row>
                   </Col>
@@ -93,13 +104,16 @@ const OrderList = () => {
                     x{orderItem.quantity}
                   </Col>
                   <Col span={4} className="product-totalamount">
-                    {orderItem.totalAmount}
+                    <MoneyFormat>{orderItem.totalAmount}</MoneyFormat>
                   </Col>
                 </Row>
               ))}
               <Row className="product-cost">
                 <Col span={6} offset={18}>
-                  Tổng tiền: <span>{item.totalCost}đ </span>
+                  Tổng tiền:{' '}
+                  <span>
+                    <MoneyFormat>{item.totalCost}</MoneyFormat>
+                  </span>
                 </Col>
               </Row>
             </div>

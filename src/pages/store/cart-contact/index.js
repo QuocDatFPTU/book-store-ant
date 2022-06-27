@@ -30,6 +30,7 @@ import {
   setReceiverInforSession,
 } from './service';
 import axiosClient from 'util/axiosClient';
+import { MoneyFormat } from 'components/format';
 const { Option } = Select;
 
 const layout = {
@@ -334,13 +335,22 @@ const CartContact = () => {
                     <img className="cart-img" src={item.product.thumbnail} />
                   </Col>
                   <Col span={10}>
-                    <Typography.Text ellipsis={true} className="cart-title">
+                    <Typography.Text
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        navigate(`/product-detail/${item.product._id}`)
+                      }
+                      ellipsis={true}
+                      className="cart-title"
+                    >
                       {item.title}
                     </Typography.Text>
                     <p className="cart-pushlisher">
                       {item.product.briefInformation.publisher}
                     </p>
-                    <p className="cart-price">{item.amount}</p>
+                    <p className="cart-price">
+                      <MoneyFormat>{item.amount}</MoneyFormat>
+                    </p>
                   </Col>
                   <Col
                     style={{ textAlign: 'center', fontSize: '27px' }}
@@ -355,7 +365,7 @@ const CartContact = () => {
                     span={4}
                     offset={1}
                   >
-                    {item.totalAmount}
+                    <MoneyFormat>{item.totalAmount}</MoneyFormat>
                   </Col>
                 </Row>
               </div>
@@ -379,7 +389,7 @@ const CartContact = () => {
                   className="total-price"
                   style={{ fontSize: '16px', fontWeight: '600' }}
                 >
-                  {cart.totalCost} đ
+                  <MoneyFormat>{cart.totalCost}</MoneyFormat>
                 </p>
               </div>
               <div className="cart-cost">
@@ -393,7 +403,9 @@ const CartContact = () => {
               </div>
               <div className="cart-cost">
                 <p>Thành tiền</p>
-                <p className="total-price">{cart.totalCost} đ</p>
+                <p className="total-price">
+                  <MoneyFormat>{cart.totalCost}</MoneyFormat>
+                </p>
               </div>
             </div>
           </Col>

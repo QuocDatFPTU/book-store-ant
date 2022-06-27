@@ -16,6 +16,7 @@ import {
   List,
   Form,
   message,
+  Result,
 } from 'antd';
 import {
   FireOutlined,
@@ -32,13 +33,16 @@ import { useState } from 'react';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   addProudctToCart,
   addProudctToCartGuest,
+  getCategoyById,
   getProductDetailById,
+  getProductListFearture,
 } from './service';
 import axiosClient from 'util/axiosClient';
+import { DateFormat, MoneyFormat } from 'components/format';
 
 const ProductDetail = () => {
   //data
@@ -141,17 +145,21 @@ const ProductDetail = () => {
     },
   ];
 
-  //State
+  //Hook
   const [form] = Form.useForm();
   const [btnExpand, setBtnExpand] = useState(true);
   const [productDetail, setProductDetail] = useState({});
-  const [maxQuantity, setMaxQuantity] = useState(1);
+  const [moreProductDetail, setMoreProductDetail] = useState({});
+  const [categoryName, setCategoryName] = useState('');
+  const [products, setProducts] = useState([]);
+  const navigate = useNavigate('/cart');
+  const { id } = useParams();
 
   //Method
   const onClickNotExpand = () => {
     setBtnExpand((val) => !val);
   };
-  const addToCart = async () => {
+  const addToCart = async (isToCart) => {
     const cartItem = {
       quantity: form.getFieldValue('quantityNeed'),
       productId: productDetail._id,
@@ -165,17 +173,54 @@ const ProductDetail = () => {
       else cart = await addProudctToCart(cartItem);
 
       console.log(cart);
-      message.success('Thêm vào giỏ hàng thành công', 5);
+
+      //Go to cart or not
+      if (isToCart) navigate('/cart');
+      else message.success('Thêm vào giỏ hàng thành công', 5);
     } catch (error) {
       message.error(`${error.response.data.error}`, 5);
     }
   };
+  const getProductById = (productId) => {
+    getProductDetailById(productId)
+      .then((res) => {
+        //Set product detail
+        console.log(res);
+        setProductDetail(res);
+        const { author, publisher, publicDate, language, pages } =
+          res.briefInformation;
+        setMoreProductDetail({
+          'Mã hàng': res._id,
+          'NXB ': publisher,
+          'Năm xuất bản': <DateFormat>{publicDate}</DateFormat>,
+          'Tác giả': author,
+          'Số trang': pages,
+          language,
+        });
 
-  //State
-  const [visible, setVisible] = useState(false);
-
+        //Set product category
+        getCategoryName(res.category);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const getCategoryName = (categoryId) => {
+    getCategoyById(categoryId)
+      .then((result) => {
+        setCategoryName(result.name);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getProducts = () => {
+    getProductListFearture()
+      .then((result) => {
+        console.log(result);
+        setProducts(result);
+      })
+      .catch((e) => console.log(e));
+  };
   //RUN
-  const { id } = useParams();
   useEffect(() => {
     if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
       console.log('not have jwt store in localStorage');
@@ -184,25 +229,39 @@ const ProductDetail = () => {
       });
     }
     form.setFieldsValue({ quantityNeed: 1 });
-    getProductDetailById(id)
-      .then((result) => {
-        console.log(result);
-        setProductDetail(result);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    getProductById(id);
+    getProducts();
   }, []);
-  console.log(productDetail.briefInformation);
 
-  return (
+  return productDetail.status === false ? (
+    <StoreLayoutContainer>
+      <WrapperConentContainer>
+        <Result
+          status="404"
+          // title="404"
+          subTitle="Aaaa đéo tìm thấy vc thật:(((("
+          extra={
+            <Button onClick={() => navigate(-1)} type="primary">
+              {'Quay lại trang trước đi nha <3'}
+            </Button>
+          }
+        />
+      </WrapperConentContainer>
+    </StoreLayoutContainer>
+  ) : (
     <StoreLayoutContainer>
       <WrapperConentContainer className="proudcts-detail-link">
         <Breadcrumb>
           <Breadcrumb.Item href="/">
             <HomeOutlined />
           </Breadcrumb.Item>
-          <Breadcrumb.Item href="/product-list">THỂ LOẠI</Breadcrumb.Item>
+          <Breadcrumb.Item>THỂ LOẠI</Breadcrumb.Item>
+          <Breadcrumb.Item
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate(`/product-list/${productDetail.category}`)}
+          >
+            {categoryName}
+          </Breadcrumb.Item>
           <Breadcrumb.Item>{productDetail.title}</Breadcrumb.Item>
         </Breadcrumb>
       </WrapperConentContainer>
@@ -243,21 +302,25 @@ const ProductDetail = () => {
                 justify="center"
                 style={{ marginTop: '10px', marginBottom: '10px' }}
               >
-                <Col span={12}>
-                  <Form.Item>
+                <Col span={12} style={{ textAlign: 'center' }}>
+                  <Form.Item style={{ width: '100%', textAlign: 'center' }}>
                     <button
                       style={{ width: '80%' }}
                       className="btn-cart"
-                      onClick={addToCart}
+                      onClick={() => addToCart(false)}
                     >
                       <ShoppingCartOutlined style={{ fontSize: '25px' }} /> Thêm
                       vào giỏ hàng
                     </button>
                   </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={12} style={{ textAlign: 'center' }}>
                   <Form.Item style={{ width: '100%' }}>
-                    <button style={{ width: '80%' }} className="btn-buy">
+                    <button
+                      style={{ width: '80%' }}
+                      onClick={() => addToCart(true)}
+                      className="btn-buy"
+                    >
                       Mua ngay
                     </button>
                   </Form.Item>
@@ -279,7 +342,9 @@ const ProductDetail = () => {
                 </Descriptions.Item>
                 <Descriptions.Item span={1} label="Ngày phát hành">
                   <div className="infor-text">
-                    {productDetail?.briefInformation?.publicDate}
+                    <DateFormat>
+                      {productDetail?.briefInformation?.publicDate}
+                    </DateFormat>
                   </div>
                 </Descriptions.Item>
                 <Descriptions.Item span={1} label="Số trang">
@@ -290,10 +355,9 @@ const ProductDetail = () => {
               </Descriptions>
               <Rate style={{ fontSize: '15px' }} defaultValue={4} />
               <div className="detail-sale">
-                {productDetail.salePrice} đ
+                <MoneyFormat>{productDetail.salePrice}</MoneyFormat>
                 <span className="detail-price">
-                  {' '}
-                  {productDetail.listPrice} đ
+                  <MoneyFormat>{productDetail.listPrice}</MoneyFormat>
                 </span>
               </div>
 
@@ -341,7 +405,7 @@ const ProductDetail = () => {
                 borderRadius: '100%',
               }}
             />
-            Sách cùng thể loại
+            Sản phẩm đang hot
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
@@ -403,16 +467,16 @@ const ProductDetail = () => {
             Thông tin sản phẩm
           </h2>
           <Row className="products-description-briefs">
-            {Object.entries(productDetail).map((item, index) => (
+            {Object.entries(moreProductDetail).map((item) => (
               <Row
                 style={{ marginBottom: '10px' }}
                 className="products-description-briefs"
               >
-                <Col style={{ color: '#8c8c8c' }} span={7}>
+                <Col style={{ color: '#8c8c8c' }} span={5}>
                   {item[0]}
                 </Col>
-                <Col style={{ color: 'black' }} span={17}>
-                  {/* {item[1]} */}
+                <Col style={{ color: 'black' }} span={19}>
+                  {item[1]}
                 </Col>
               </Row>
             ))}

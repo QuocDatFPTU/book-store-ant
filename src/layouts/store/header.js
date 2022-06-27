@@ -3,6 +3,7 @@ import {
   LogoutOutlined,
   SaveOutlined,
   ShoppingCartOutlined,
+  StepForwardOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import {
@@ -17,126 +18,66 @@ import {
   Layout,
   Affix,
 } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.less';
 import logoImg from 'assets/logo-new.png';
-import paymentImg from 'assets/footer-payment.png';
-import socialtImg from 'assets/footer-social.png';
-import appImg from 'assets/footer-app.png';
-import WrapperConentContainer from './wrapper.content';
 import { useNavigate } from 'react-router-dom';
+import axiosClient from 'util/axiosClient';
+import { useDispatch } from 'react-redux';
+import { logoutInitiate } from 'redux/action';
 const { Header } = Layout;
 
-const menu = (
-  <Menu
-    className="header-custom-menu"
-    theme="dark"
-    style={{ width: 200 }}
-    items={[
-      {
-        key: '1',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.antgroup.com"
-          >
-            Văn học
-          </a>
-        ),
-      },
-      {
-        key: '2',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.aliyun.com"
-          >
-            Ngoại ngữ
-          </a>
-        ),
-      },
-      {
-        key: '3',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Anime
-          </a>
-        ),
-      },
-      {
-        key: '4',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Manga
-          </a>
-        ),
-      },
-    ]}
-  />
-);
-const menuUser = (
-  <Menu
-    className="header-custom-menu"
-    theme="dark"
-    style={{ width: 200 }}
-    items={[
-      {
-        icon: <UserOutlined />,
-        key: '1',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.antgroup.com"
-          >
-            Nguyễn Hoàng Anh
-          </a>
-        ),
-      },
-      {
-        key: '2',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.aliyun.com"
-          >
-            Đơn hàng của tôi
-          </a>
-        ),
-        icon: <SaveOutlined />,
-      },
-      {
-        key: '3',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Thoát tài khoản
-          </a>
-        ),
-        icon: <LogoutOutlined />,
-      },
-    ]}
-  />
-);
-
 const HeaderContainer = () => {
+  //Hook
   const onSearch = (value) => console.log(value);
   const navigate = useNavigate();
-  console.log(23546546754756);
+  const dispatch = useDispatch();
+  const [categories, setCategories] = useState([]);
+  const [username, setUsername] = useState([]);
+
+  //Effect
+  useEffect(() => {
+    axiosClient.get('/categories').then((cates) => setCategories(cates));
+    // axiosClient
+    //   .get('/user/profile')
+    //   .then(({ user }) => setUsername(user.fullName));
+  }, []);
+  useEffect(() => {
+    axiosClient
+      .get('/user/profile')
+      .then(({ user }) => setUsername(user.fullName));
+  }, [username]);
+
+  const onLogout = async () => {
+    dispatch(logoutInitiate());
+    navigate('/login');
+  };
+  const menuUser = (
+    <Menu
+      className="header-custom-menu"
+      theme="dark"
+      style={{ width: 200 }}
+      items={[
+        {
+          icon: <UserOutlined />,
+          key: '1',
+          label: <a onClick={() => navigate('/profile')}>{username}</a>,
+        },
+        {
+          key: '2',
+          label: (
+            <a onClick={() => navigate('/order-list')}>Đơn hàng của tôi</a>
+          ),
+          icon: <SaveOutlined />,
+        },
+        {
+          key: '3',
+          label: <a onClick={onLogout}>Thoát tài khoản</a>,
+          icon: <LogoutOutlined />,
+        },
+      ]}
+    />
+  );
 
   return (
     <div>
@@ -146,18 +87,37 @@ const HeaderContainer = () => {
             <Col span={16} offset={4}>
               <Row align="middle" style={{ padding: '3px 0' }}>
                 <Col span={2}>
-                  <img
-                    style={{ height: '48px' }}
-                    src={logoImg}
-                    alt="logo image"
-                  />
+                  <a onClick={() => navigate('/')}>
+                    <img
+                      style={{ height: '48px' }}
+                      src={logoImg}
+                      alt="logo image"
+                    />
+                  </a>
                 </Col>
-                <Col
-                  className="header_categories header-item"
-                  span={1}
-                  style={{}}
-                >
-                  <Dropdown overlay={menu} placement="bottomLeft">
+                <Col className="header_categories header-item" span={1}>
+                  <Dropdown
+                    overlay={
+                      <Menu
+                        className="header-custom-menu"
+                        theme="dark"
+                        style={{ width: 200 }}
+                      >
+                        {categories.map((cate) => (
+                          <Menu.Item>
+                            <a
+                              onClick={() =>
+                                navigate(`/product-list/${cate._id}`)
+                              }
+                            >
+                              {cate.name}
+                            </a>
+                          </Menu.Item>
+                        ))}
+                      </Menu>
+                    }
+                    placement="bottomLeft"
+                  >
                     <AppstoreAddOutlined
                       style={{ color: 'white', fontSize: '40px' }}
                     />
@@ -177,28 +137,32 @@ const HeaderContainer = () => {
                   />
                 </Col>
                 <Col
-                  // style={{ paddingTop: '10px' }}
-                  className="header_cart header-item"
-                  span={1}
+                  className="header-item"
+                  span={5}
                   offset={4}
+                  style={{ display: 'flex', justifyContent: 'right' }}
                 >
-                  <Badge
-                    className="custom-badge"
-                    color="cyan"
-                    count={5}
-                    size="small"
+                  <div
+                    className="header_cart header-item"
+                    style={{ marginRight: '20px', marginTop: '10px' }}
                   >
-                    <ShoppingCartOutlined
-                      onClick={() => navigate('/cart')}
-                      style={{ color: 'white', fontSize: '32px' }}
-                    />
-                  </Badge>
-                </Col>
-                <Col className="header-item" span={4}>
+                    <Badge
+                      className="custom-badge"
+                      color="cyan"
+                      //Add count for badge
+                      // count={5}
+                      size="small"
+                    >
+                      <ShoppingCartOutlined
+                        onClick={() => navigate('/cart')}
+                        style={{ color: 'white', fontSize: '32px' }}
+                      />
+                    </Badge>
+                  </div>
                   <Dropdown overlay={menuUser}>
-                    <a onClick={(e) => e.preventDefault()}>
+                    <a onClick={() => navigate(`/profile`)}>
                       <Space>
-                        Nguyễn Hoàng Anh
+                        {username}
                         <Avatar src="https://joeschmoe.io/api/v1/random" />
                       </Space>
                     </a>

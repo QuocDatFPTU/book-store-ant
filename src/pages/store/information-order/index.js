@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import "./styles.less";
-import { Button, Col, Divider, Input, Row, Typography } from "antd";
+import React, { useEffect, useState } from 'react';
+import './styles.less';
+import { Button, Col, Divider, Input, Row, Typography } from 'antd';
 
-import { getOrderInformation } from "./service";
-import { useParams } from "react-router-dom";
-import StoreLayoutContainer from "layouts/store/store.layout";
+import { getOrderInformation } from './service';
+import { useParams } from 'react-router-dom';
+import StoreLayoutContainer from 'layouts/store/store.layout';
 
 const InformationOrder = () => {
   // State
@@ -48,12 +48,12 @@ const InformationOrder = () => {
                     </p>
                     <p>
                       <span className="order-title-receiver">
-                        Số điện thoại:{" "}
-                      </span>{" "}
+                        Số điện thoại:{' '}
+                      </span>{' '}
                       {order.phone}
                     </p>
                     <p>
-                      <span className="order-title-receiver">Địa chỉ: </span>{" "}
+                      <span className="order-title-receiver">Địa chỉ: </span>{' '}
                       {order.address}
                     </p>
                   </div>
@@ -69,7 +69,7 @@ const InformationOrder = () => {
                     <p>Ngày đặt hàng: {order.createdAt}</p>
                     <p>Tổng tiền: {order.totalCost}đ</p>
                     <p className="status">
-                      Trạng Thái:{" "}
+                      Trạng Thái:{' '}
                       <span className="infor-wait">{order.status}</span>
                     </p>
                   </div>
@@ -93,7 +93,7 @@ const InformationOrder = () => {
                   <Col span={18} className="infor-form">
                     <Typography.Paragraph
                       ellipsis={{
-                        rows: 1
+                        rows: 1,
                         // expandable: true,
                       }}
                       className="infor-type"
@@ -107,7 +107,7 @@ const InformationOrder = () => {
                   </Col>
                 </Row>
               </Col>
-              <Col style={{ display: "flex" }} span={5}>
+              <Col style={{ display: 'flex' }} span={5}>
                 {item.amount}
               </Col>
               <Col span={5}>{item.quantity}</Col>
@@ -125,10 +125,19 @@ const InformationOrder = () => {
             </Col>
           </Row>
           <Row className="infor-update">
-            <Col span={4} offset={20}>
+            <Col span={4} offset={15}>
               <Button
                 className="infor-min"
-                style={{ backgroundColor: "#1c2260", color: "#fff" }}
+                style={{ backgroundColor: '#f5222d', color: '#fff' }}
+                onClick={onDeleteOrder}
+              >
+                Hủy đơn hàng
+              </Button>
+            </Col>
+            <Col span={4} offset={1}>
+              <Button
+                className="infor-min"
+                style={{ backgroundColor: '#1c2260', color: '#fff' }}
               >
                 Cập nhật
               </Button>
