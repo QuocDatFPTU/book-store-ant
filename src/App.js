@@ -1,5 +1,5 @@
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.less';
 import { store } from '../src/redux/store';
@@ -19,6 +19,9 @@ import Cart from 'pages/store/cart';
 import InformationOrder from 'pages/store/information-order';
 import ScrollToTop from 'components/scroll-to-top';
 import CartCompletion from 'pages/store/cart-completion';
+import ManageProductList from 'pages/dashboard/products/product-list.container';
+import DashboardSider from 'layouts/dashboard/dashboard.sider';
+import DashboardLayout from 'layouts/dashboard/dashboard.layout';
 
 const AppWrapper = () => {
   return (
@@ -28,7 +31,7 @@ const AppWrapper = () => {
   );
 };
 const App = () => {
-  // const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   return (
     <>
       {/* <HomePage /> */}
@@ -51,6 +54,16 @@ const App = () => {
           </Routes>
           <Routes>
             <Route path="/login" element={<Login />} />
+            {currentUser?.role === 'R03' && (
+              <Route
+                path="dashboard"
+                element={
+                  <DashboardLayout sider={<DashboardSider />} title="Admin" />
+                }
+              >
+                <Route path="product" element={<ManageProductList />} />
+              </Route>
+            )}
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />

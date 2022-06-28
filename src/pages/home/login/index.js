@@ -58,6 +58,12 @@ const Login = (props) => {
           //Delete session: dù fail hoặc sucess lấy cart item
           await axiosClient.delete('/session');
         }
+        if (localStorage.getItem('__role') === 'R03') {
+          message.success('Login success');
+          setLoading(true);
+          navigate('/dashboard/product');
+          return;
+        }
 
         // Move to User homepage
         message.success('Đăng nhập thành công');
