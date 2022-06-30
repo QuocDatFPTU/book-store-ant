@@ -137,7 +137,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer className="home-sliders">
         <Row style={{ height: '100%' }}>
           <Col className="slider-main" span={16}>
@@ -351,7 +351,7 @@ const HomePage = () => {
           </Row> */}
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

@@ -67,7 +67,7 @@ const OrderList = () => {
   }, []);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <Row className="order-content">
         <Col span={8} offset={4}>
           Danh sách đơn hàng
@@ -183,7 +183,7 @@ const OrderList = () => {
           </Col>
         </Row>
       )}
-    </StoreLayoutContainer>
+    </>
   );
 };
 

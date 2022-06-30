@@ -94,7 +94,7 @@ const Cart = () => {
   console.log(cart);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <div className="cart-content">Giỏ hàng</div>
       </WrapperConentContainer>
@@ -331,7 +331,7 @@ const Cart = () => {
           </Row>
         </WrapperConentContainer>
       )}
-    </StoreLayoutContainer>
+    </>
   );
 };
 
