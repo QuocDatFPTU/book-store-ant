@@ -204,8 +204,8 @@ const ProductEdit = ({
     listPrice: currentRow ? currentRow?.listPrice : undefined,
     quantity: currentRow ? currentRow?.quantity : undefined,
     description: currentRow ? currentRow?.description : undefined,
-    // feartured: currentRow ? currentRow?.feartured : undefined,
-    // status: currentRow ? currentRow?.status : undefined,
+    feartured: currentRow ? currentRow?.feartured : undefined,
+    status: currentRow ? currentRow?.status : undefined,
     salePrice: currentRow ? currentRow?.salePrice : undefined,
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
@@ -301,20 +301,20 @@ const ProductEdit = ({
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item label="Đặc biệt" name="feartured">
-            <Checkbox defaultChecked value={currentRow?.feartured}>
+          <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
+            <Checkbox>
               Đặc biệt
             </Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item label="Trạng thái" name="status">
-            <Checkbox defaultChecked value={currentRow?.status}>
+          <Form.Item label="Trạng thái" name="status" valuePropName="checked">
+            <Checkbox>
               Trạng thái
             </Checkbox>
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
           <Form.Item label="Loại" name="category">
             <Select
               placeholder="Hãy chọn thể loại"
