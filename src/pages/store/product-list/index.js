@@ -126,7 +126,7 @@ const ProductList = () => {
   }, [categoryId]);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <Breadcrumb>
           <Breadcrumb.Item>
@@ -303,7 +303,7 @@ const ProductList = () => {
           </Col>
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

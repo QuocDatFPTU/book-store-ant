@@ -196,7 +196,7 @@ const CartContact = () => {
   }, []);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <div className="contact-infor">
           <h2
@@ -441,7 +441,7 @@ const CartContact = () => {
           </Col>
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

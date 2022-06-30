@@ -234,7 +234,7 @@ const ProductDetail = () => {
   }, [id]);
 
   return productDetail.status === false ? (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <Result
           status="404"
@@ -247,9 +247,9 @@ const ProductDetail = () => {
           }
         />
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   ) : (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer className="proudcts-detail-link">
         <Breadcrumb>
           <Breadcrumb.Item href="/">
@@ -568,7 +568,7 @@ const ProductDetail = () => {
           </Row>
         </Col>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

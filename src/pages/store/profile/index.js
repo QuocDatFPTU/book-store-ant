@@ -84,7 +84,7 @@ const ProfilePage = () => {
   }, []);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <Col
         style={{
           backgroundColor: 'white',
@@ -209,7 +209,7 @@ const ProfilePage = () => {
           </Col>
         </Row>
       </Col>
-    </StoreLayoutContainer>
+    </>
   );
 };
 export default ProfilePage;
