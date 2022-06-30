@@ -303,7 +303,7 @@ const ProductEdit = ({
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
             <Checkbox>
-              Đặc biệt
+               Đặc biệt 
             </Checkbox>
           </Form.Item>
         </Col>
