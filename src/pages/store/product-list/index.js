@@ -296,7 +296,7 @@ const ProductList = () => {
                   style={{ width: '100%' }}
                   status="404"
                   // title="404"
-                  subTitle="Éo có sản phẩm nào cho m xem đâu ra chỗ khác chơi đi ???"
+                  subTitle="Hiện tại không có sản phẩm khả thi"
                 />
               </Row>
             )}

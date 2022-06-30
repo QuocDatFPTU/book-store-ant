@@ -103,7 +103,7 @@ const Cart = () => {
           <Result
             status="404"
             // title="404"
-            subTitle="Giỏ hàng của bạn đang trống làm ơn đi á đồ chêt tiệt này:(((("
+            subTitle="Giỏ hàng của bạn đang trống"
             extra={
               <Button onClick={() => navigate('/')} type="primary">
                 {'Đi lựa đồ thôi <3'}

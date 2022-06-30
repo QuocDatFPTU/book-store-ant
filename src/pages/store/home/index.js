@@ -51,52 +51,61 @@ const dataPostFeature = [
 ];
 const dataListCates = [
   {
-    name: 'Sách tham khảo',
+    name: 'Adventure',
     imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9780451530943_1.jpg',
   },
   {
-    name: 'Sách học ngoại ngữ',
+    name: 'Lifestyle',
     imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-  },
-  {
-    name: 'Văn học',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
-  },
-  {
-    name: 'Thiếu nhi',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-  },
-  {
-    name: 'Tâm lý kỹ năng',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-  },
-  {
-    name: 'Kinh tế',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_25243.jpg',
   },
   {
     name: 'Sách giáo khoa',
     imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
+      'https://cdn0.fahasa.com/media/catalog/product/c/o/combo-8_3.jpg',
+  },
+  {
+    name: 'Tâm lý kỹ năng',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974109105-t13.jpg',
+  },
+  {
+    name: 'Kinh tế',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043026542_1.jpg',
+  },
+  {
+    name: 'Sách tham khảo',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180049.jpg',
+  },
+  {
+    name: 'Văn học',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_39444.jpg',
   },
   {
     name: 'Foreigns Books',
-    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/9/7/9786041055421.jpg',
+  },
+  {
+    name: 'Thiếu nhi',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+  },
+  {
+    name: 'Sách học ngoại ngữ',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_185738.jpg',
   },
   {
     name: 'Văn phòng phẩm',
-    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
-  },
-  {
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
+  },{
     name: 'Đồ chơi',
     imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
+      'https://cdn0.fahasa.com/media/catalog/product/e/b/eb7f9af9bc5cb8e852f206448b13d556.jpg',
   },
 ];
 
