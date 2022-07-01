@@ -14,12 +14,13 @@ import Register from 'pages/home/register';
 import ForgetPassword from 'pages/home/forget-password';
 import ResetPassword from 'pages/home/reset-password';
 import ChangePassword from 'pages/home/change-password';
-import { Button } from 'antd';
 import OrderList from 'pages/store/order-list';
 import Cart from 'pages/store/cart';
 import InformationOrder from 'pages/store/information-order';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import ProtectedRoute from 'components/protected-route';
+import ManageProductList from 'pages/dashboard/products/product-list.container';
+import ManageSliderList from 'pages/dashboard/sliders/slider-list.container';
 
 const AppWrapper = () => {
   return (
@@ -60,6 +61,11 @@ const App = () => {
           <Route path="/forget-password" element={<ForgetPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-password" element={<ChangePassword />} />
+        </Routes>
+
+        <Routes>
+          <Route path="/manage-product-list" element={<ManageProductList />} />
+          <Route path="/manage-slider-list" element={<ManageSliderList />} />
         </Routes>
       </BrowserRouter>
     </>
