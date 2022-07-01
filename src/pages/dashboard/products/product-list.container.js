@@ -24,9 +24,9 @@ import TableCustom from 'components/CustomTable';
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
 // };
+
 const ManageProductList = () => {
   const [productList, setProductList] = useState([]);
-  const [product, setProduct] = useState();
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModal, setIsEditModal] = useState(false);
@@ -80,6 +80,8 @@ const ManageProductList = () => {
               size="small"
               type="link"
               onClick={() => {
+                console.log('------');
+                console.log(record);
                 setCurrentRow(record);
                 setIsEditModal(true);
               }}

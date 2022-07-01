@@ -28,6 +28,7 @@ import { getSliderList } from './slider.service';
 const ManageSliderList = () => {
   const [form] = Form.useForm();
   const [params, setParams] = useState({ ...defaultPage });
+  const [test, setTest] = useState({ ...defaultPage });
   const [loading, setLoading] = useState(false);
   const [sliderList, setSliderList] = useState([]);
   const [totalItem, setTotalItem] = useState(0);
@@ -38,14 +39,14 @@ const ManageSliderList = () => {
       .then((result) => {
         console.log(result);
         setSliderList([...result?.sliders]);
-        // setTotalItem(result?.count);
+        setTotalItem(result.count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
   };
 
   useEffect(() => {
-    fetchSliderList();
+    fetchSliderList(params);
   }, []);
 
   const extraButton = [
@@ -78,12 +79,13 @@ const ManageSliderList = () => {
       title: 'ID',
       dataIndex: '_id',
       key: '_id',
-      width: '12%',
+      width: '10%',
     },
     {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      width: '20%',
       ellipsis: {
         showTitle: false,
       },
@@ -115,13 +117,14 @@ const ManageSliderList = () => {
       title: 'BackLink',
       dataIndex: 'backlink',
       key: 'backlink',
-      width: '12%',
+      width: '50%',
+      render: (backlink, _) => <a href={backlink}>backlink</a>,
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: '12%',
+      width: '10%',
       render: (status, _) => {
         if (status)
           return (
@@ -132,6 +135,8 @@ const ManageSliderList = () => {
       },
     },
   ];
+  console.log(totalItem);
+  console.log(sliderList);
 
   return (
     <Layout className="layoutContent">
@@ -148,18 +153,18 @@ const ManageSliderList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== '' && v.trim() !== ''
-              );
-              console.log(cleanValue);
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
-            }}
+            // onFinish={(value) => {
+            //   const cleanValue = pickBy(
+            //     value,
+            //     (v) => v !== undefined && v !== '' && v.trim() !== ''
+            //   );
+            //   console.log(cleanValue);
+            //   setParams({
+            //     ...cleanValue,
+            //     // "page-number": 1,
+            //     // "page-size": params["page-size"]
+            //   });
+            // }}
           >
             <Row gutter={16}>
               <Col xxl={{ span: 6 }} md={8} sm={12} xs={24}>
@@ -197,6 +202,8 @@ const ManageSliderList = () => {
           dataSource={sliderList}
           onChange={(pagination, filters, sorter) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            console.log(pagination, 'pagin');
             if (pagination.pageSize !== params.limit) {
               params.page = 1;
             } else {
