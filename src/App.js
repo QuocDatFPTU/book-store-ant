@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.less';
@@ -21,6 +21,7 @@ import StoreLayoutContainer from 'layouts/store/store.layout';
 import ProtectedRoute from 'components/protected-route';
 import ManageProductList from 'pages/dashboard/products/product-list.container';
 import ManageSliderList from 'pages/dashboard/sliders/slider-list.container';
+import ManageSliderList2 from 'pages/dashboard/sliders-2/slider-list.container';
 
 const AppWrapper = () => {
   return (
@@ -29,8 +30,10 @@ const AppWrapper = () => {
     </Provider>
   );
 };
+
 const App = () => {
   // const { currentUser } = useSelector((state) => state.user);
+
   return (
     <>
       {/* <HomePage /> */}
@@ -66,6 +69,7 @@ const App = () => {
         <Routes>
           <Route path="/manage-product-list" element={<ManageProductList />} />
           <Route path="/manage-slider-list" element={<ManageSliderList />} />
+          <Route path="/manage-slider-list-2" element={<ManageSliderList2 />} />
         </Routes>
       </BrowserRouter>
     </>

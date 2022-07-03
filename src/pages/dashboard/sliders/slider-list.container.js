@@ -24,6 +24,7 @@ import { defaultPage } from 'util/constant';
 import TableCustom from 'components/CustomTable';
 import { useForm } from 'antd/lib/form/Form';
 import { getSliderList } from './slider.service';
+import SliderEdit from './slider.edit';
 
 const ManageSliderList = () => {
   const [form] = Form.useForm();
@@ -221,6 +222,7 @@ const ManageSliderList = () => {
           scroll={{ x: 1200 }}
         />
       </Layout.Content>
+      <SliderEdit />
     </Layout>
   );
 };

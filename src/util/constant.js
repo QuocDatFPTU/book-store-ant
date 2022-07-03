@@ -1,6 +1,6 @@
 export const defaultPage = {
   page: 1,
-  limit: 1,
+  limit: 10,
 };
 export const formatDate = 'DD-MM-YYYY';
 export const formatDateTime = 'DD-MM-YYYY HH:mm';

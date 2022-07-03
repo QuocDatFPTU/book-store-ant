@@ -36,6 +36,7 @@ const ManageProductList = () => {
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
+  //Method Service
   const fetchProductList = (params, sortedInfo) => {
     setLoading(true);
     getProductList({ ...params })
@@ -57,6 +58,7 @@ const ManageProductList = () => {
       });
   };
 
+  //Method Component
   useEffect(() => {
     fetchProductList(params);
   }, [params]);
@@ -65,6 +67,7 @@ const ManageProductList = () => {
     fetchCategoryList(params);
   }, []);
 
+  //Set Table
   const columns = [
     {
       title: 'Tiêu đề',
