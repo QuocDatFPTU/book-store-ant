@@ -1,46 +1,49 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
   Col,
   Form,
+  Image,
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Row,
-  Tooltip,
+  Switch,
+  Tooltip
 } from 'antd';
 import { pickBy } from 'lodash';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getCategoryList, getProductList } from './product.service';
-import ProductEdit from './product.edit';
 import TableCustom from 'components/CustomTable';
+import PostEdit from './post.edit';
+import { getCategoryList, getPostList, getProductList } from './post.service';
+import { async } from '@firebase/util';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
 // };
-const ManageProductList = () => {
+const ManagePostList = () => {
   const [productList, setProductList] = useState([]);
-  const [product, setProduct] = useState();
-  const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModal, setIsEditModal] = useState(false);
   const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
+  const [blogList, setBlogList] = useState([])
+  const [categoryList, setCategoryList] = useState([]);
+
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
-  const fetchProductList = (params, sortedInfo) => {
+  const fetchBlogList = (params, sortedInfo) => {
     setLoading(true);
-    getProductList({ ...params })
+    getPostList({ ...params })
       .then((result) => {
-        setProductList([...result?.products]);
+        setBlogList([...result.posts]);
         setTotalItem(result?.count);
         setLoading(false);
       })
@@ -56,14 +59,19 @@ const ManageProductList = () => {
         return false;
       });
   };
-
   useEffect(() => {
-    fetchProductList(params);
+    fetchBlogList(params);
   }, [params]);
+
 
   useEffect(() => {
     fetchCategoryList(params);
   }, []);
+
+  useEffect(() => {
+    fetchCategoryList(params);
+  }, []);
+
 
   const columns = [
     {
@@ -91,36 +99,89 @@ const ManageProductList = () => {
       },
     },
     {
-      title: 'Giá',
-      dataIndex: 'listPrice',
-      key: 'listPrice',
+      title: 'Tác giả',
+      dataIndex: 'author',
+      key: 'author',
       width: '12%',
+      // render: (text, _) => <img src={text} width={100} alt="img" />,
     },
     {
-      title: 'Giá giảm giá',
-      dataIndex: 'salePrice',
-      key: 'salePrice',
+      title: 'Brief',
+      dataIndex: 'brief',
+      key: 'brief',
       width: '12%',
-    },
-    {
-      title: 'Số lượng',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      width: '12%',
-    },
-    {
-      title: 'Hình ảnh',
-      dataIndex: 'thumbnail',
-      key: 'thumbnail',
-      width: '12%',
-      render: (text, _) => <img src={text} width={100} alt="img" />,
+      ellipsis: true,
+      // render: (text, _) => <img src={text} width={100} alt="img" />,
     },
     {
       title: 'Thể loại',
       dataIndex: 'category',
       key: 'category',
       width: '12%',
-      render: (_, value) => value?.category?.name,
+      render: (_, value) => value?.category?.name || 'Không có dữ liệu',
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      align: 'center',
+      render: (text, _) => (
+        <Popconfirm
+          title={<div><span>Bạn có muốn ẩn blog này không ?</span></div>}
+          onConfirm={async (value) => { console.log(value) }}
+          icon={<ExclamationCircleOutlined />}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      )
+    },
+    {
+      title: 'Nổi bật',
+      dataIndex: 'featured',
+      key: 'featured',
+      align: 'center',
+      width: '12%',
+      render: (text, _) => {
+        return (
+          <Popconfirm
+            title={<div><span>Bạn có muốn chuyển trạng thái blog này không ?</span></div>}
+            onConfirm={async () => { console.log('value') }}
+            icon={<ExclamationCircleOutlined />}
+            okText={'Có'}
+            cancelText={'Không'}
+          >
+            <Switch checked={text}></Switch>
+          </Popconfirm>
+        )
+      },
+    },
+    {
+      title: 'Hình ảnh',
+      dataIndex: 'thumbnail',
+      key: 'thumbnail',
+      width: '12%',
+      render: (text, _) => <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />,
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      dataIndex: 'action',
+      width: '12%',
+      align: 'center',
+      render: (_, value) => (
+        <Popconfirm
+          title={"Bạn có muốn xóa blog này không"}
+          okText={"Có"}
+          cancelText={"Không"}
+          onConfirm={async () => { console.log('oke') }}
+          icon={<ExclamationCircleOutlined />}
+        >
+          <Button icon={<DeleteOutlined />} type="primary" danger style={{ borderRadius: '6px' }} />
+        </Popconfirm>
+      ),
     },
   ];
 
@@ -144,8 +205,8 @@ const ManageProductList = () => {
       breadcrumbName: 'Dashboard',
     },
     {
-      path: 'products',
-      breadcrumbName: 'products',
+      path: 'posts',
+      breadcrumbName: 'posts',
     },
   ];
 
@@ -153,7 +214,7 @@ const ManageProductList = () => {
     <Layout className="layoutContent">
       <PageHeader
         ghost={false}
-        title="Danh sách sản phẩm"
+        title="Danh sách post"
         extra={extraButton}
         breadcrumb={{ routes }}
         className="customPageHeader"
@@ -190,7 +251,7 @@ const ManageProductList = () => {
                     icon={<SearchOutlined />}
                     htmlType="submit"
                   >
-                    {'Tìm kiếm'}
+                    {'Search'}
                   </Button>
                 </Form.Item>
               </Col>
@@ -201,7 +262,7 @@ const ManageProductList = () => {
           title={() => (
             <Row>
               <Col span={12}>
-                <h3> {'Danh sách sản phẩm'}</h3>
+                <h3> {'Danh sách blog'}</h3>
               </Col>
             </Row>
           )}
@@ -209,7 +270,7 @@ const ManageProductList = () => {
           loading={loading}
           bordered
           columns={columns}
-          dataSource={productList}
+          dataSource={blogList}
           onChange={(pagination, filters, sorter) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (pagination.pageSize !== params.limit) {
@@ -228,7 +289,7 @@ const ManageProductList = () => {
           }}
           scroll={{ x: 1200 }}
         />
-        <ProductEdit
+        <PostEdit
           currentRow={currentRow}
           onCallback={(value) => {
             setParams({ ...defaultPage });
@@ -243,4 +304,4 @@ const ManageProductList = () => {
   );
 };
 
-export default ManageProductList;
+export default ManagePostList;
