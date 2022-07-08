@@ -221,7 +221,7 @@ const HeaderContainer = () => {
                   <Dropdown
                     overlay={
                       localStorage.getItem('__role') === 'R02' ||
-                      !localStorage.getItem('__role')
+                        !localStorage.getItem('__role')
                         ? menuGuest
                         : menuUser
                     }
@@ -231,6 +231,7 @@ const HeaderContainer = () => {
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
                     </Space>
                   </Dropdown>
+                  <Button type='link' onClick={() => navigate('/blog')}>Blog</Button>
                 </Col>
               </Row>
             </Col>

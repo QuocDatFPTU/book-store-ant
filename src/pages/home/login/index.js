@@ -8,6 +8,8 @@ import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
+import { loginStart } from 'redux/features/auth/authSlice';
+import { result } from 'lodash';
 
 // if (!result?.error) {
 // 	let role = localStorage.getItem("__role");
@@ -23,61 +25,67 @@ import axiosClient from 'util/axiosClient';
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const { role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   async function handleSubmit(value) {
     const { username, password } = value;
-    await dispatch(loginInitiate(username, password))
-      //LOGIN SUCESS
-      .then(async (result) => {
-        if (localStorage.getItem('__role') === 'R01') {
-          console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
-          try {
-            //Take all cart item of guest to customer
-            const cartGuest = await axiosClient.get('/cart/guest');
-            console.log('CART CỦA GUEST NÀY---------------');
-            console.log(cartGuest);
-            for (let i = 0; i < cartGuest.items.length; i++) {
-              const productId = cartGuest.items[i].product._id;
-              const quantity = cartGuest.items[i].quantity;
-              console.log(productId, quantity, '------------');
+    dispatch(loginStart({ username, password }));
+    if (role === 'R03') {
+      message.success('Đăng nhập thành công');
+      setLoading(true);
+      navigate('/dashboard/product');
+      return;
+    }
+    //LOGIN SUCESS
+    // .then(async (result) => {
+    //   if (localStorage.getItem('__role') === 'R01') {
+    //     console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
+    //     try {
+    //       //Take all cart item of guest to customer
+    //       const cartGuest = await axiosClient.get('/cart/guest');
+    //       console.log('CART CỦA GUEST NÀY---------------');
+    //       console.log(cartGuest);
+    //       for (let i = 0; i < cartGuest.items.length; i++) {
+    //         const productId = cartGuest.items[i].product._id;
+    //         const quantity = cartGuest.items[i].quantity;
+    //         console.log(productId, quantity, '------------');
 
-              //Update lại cart item của customer:
-              try {
-                await axiosClient.post('/cart', { productId, quantity });
-              } catch (error) {
-                console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
-                console.log(error);
-                console.log('++++++++++++++++++++');
-              }
-            }
-          } catch (error) {
-            console.log(error.response);
-          }
-          //Delete session: dù fail hoặc sucess lấy cart item
-          await axiosClient.delete('/session');
-        }
-        if (localStorage.getItem('__role') === 'R03') {
-          message.success('Login success');
-          setLoading(true);
-          navigate('/dashboard/product');
-          return;
-        }
+    //         //Update lại cart item của customer:
+    //         try {
+    //           await axiosClient.post('/cart', { productId, quantity });
+    //         } catch (error) {
+    //           console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
+    //           console.log(error);
+    //           console.log('++++++++++++++++++++');
+    //         }
+    //       }
+    //     } catch (error) {
+    //       console.log(error.response);
+    //     }
+    //     //Delete session: dù fail hoặc sucess lấy cart item
+    //     await axiosClient.delete('/session');
+    //   }
+    //   if (localStorage.getItem('__role') === 'R03') {
+    //     message.success('Login success');
+    //     setLoading(true);
+    //     navigate('/dashboard/product');
+    //     return;
+    //   }
 
-        // Move to User homepage
-        message.success('Đăng nhập thành công');
-        setLoading(true);
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
-        return true;
-      })
-      //LOGIN FAIL
-      .catch((error) => {
-        console.log(error.message);
-        message.error('Đăng nhập không thành công');
-      });
+    //   // Move to User homepage
+    //   message.success('Đăng nhập thành công');
+    //   setLoading(true);
+    //   setTimeout(() => {
+    //     navigate('/');
+    //   }, 3000);
+    //   return true;
+    // })
+    // //LOGIN FAIL
+    // .catch((error) => {
+    //   console.log(error.message);
+    //   message.error('Đăng nhập không thành công');
+    // });
   }
 
   // Listen to the Firebase Auth state and set the local state.

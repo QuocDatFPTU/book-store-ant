@@ -1,44 +1,27 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import {
-  Col,
-  Form,
-  Modal,
-  Upload,
-  Row,
-  Input,
-  Button,
-  message,
-  Checkbox,
-  Select,
-  InputNumber,
-  DatePicker,
+  Button, Checkbox, Col,
+  Form, Input, message, Modal, Row, Select, Upload
 } from 'antd';
+import TextEditor from 'components/TextEditor';
 import 'moment/locale/vi';
-import {
-  createDepartment,
-  createProduct,
-  updateDepartment,
-  updateProduct,
-} from './product.service';
+import { useEffect, useState } from 'react';
 import {
   beforeUpload,
   fakeUpload,
-  getBase64,
   normFile,
   uploadFileToFirebase,
-  uuidv4,
+  uuidv4
 } from 'util/file';
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { storage } from 'firebase';
-import moment from 'moment';
-const ProductEdit = ({
+import { createPost, updatePost } from './post.service';
+
+const PostEdit = ({
   currentRow,
   onCallback,
   isEditModal,
   setIsEditModal,
-  categoryList,
+  categoryList
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -47,6 +30,8 @@ const ProductEdit = ({
   const [defaultFileList, setDefaultFileList] = useState([]);
   const { TextArea } = Input;
   const { Option } = Select;
+
+
   const getDefaultFileList = (record) => {
     return [
       {
@@ -57,16 +42,6 @@ const ProductEdit = ({
     ];
   };
 
-  const handleChange = ({ fileList }) =>
-    setFileList(fileList.filter((file) => file.status !== 'error'));
-
-  const onRemove = async (file) => {
-    const index = fileList.indexOf(file);
-    const newFileList = fileList.slice();
-    newFileList.splice(index, 1);
-
-    setFileList(newFileList);
-  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -107,7 +82,6 @@ const ProductEdit = ({
       setLoading(true);
       // create\
 
-
       if (!currentRow) {
         const imageUrl = await uploadFileToFirebase(
           values?.thumbnail[0]?.originFileObj
@@ -115,13 +89,8 @@ const ProductEdit = ({
         const createData = {
           ...values,
           thumbnail: imageUrl,
-          briefInformation: {
-            ...values.briefInformation,
-            publicDate:
-              values?.briefInformation?.publicDate.format('YYYY-MM-DD'),
-          },
         };
-        await createProduct(createData)
+        await createPost(createData)
           .then((result) => {
             if (result) {
               message.success('Thêm mới sản phẩm thành công!');
@@ -140,11 +109,6 @@ const ProductEdit = ({
             ...values,
             id: currentRow?._id,
             thumbnail: updateImageUrl,
-            briefInformation: {
-              ...values.briefInformation,
-              publicDate:
-                values?.briefInformation?.publicDate.format('YYYY-MM-DD'),
-            },
           };
           await updateProduct(updateData)
             .then((result) => {
@@ -162,17 +126,10 @@ const ProductEdit = ({
           const updateData = {
             ...values,
             id: currentRow?._id,
-            briefInformation: {
-              ...values.briefInformation,
-              publicDate:
-                values?.briefInformation?.publicDate.format('YYYY-MM-DD'),
-            },
             thumbnail: currentRow?.thumbnail,
           };
-          console.log(updateData);
-          await updateProduct(updateData)
+          updatePost(updateData)
             .then((result) => {
-              console.log(result);
               message.success('Cập nhật sản phẩm thành công!');
               setLoading(false);
               onCallback();
@@ -192,6 +149,16 @@ const ProductEdit = ({
     }
   };
 
+  const onRemove = async (file) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+
+    setFileList(newFileList);
+  };
+  const handleChange = ({ fileList }) =>
+    setFileList(fileList.filter((file) => file.status !== 'error'));
+
   const categoryOptions = categoryList.map((data) => {
     return {
       label: data?.name,
@@ -201,36 +168,25 @@ const ProductEdit = ({
 
   const initalValue = {
     title: currentRow ? currentRow?.title : undefined,
-    listPrice: currentRow ? currentRow?.listPrice : undefined,
-    quantity: currentRow ? currentRow?.quantity : undefined,
+    brief: currentRow ? currentRow?.brief : undefined,
+    author: currentRow ? currentRow?.author : undefined,
     description: currentRow ? currentRow?.description : undefined,
-    feartured: currentRow ? currentRow?.feartured : undefined,
     status: currentRow ? currentRow?.status : undefined,
-    salePrice: currentRow ? currentRow?.salePrice : undefined,
+    featured: currentRow ? currentRow?.featured : undefined,
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
       : undefined,
     category: currentRow ? currentRow?.category?.name : undefined,
-    briefInformation: currentRow
-      ? {
-        author: currentRow?.briefInformation?.author,
-        language: currentRow?.briefInformation?.language,
-        pages: currentRow?.briefInformation?.pages,
-        publicDate: moment(currentRow?.briefInformation?.publicDate),
-        publisher: currentRow?.briefInformation?.publisher,
-      }
-      : undefined,
   };
   return (
     <Modal
-      title={currentRow ? 'Cập nhật sản phẩm' : 'Tạo sản phẩm'}
+      title={currentRow ? 'Cập nhật blog' : 'Tạo blog'}
       visible={isEditModal}
       width={900}
       centered
       footer={null}
       forceRender={true}
       afterClose={() => {
-        // console.log(defaultFileList);
         form.resetFields();
       }}
       onCancel={onCancel}
@@ -260,44 +216,49 @@ const ProductEdit = ({
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item
-            label="Giá"
-            name="listPrice"
+            label="Nội dung vắn tắt"
+            name="brief"
             rules={[
               {
                 required: true,
-                message: 'Cần nhập giá',
+                message: 'Vui lòng nhập nội dung tóm tắt',
+              },
+            ]}
+          >
+            <TextArea
+              showCount
+              maxLength={135}
+              style={{
+                height: 120,
+              }}
+            />
+          </Form.Item>
+        </Col>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Tác giả"
+            name="author"
+            rules={[
+              {
+                required: true,
+                message: 'Cần nhập tên tác giả!',
               },
             ]}
           >
             <Input />
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Giá sale"
-            name="salePrice"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập giá sale',
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Số lượng"
-            name="quantity"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập số lượng sản phẩm!',
-              },
-            ]}
-          >
-            <Input />
+        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
+          <Form.Item label="Loại" name="category" rules={[
+            {
+              required: true,
+              message: 'Cần chọn loại !',
+            },
+          ]}>
+            <Select
+              placeholder="Hãy chọn thể loại"
+              options={categoryOptions}
+            ></Select>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
@@ -312,104 +273,6 @@ const ProductEdit = ({
             <Checkbox>
               Trạng thái
             </Checkbox>
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
-          <Form.Item label="Loại" name="category">
-            <Select
-              placeholder="Hãy chọn thể loại"
-              options={categoryOptions}
-            ></Select>
-          </Form.Item>
-        </Col>
-        <Row gutter={[16, 0]}>
-          <Col lg={{ span: 5 }}>
-            <Form.Item
-              label="Tác giả"
-              name={['briefInformation', 'author']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Cần nhập thông tin tác giả!',
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col lg={{ span: 5 }}>
-            <Form.Item
-              label="Nhà sản xuất"
-              name={['briefInformation', 'publisher']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Cần nhập thông tin nhà sản xuất',
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col lg={{ span: 5 }}>
-            <Form.Item
-              label="Ngày sản xuất"
-              name={['briefInformation', 'publicDate']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Cần chọn ngày xuất bản',
-                },
-              ]}
-            >
-              <DatePicker placeholder={'Chọn ngày'} format={'DD-MM-YYYY'} />
-            </Form.Item>
-          </Col>
-          <Col lg={{ span: 5 }}>
-            <Form.Item
-              label="Ngôn ngữ"
-              name={['briefInformation', 'language']}
-              initialValue={`Tiếng việt`}
-              rules={[
-                {
-                  required: true,
-                  message: 'Cần chọn ngôn ngữ',
-                },
-              ]}
-            >
-              <Select>
-                <Option value="Tiếng Việt">Tiếng Việt</Option>
-                <Option value="Nước ngoài">Nước ngoài</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col lg={{ span: 4 }}>
-            <Form.Item
-              label="Số trang"
-              name={['briefInformation', 'pages']}
-              rules={[
-                {
-                  required: true,
-                  message: 'Cần nhập số trang',
-                },
-              ]}
-            >
-              <InputNumber />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Mô tả"
-            name="description"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập mô tả',
-              },
-            ]}
-          >
-            <TextArea showCount maxLength={256} />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
@@ -432,12 +295,26 @@ const ProductEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
-            // fileList={fileList}
             >
               {uploadButton}
             </Upload>
           </Form.Item>
         </Col>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }} style={{ height: '300px' }}>
+          <Form.Item
+            label="Nội dung"
+            name="description"
+            rules={[
+              {
+                required: true,
+                message: 'Cần nhập nội dung!',
+              },
+            ]}
+          >
+            <TextEditor style={{ height: '200px' }} />
+          </Form.Item>
+        </Col>
+
         <div
           className="ant-modal-footer"
           style={{ marginLeft: -24, marginRight: -24, marginBottom: -24 }}
@@ -453,7 +330,7 @@ const ProductEdit = ({
                 onClick={onCancel}
                 style={{ fontWeight: 'bold' }}
               >
-                {'Cancel'}
+                {'Hủy'}
               </Button>
               {loading === false ? (
                 <Button
@@ -461,7 +338,7 @@ const ProductEdit = ({
                   htmlType="submit"
                   style={{ fontWeight: 'bold' }}
                 >
-                  {'Save'}
+                  {'Lưu'}
                 </Button>
               ) : (
                 <Button type="primary" loading style={{ fontWeight: 'bold' }}>
@@ -476,4 +353,4 @@ const ProductEdit = ({
   );
 };
 
-export default ProductEdit;
+export default PostEdit;
