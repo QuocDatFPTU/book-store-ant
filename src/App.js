@@ -8,7 +8,7 @@ import Login from 'pages/home/login';
 import ProductList from 'pages/store/product-list';
 import ProfilePage from 'pages/store/profile';
 import ProductDetail from 'pages/store/product-detail';
-import BlogDetail from 'pages/store/blog-detail';
+import BlogDetail from 'pages/store/blog-detail-test';
 import CartContact from 'pages/store/cart-contact';
 import Register from 'pages/home/register';
 import ForgetPassword from 'pages/home/forget-password';
@@ -27,6 +27,8 @@ import ManageProductList from 'pages/dashboard/products/product-list.container';
 import DashboardLayout from 'layouts/dashboard/dashboard.layout';
 import ManagePostList from 'pages/dashboard/posts/post-list.container';
 import BlogList from 'pages/store/blog';
+import BlogListDetail from 'pages/store/blog-detail';
+import ManageSliderList from 'pages/dashboard/slider/slider-list.container';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -48,7 +50,7 @@ const App = () => {
               <Route path="/" element={<HomePage />}></Route>
               <Route path="/product-list/:id" element={<ProductList />} />
               <Route path="/product-detail/:id" element={<ProductDetail />} />
-              <Route path="/blog-detail" element={<BlogDetail />} />
+              {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
               <Route path="/cart" element={<Cart />} />
               <Route path="/cart-contact" element={<CartContact />} />
               {/* </Route> */}
@@ -58,6 +60,7 @@ const App = () => {
               <Route path="/information-order" element={<InformationOrder />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/blog" element={<BlogList />} />
+              <Route path="/blog/:blogId" element={<BlogListDetail />} />
             </Route>
             {/* </Route> */}
           </Routes>
@@ -75,6 +78,7 @@ const App = () => {
                 <Route path="customer" element={<ManageProductList />} />
                 <Route path="order" element={<ManageProductList />} />
                 <Route path="post" element={<ManagePostList />} />
+                <Route path="slider" element={<ManageSliderList />} />
               </Route>
             )}
             <Route path="/register" element={<Register />} />

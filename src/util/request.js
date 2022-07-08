@@ -1,6 +1,8 @@
 import axios from 'axios';
 import environment from 'environments/environment';
 import _ from 'lodash'
+import queryString from 'query-string';
+
 const getAxiosInstance = (baseUrl) => {
     const access_token = localStorage.getItem('__token');
 
@@ -11,6 +13,7 @@ const getAxiosInstance = (baseUrl) => {
     const axiosInstance = axios.create({
         baseURL: baseUrl,
         headers,
+        paramsSerializer: (params) => queryString.stringify(params),
     })
 
     axiosInstance.interceptors.response.use(
@@ -42,6 +45,8 @@ const request = (url, data = {}, method = 'POST') => {
                 return API.put(url, data);
             case 'DELETE':
                 return API.delete(url, data);
+            case 'GET-ONE':
+                return API.get(url);
             default:
                 return API.post(url, data);
         }
