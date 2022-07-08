@@ -75,6 +75,13 @@ const DashboardSider = () => {
             >
               Post
             </Menu.Item>
+            <Menu.Item
+              key="5"
+              // icon={<PostIconSvg />}
+              onClick={() => navigate('/dashboard/slider')}
+            >
+              Slider
+            </Menu.Item>
           </>
         }
       </Menu>

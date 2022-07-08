@@ -9,7 +9,8 @@ export default function ({
             createPost: 'posts',
             updatePost: 'posts',
             getPost: 'posts',
-            getCategory: 'categories'
+            getCategory: 'categories',
+            getBlogDetail: 'blogs'
         },
         isDevelopment: NODE_ENV === 'development'
     }
