@@ -31,6 +31,12 @@ const authSlice = createSlice({
                 loading: false,
                 error: action.payload,
             };
+        },
+        logoutSuccess(state) {
+            return {
+                ...state,
+                currentUser: null
+              };
         }
     },
 })

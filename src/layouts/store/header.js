@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logoutInitiate } from 'redux/action';
+import request from 'util/request';
 const { Header } = Layout;
 
 const HeaderContainer = () => {
@@ -41,23 +42,22 @@ const HeaderContainer = () => {
 
   //Effect
   useEffect(() => {
-    axiosClient.get('/categories').then((cates) => setCategories(cates));
+    request('/categories', {}, 'GET').then((cates) => setCategories(cates));
     // axiosClient
     //   .get('/user/profile')
     //   .then(({ user }) => setUsername(user.fullName));
   }, []);
   useEffect(() => {
-    axiosClient
-      .get('/user/profile')
-      .then(({ user }) => setUsername(user.fullName));
+      request('/user/profile', {}, 'GET') .then(({ user }) => setUsername(user?.fullName));
   }, [username]);
 
   const onSearch = async (value) => {
     console.log(value.target.value);
     try {
-      const lstProduct = await axiosClient.post('/products/search', {
-        searchText: value.target.value,
-      });
+      
+      const lstProduct = await request('/products/search', {
+        searchText: value.target.value
+      }, 'POST');
       console.log(lstProduct);
       let index = 0;
       let list = [];
@@ -74,7 +74,6 @@ const HeaderContainer = () => {
       console.log(list);
     } catch (error) {
       console.log(error);
-      console.log('Éo search được');
     }
   };
   const onLogout = async () => {
