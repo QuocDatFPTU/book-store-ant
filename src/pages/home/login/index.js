@@ -50,7 +50,6 @@ const Login = (props) => {
     //         const productId = cartGuest.items[i].product._id;
     //         const quantity = cartGuest.items[i].quantity;
     //         console.log(productId, quantity, '------------');
-
     //         //Update lại cart item của customer:
     //         try {
     //           await axiosClient.post('/cart', { productId, quantity });

@@ -9,7 +9,6 @@ import {
   PageHeader,
   Row,
   Tooltip,
-  Typography,
 } from 'antd';
 import { pickBy } from 'lodash';
 import moment from 'moment';
@@ -18,15 +17,17 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getCategoryList, getSliderList } from './slider.service';
-import ProductEdit from './slider.edit';
+import { getOrderList } from './order.service';
+import ProductEdit from './order.edit';
 import TableCustom from 'components/CustomTable';
+import axiosClient from 'util/axiosClient';
+import { DateFormat, MoneyFormat } from 'components/format';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
 // };
-const ManageSliderList = () => {
-  const [sliderList, setSliderList] = useState([]);
+const ManageOrderList = () => {
+  const [orderList, setOrderList] = useState([]);
   const [product, setProduct] = useState();
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,37 +38,23 @@ const ManageSliderList = () => {
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
-  const fetchSliderList = (params, sortedInfo) => {
+  const fetchOrderList = (params, sortedInfo) => {
     setLoading(true);
-    getSliderList({ ...params })
+    getOrderList({ ...params })
       .then((result) => {
-        setSliderList([...result?.sliders]);
+        setOrderList([...result?.orders]);
         setTotalItem(result?.count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
   };
-  const fetchCategoryList = (params) => {
-    getCategoryList({ ...params })
-      .then((result) => {
-        setCategoryList([...result]);
-        // setTotalItem(result.data["total-count"]);
-      })
-      .catch((e) => {
-        return false;
-      });
-  };
 
   useEffect(() => {
-    fetchSliderList(params);
+    fetchOrderList(params);
   }, [params]);
 
-  useEffect(() => {
-    fetchCategoryList(params);
-  }, []);
-
   const columns = [
-    //sliders' id, title, image, backlink, status
+    //id, ordered date, customer name, product (first product name & number of other products if any), total cost, status
     {
       title: 'ID',
       dataIndex: '_id',
@@ -78,7 +65,11 @@ const ManageSliderList = () => {
             size="small"
             type="link"
             onClick={async () => {
-              setCurrentRow(record);
+              const orderUpdate = await axiosClient.get(
+                `/orders/saler/${text}`
+              );
+              console.log(orderUpdate);
+              setCurrentRow(orderUpdate);
               setIsEditModal(true);
             }}
           >
@@ -88,36 +79,47 @@ const ManageSliderList = () => {
       },
     },
     {
-      title: 'Tiêu đề',
-      dataIndex: 'title',
-      key: 'title',
+      title: 'Ngày đặt hàng',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '12%',
+      render: (text, record) => {
+        return <DateFormat>{text}</DateFormat>;
+      },
+    },
+    {
+      title: 'Tên khách hàng',
+      dataIndex: 'receiverName',
+      key: 'receiverName',
+      width: '12%',
+    },
+    {
+      title: 'Tên sản phẩm',
+      dataIndex: 'items',
+      // key: 'items',
       ellipsis: {
         showTitle: false,
       },
-      render: (title, record) => {
-        return <p>{title}</p>;
+      render: (items, record) => {
+        return <p>{items[0]?.title}</p>;
       },
     },
     {
-      title: 'Hình ảnh',
-      dataIndex: 'image',
-      key: 'image',
+      title: 'số lượng sản phẩm',
+      dataIndex: 'items',
+      // key: 'items',
       width: '12%',
-      render: (image, _) => {
-        return <img src={image?.img} width={100} alt="img" />;
+      render: (items, record) => {
+        return <p>{items?.length}</p>;
       },
     },
     {
-      title: 'Backlink',
-      dataIndex: 'backlink',
-      key: 'backlink',
+      title: 'Chi phí',
+      dataIndex: 'totalCost',
+      key: 'totalCost',
       width: '12%',
       render: (text, record) => {
-        return (
-          <Typography.Link target="_blank" href={text}>
-            Click here
-          </Typography.Link>
-        );
+        return <MoneyFormat>{text}</MoneyFormat>;
       },
     },
     {
@@ -125,23 +127,10 @@ const ManageSliderList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
-      render: (text, record) => <p>{text ? 'true' : 'false'}</p>,
     },
   ];
-
-  const extraButton = [
-    <Button
-      key="btn-complete"
-      type="primary"
-      onClick={() => {
-        setCurrentRow(undefined);
-        setIsEditModal(true);
-      }}
-    >
-      {'Tạo mới'}
-      <PlusOutlined />
-    </Button>,
-  ];
+  console.log(orderList);
+  console.log(totalItem);
 
   const routes = [
     {
@@ -149,18 +138,16 @@ const ManageSliderList = () => {
       breadcrumbName: 'Dashboard',
     },
     {
-      path: 'sliders',
-      breadcrumbName: 'slider',
+      path: 'order',
+      breadcrumbName: 'orders',
     },
   ];
-  console.log(sliderList);
 
   return (
     <Layout className="layoutContent">
       <PageHeader
         ghost={false}
-        title="Danh sách sliders"
-        extra={extraButton}
+        title="Danh sách đơn hàng"
         breadcrumb={{ routes }}
         className="customPageHeader"
       />
@@ -207,7 +194,7 @@ const ManageSliderList = () => {
           title={() => (
             <Row>
               <Col span={12}>
-                <h3> {'Danh sách sliders'}</h3>
+                <h3> {'Danh sách đơn hàng'}</h3>
               </Col>
             </Row>
           )}
@@ -215,7 +202,7 @@ const ManageSliderList = () => {
           loading={loading}
           bordered
           columns={columns}
-          dataSource={sliderList}
+          dataSource={orderList}
           onChange={(pagination, filters, sorter) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (pagination.pageSize !== params.limit) {
@@ -249,4 +236,4 @@ const ManageSliderList = () => {
   );
 };
 
-export default ManageSliderList;
+export default ManageOrderList;

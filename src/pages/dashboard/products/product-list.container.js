@@ -149,6 +149,7 @@ const ManageProductList = () => {
     },
   ];
 
+  console.log(categoryList);
   return (
     <Layout className="layoutContent">
       <PageHeader

@@ -1,37 +1,46 @@
 /* eslint-disable react/prop-types */
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import {
-  Button, Checkbox, Col,
-  Form, Input, message, Modal, Row, Select, Upload
+  Col,
+  Form,
+  Modal,
+  Upload,
+  Row,
+  Input,
+  Button,
+  message,
+  Checkbox,
+  Select,
+  InputNumber,
+  DatePicker,
 } from 'antd';
-import TextEditor from 'components/TextEditor';
 import 'moment/locale/vi';
-import { useEffect, useState } from 'react';
+import { createSlider, updateSlider } from './slider.service';
 import {
   beforeUpload,
   fakeUpload,
+  getBase64,
   normFile,
   uploadFileToFirebase,
-  uuidv4
+  uuidv4,
 } from 'util/file';
-import { createPost, updatePost } from './slider.service';
-
-const PostEdit = ({
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { storage } from 'firebase';
+import moment from 'moment';
+const ProductEdit = ({
   currentRow,
   onCallback,
   isEditModal,
   setIsEditModal,
-  categoryList
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
   const [fileList, setFileList] = useState([]);
   const [defaultFileList, setDefaultFileList] = useState([]);
   const { TextArea } = Input;
-  const { Option } = Select;
 
-
+  //Set up upload images
   const getDefaultFileList = (record) => {
     return [
       {
@@ -40,6 +49,17 @@ const PostEdit = ({
         url: record,
       },
     ];
+  };
+
+  const handleChange = ({ fileList }) =>
+    setFileList(fileList.filter((file) => file.status !== 'error'));
+
+  const onRemove = async (file) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+
+    setFileList(newFileList);
   };
 
   const uploadButton = (
@@ -54,6 +74,7 @@ const PostEdit = ({
       </div>
     </div>
   );
+
   useEffect(() => {
     return () => {
       form.resetFields();
@@ -66,7 +87,7 @@ const PostEdit = ({
       {
         uid: uuidv4(),
         name: 'image',
-        url: currentRow?.thumbnail,
+        url: currentRow?.image?.img,
       },
     ]);
     return () => {
@@ -74,72 +95,61 @@ const PostEdit = ({
     };
   }, [currentRow]);
 
+  //Handle form
   const onCancel = () => {
     setIsEditModal(false);
   };
   const onFinish = async (values) => {
+    console.log(values);
     try {
       setLoading(true);
-      // create\
-
+      // create
       if (!currentRow) {
         const imageUrl = await uploadFileToFirebase(
-          values?.thumbnail[0]?.originFileObj
+          values?.image?.img[0]?.originFileObj
         );
         const createData = {
           ...values,
-          thumbnail: imageUrl,
+          status: values.status ? true : false,
+          image: { img: imageUrl },
         };
-        await createPost(createData)
+        await createSlider(createData)
           .then((result) => {
             if (result) {
-              message.success('Thêm mới sản phẩm thành công!');
+              message.success('Thêm mới sliders thành công!');
             }
           })
           .catch((error) => message.error(error.message));
         setLoading(false);
         onCallback();
       } else {
-        if (values?.thumbnail[0]?.originFileObj) {
+        //update
+        const { image, ...updateObj } = values;
+        let updateData = {
+          ...updateObj,
+          id: currentRow?._id,
+          status: updateObj.status ? true : false,
+        };
+
+        if (image?.img[0]?.originFileObj) {
           const updateImageUrl = await uploadFileToFirebase(
-            values?.thumbnail[0]?.originFileObj
+            image?.img[0]?.originFileObj
           );
-          delete values.thumbnail;
-          const updateData = {
-            ...values,
-            id: currentRow?._id,
-            thumbnail: updateImageUrl,
-          };
-          await updateProduct(updateData)
-            .then((result) => {
-              console.log(result);
-              message.success('Cập nhật sản phẩm thành công!');
-              setLoading(false);
-              onCallback();
-            })
-            .catch((error) => {
-              message.error(error.message);
-              setLoading(false);
-            });
-        } else {
-          delete values.thumbnail;
-          const updateData = {
-            ...values,
-            id: currentRow?._id,
-            thumbnail: currentRow?.thumbnail,
-          };
-          updatePost(updateData)
-            .then((result) => {
-              message.success('Cập nhật sản phẩm thành công!');
-              setLoading(false);
-              onCallback();
-            })
-            .catch((error) => {
-              console.log('error2', error);
-              message.error(error.message);
-              setLoading(false);
-            });
+          updateData.image = { img: updateImageUrl };
         }
+
+        console.log(updateData);
+        await updateSlider(updateData)
+          .then((result) => {
+            console.log(result);
+            message.success('Cập nhật sliders thành công!');
+            setLoading(false);
+            onCallback();
+          })
+          .catch((error) => {
+            message.error(error.message);
+            setLoading(false);
+          });
       }
     } catch (error) {
       console.log('errorTong', error);
@@ -149,44 +159,30 @@ const PostEdit = ({
     }
   };
 
-  const onRemove = async (file) => {
-    const index = fileList.indexOf(file);
-    const newFileList = fileList.slice();
-    newFileList.splice(index, 1);
-
-    setFileList(newFileList);
-  };
-  const handleChange = ({ fileList }) =>
-    setFileList(fileList.filter((file) => file.status !== 'error'));
-
-   const categoryOptions = categoryList.map((data) => {
-    return {
-      label: data?.name,
-      value: data?._id,
-    };
-  });
-
   const initalValue = {
     title: currentRow ? currentRow?.title : undefined,
-    brief: currentRow ? currentRow?.brief : undefined,
-    author: currentRow ? currentRow?.author : undefined,
-    description: currentRow ? currentRow?.description : undefined,
+    backlink: currentRow ? currentRow?.backlink : undefined,
+    notes: currentRow ? currentRow?.notes : undefined,
     status: currentRow ? currentRow?.status : undefined,
-    featured: currentRow ? currentRow?.featured : undefined,
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
       : undefined,
-    category: currentRow ? currentRow?.category?.name : undefined,
+    image: currentRow
+      ? {
+          img: getDefaultFileList(currentRow?.image?.img),
+        }
+      : undefined,
   };
   return (
     <Modal
-      title={currentRow ? 'Cập nhật blog' : 'Tạo blog'}
+      title={currentRow ? 'Cập nhật slider' : 'Tạo sản phẩm'}
       visible={isEditModal}
       width={900}
       centered
       footer={null}
       forceRender={true}
       afterClose={() => {
+        // console.log(defaultFileList);
         form.resetFields();
       }}
       onCancel={onCancel}
@@ -216,69 +212,41 @@ const PostEdit = ({
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item
-            label="Nội dung vắn tắt"
-            name="brief"
+            label="Backlink"
+            name="backlink"
             rules={[
               {
                 required: true,
-                message: 'Vui lòng nhập nội dung tóm tắt',
-              },
-            ]}
-          >
-            <TextArea
-              showCount
-              maxLength={135}
-              style={{
-                height: 120,
-              }}
-            />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Tác giả"
-            name="author"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập tên tác giả!',
+                message: 'Cần nhập Backlink',
               },
             ]}
           >
             <Input />
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
-          <Form.Item label="Loại" name="category" rules={[
-            {
-              required: true,
-              message: 'Cần chọn loại !',
-            },
-          ]}>
-            <Select
-              placeholder="Hãy chọn thể loại"
-              options={categoryOptions}
-            ></Select>
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
-            <Checkbox>
-              Đặc biệt
-            </Checkbox>
-          </Form.Item>
-        </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
-            <Checkbox>
-              Trạng thái
-            </Checkbox>
+            <Checkbox>Trạng thái</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item
-            name="thumbnail"
-            label={'Thumbnail'}
+            label="Ghi chú"
+            name="notes"
+            rules={[
+              {
+                required: true,
+                message: 'Cần nhập ghi chú',
+              },
+            ]}
+          >
+            <TextArea showCount maxLength={256} />
+          </Form.Item>
+        </Col>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Ảnh"
+            name={['image', 'img']}
             getValueFromEvent={normFile}
             style={{ width: '100%' }}
           >
@@ -295,26 +263,12 @@ const PostEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
+              // fileList={fileList}
             >
               {uploadButton}
             </Upload>
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} style={{ height: '300px' }}>
-          <Form.Item
-            label="Nội dung"
-            name="description"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập nội dung!',
-              },
-            ]}
-          >
-            <TextEditor style={{ height: '200px' }} />
-          </Form.Item>
-        </Col>
-
         <div
           className="ant-modal-footer"
           style={{ marginLeft: -24, marginRight: -24, marginBottom: -24 }}
@@ -330,7 +284,7 @@ const PostEdit = ({
                 onClick={onCancel}
                 style={{ fontWeight: 'bold' }}
               >
-                {'Hủy'}
+                {'Cancel'}
               </Button>
               {loading === false ? (
                 <Button
@@ -338,7 +292,7 @@ const PostEdit = ({
                   htmlType="submit"
                   style={{ fontWeight: 'bold' }}
                 >
-                  {'Lưu'}
+                  {'Save'}
                 </Button>
               ) : (
                 <Button type="primary" loading style={{ fontWeight: 'bold' }}>
@@ -353,4 +307,4 @@ const PostEdit = ({
   );
 };
 
-export default PostEdit;
+export default ProductEdit;
