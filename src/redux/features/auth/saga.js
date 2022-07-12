@@ -16,6 +16,7 @@ function* login(action) {
             return;
         }
         const decode_token = jwt.decode(data.token);
+        localStorage.setItem('__role', decode_token?.role);
         localStorage.setItem('__token', data.token);
         yield put(loginSuccess({
             ...data,
@@ -28,6 +29,9 @@ function* login(action) {
     }
 }
 
+// fucntion* logout(action) {
+
+// }
 export default function* watchAuth() {
     yield takeLeading(loginStart.type, login);
 }
