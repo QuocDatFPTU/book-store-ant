@@ -80,15 +80,14 @@ const DashboardSider = () => {
           >
             Slider
           </Menu.Item>
-          {role === 'R00' && (
-            <Menu.Item
-              key="6"
-              // icon={<PostIconSvg />}
-              onClick={() => navigate('/dashboard/user')}
-            >
-              User
-            </Menu.Item>
-          )}
+
+          <Menu.Item
+            key="6"
+            // icon={<PostIconSvg />}
+            onClick={() => navigate('/dashboard/user')}
+          >
+            User
+          </Menu.Item>
         </>
       </Menu>
     </Sider>
