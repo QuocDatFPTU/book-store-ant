@@ -29,6 +29,7 @@ import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logoutInitiate } from 'redux/action';
 import request from 'util/request';
+import { logoutStart } from 'redux/features/auth/authSlice';
 const { Header } = Layout;
 
 const HeaderContainer = () => {
@@ -48,16 +49,21 @@ const HeaderContainer = () => {
     //   .then(({ user }) => setUsername(user.fullName));
   }, []);
   useEffect(() => {
-      request('/user/profile', {}, 'GET') .then(({ user }) => setUsername(user?.fullName));
+    request('/user/profile', {}, 'GET').then(({ user }) =>
+      setUsername(user?.fullName)
+    );
   }, [username]);
 
   const onSearch = async (value) => {
     console.log(value.target.value);
     try {
-      
-      const lstProduct = await request('/products/search', {
-        searchText: value.target.value
-      }, 'POST');
+      const lstProduct = await request(
+        '/products/search',
+        {
+          searchText: value.target.value,
+        },
+        'POST'
+      );
       console.log(lstProduct);
       let index = 0;
       let list = [];
@@ -77,7 +83,7 @@ const HeaderContainer = () => {
     }
   };
   const onLogout = async () => {
-    dispatch(logoutInitiate());
+    dispatch(logoutStart());
     navigate('/login');
   };
   const menuGuest = (
@@ -220,7 +226,7 @@ const HeaderContainer = () => {
                   <Dropdown
                     overlay={
                       localStorage.getItem('__role') === 'R02' ||
-                        !localStorage.getItem('__role')
+                      !localStorage.getItem('__role')
                         ? menuGuest
                         : menuUser
                     }
@@ -230,7 +236,9 @@ const HeaderContainer = () => {
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
                     </Space>
                   </Dropdown>
-                  <Button type='link' onClick={() => navigate('/blog')}>Blog</Button>
+                  <Button type="link" onClick={() => navigate('/blog')}>
+                    Blog
+                  </Button>
                 </Col>
               </Row>
             </Col>

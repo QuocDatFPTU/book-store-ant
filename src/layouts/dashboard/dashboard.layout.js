@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import './styles.less';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { logoutStart } from 'redux/features/auth/authSlice';
 const { Header } = Layout;
 
 // import logo from "assets/logo.png";
@@ -31,10 +32,10 @@ const DashboardLayout = (props) => {
       <Menu.Item key="1">
         <LoginOutlined
           onClick={() => {
-            dispatch(logoutInitiate());
+            dispatch(logoutStart());
             navigate('/login');
           }}
-        />{' '}
+        />
         {'Log out'}
       </Menu.Item>
     </Menu>
