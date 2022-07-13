@@ -32,6 +32,7 @@ import ManageSliderList from 'pages/dashboard/slider/slider-list.container';
 import AccountList from 'pages/dashboard/student/account-list.container';
 import ManageOrderList from 'pages/dashboard/orders/order-list.container';
 import ManageCustomerList from 'pages/dashboard/customers/customer-list.container';
+import CartCompletion from 'pages/store/cart-completion';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -56,6 +57,11 @@ const App = () => {
               {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
               <Route path="/cart" element={<Cart />} />
               <Route path="/cart-contact" element={<CartContact />} />
+              <Route path="/cart-completion/:id" element={<CartCompletion />} />
+              <Route
+                path="/order-information/:id"
+                element={<InformationOrder />}
+              />
               {/* </Route> */}
               //Protected route
               {/* <Route element={<ProtectedRoute allowed={['customer']} />}> */}
