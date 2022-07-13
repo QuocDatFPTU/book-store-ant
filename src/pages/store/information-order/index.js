@@ -104,7 +104,7 @@ const InformationOrder = () => {
   };
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <div className="infor-content">Thông Tin Đơn Hàng</div>
       </WrapperConentContainer>
@@ -274,7 +274,7 @@ const InformationOrder = () => {
           ) : undefined}
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

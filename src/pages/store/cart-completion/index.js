@@ -100,7 +100,7 @@ const CartCompletion = () => {
   }, []);
 
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <Result
           status="success"
@@ -210,7 +210,7 @@ const CartCompletion = () => {
           </Col>
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 
