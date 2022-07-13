@@ -70,6 +70,7 @@ const ManageProductList = () => {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      sorter: (a, b) => a.title.length - b.title.length,
       ellipsis: {
         showTitle: false,
       },
@@ -95,12 +96,14 @@ const ManageProductList = () => {
       dataIndex: 'listPrice',
       key: 'listPrice',
       width: '12%',
+      sorter: (a, b) => a.listPrice - b.listPrice,
     },
     {
       title: 'Giá giảm giá',
       dataIndex: 'salePrice',
       key: 'salePrice',
       width: '12%',
+      sorter: (a, b) => a.salePrice - b.salePrice,
     },
     {
       title: 'Số lượng',
@@ -120,7 +123,24 @@ const ManageProductList = () => {
       dataIndex: 'category',
       key: 'category',
       width: '12%',
+      sorter: (a, b) => a.category?.name.length - b.category?.name.length,
       render: (_, value) => value?.category?.name,
+    },
+    {
+      title: 'Đặc biệt',
+      dataIndex: 'feartured',
+      key: 'feartured',
+      width: '12%',
+      sorter: (a, b) => a.feartured - b.feartured,
+      render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      sorter: (a, b) => a.status - b.status,
+      render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
     },
   ];
 
@@ -149,6 +169,7 @@ const ManageProductList = () => {
     },
   ];
 
+  console.log(productList);
   return (
     <Layout className="layoutContent">
       <PageHeader

@@ -1,4 +1,9 @@
-import { DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -11,7 +16,7 @@ import {
   Popconfirm,
   Row,
   Switch,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import { pickBy } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -33,7 +38,7 @@ const ManagePostList = () => {
   const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
-  const [blogList, setBlogList] = useState([])
+  const [blogList, setBlogList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
 
   // const [sortedInfo] = useState(defaultSort);
@@ -63,7 +68,6 @@ const ManagePostList = () => {
     fetchBlogList(params);
   }, [params]);
 
-
   useEffect(() => {
     fetchCategoryList(params);
   }, []);
@@ -71,13 +75,13 @@ const ManagePostList = () => {
   useEffect(() => {
     fetchCategoryList(params);
   }, []);
-
 
   const columns = [
     {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      sorter: (a, b) => a.title.length - b.title.length,
       ellipsis: {
         showTitle: false,
       },
@@ -103,7 +107,7 @@ const ManagePostList = () => {
       dataIndex: 'author',
       key: 'author',
       width: '12%',
-      // render: (text, _) => <img src={text} width={100} alt="img" />,
+      sorter: (a, b) => a.author.length - b.author.length,
     },
     {
       title: 'Brief',
@@ -118,6 +122,7 @@ const ManagePostList = () => {
       dataIndex: 'category',
       key: 'category',
       width: '12%',
+      sorter: (a, b) => a.category?.name.length - b.category?.name.length,
       render: (_, value) => value?.category?.name || 'Không có dữ liệu',
     },
     {
@@ -126,17 +131,24 @@ const ManagePostList = () => {
       key: 'status',
       width: '12%',
       align: 'center',
+      sorter: (a, b) => a.status - b.status,
       render: (text, _) => (
         <Popconfirm
-          title={<div><span>Bạn có muốn ẩn blog này không ?</span></div>}
-          onConfirm={async (value) => { console.log(value) }}
+          title={
+            <div>
+              <span>Bạn có muốn ẩn blog này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            console.log(value);
+          }}
           icon={<ExclamationCircleOutlined />}
           okText={'Có'}
           cancelText={'Không'}
         >
           <Switch checked={text}></Switch>
         </Popconfirm>
-      )
+      ),
     },
     {
       title: 'Nổi bật',
@@ -144,18 +156,25 @@ const ManagePostList = () => {
       key: 'featured',
       align: 'center',
       width: '12%',
+      sorter: (a, b) => a.feartured - b.feartured,
       render: (text, _) => {
         return (
           <Popconfirm
-            title={<div><span>Bạn có muốn chuyển trạng thái blog này không ?</span></div>}
-            onConfirm={async () => { console.log('value') }}
+            title={
+              <div>
+                <span>Bạn có muốn chuyển trạng thái blog này không ?</span>
+              </div>
+            }
+            onConfirm={async () => {
+              console.log('value');
+            }}
             icon={<ExclamationCircleOutlined />}
             okText={'Có'}
             cancelText={'Không'}
           >
             <Switch checked={text}></Switch>
           </Popconfirm>
-        )
+        );
       },
     },
     {
@@ -163,7 +182,9 @@ const ManagePostList = () => {
       dataIndex: 'thumbnail',
       key: 'thumbnail',
       width: '12%',
-      render: (text, _) => <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />,
+      render: (text, _) => (
+        <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
+      ),
     },
     {
       title: 'Hành động',
@@ -173,13 +194,20 @@ const ManagePostList = () => {
       align: 'center',
       render: (_, value) => (
         <Popconfirm
-          title={"Bạn có muốn xóa blog này không"}
-          okText={"Có"}
-          cancelText={"Không"}
-          onConfirm={async () => { console.log('oke') }}
+          title={'Bạn có muốn xóa blog này không'}
+          okText={'Có'}
+          cancelText={'Không'}
+          onConfirm={async () => {
+            console.log('oke');
+          }}
           icon={<ExclamationCircleOutlined />}
         >
-          <Button icon={<DeleteOutlined />} type="primary" danger style={{ borderRadius: '6px' }} />
+          <Button
+            icon={<DeleteOutlined />}
+            type="primary"
+            danger
+            style={{ borderRadius: '6px' }}
+          />
         </Popconfirm>
       ),
     },

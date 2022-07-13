@@ -1,8 +1,16 @@
 /* eslint-disable react/prop-types */
 import { PlusOutlined } from '@ant-design/icons';
 import {
-  Button, Checkbox, Col,
-  Form, Input, message, Modal, Row, Select, Upload
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Upload,
 } from 'antd';
 import TextEditor from 'components/TextEditor';
 import 'moment/locale/vi';
@@ -12,7 +20,7 @@ import {
   fakeUpload,
   normFile,
   uploadFileToFirebase,
-  uuidv4
+  uuidv4,
 } from 'util/file';
 import { createPost, updatePost } from './post.service';
 
@@ -21,7 +29,7 @@ const PostEdit = ({
   onCallback,
   isEditModal,
   setIsEditModal,
-  categoryList
+  categoryList,
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -30,7 +38,6 @@ const PostEdit = ({
   const [defaultFileList, setDefaultFileList] = useState([]);
   const { TextArea } = Input;
   const { Option } = Select;
-
 
   const getDefaultFileList = (record) => {
     return [
@@ -80,7 +87,7 @@ const PostEdit = ({
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      // create\
+      // create
 
       if (!currentRow) {
         const imageUrl = await uploadFileToFirebase(
@@ -110,7 +117,8 @@ const PostEdit = ({
             id: currentRow?._id,
             thumbnail: updateImageUrl,
           };
-          await updateProduct(updateData)
+          const { author, updateDataFinal } = updateData;
+          await updateProduct(updateDataFinal)
             .then((result) => {
               console.log(result);
               message.success('Cập nhật sản phẩm thành công!');
@@ -245,34 +253,31 @@ const PostEdit = ({
               },
             ]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
-          <Form.Item label="Loại" name="category" rules={[
-            {
-              required: true,
-              message: 'Cần chọn loại !',
-            },
-          ]}>
-            <Select
-              placeholder="Hãy chọn thể loại"
-              options={categoryOptions}
-            ></Select>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Loại"
+            name="category"
+            rules={[
+              {
+                required: true,
+                message: 'Cần chọn loại !',
+              },
+            ]}
+          >
+            <Select placeholder="Hãy chọn thể loại" options={categoryOptions} />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
-            <Checkbox>
-              Đặc biệt
-            </Checkbox>
+            <Checkbox>Đặc biệt</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
-            <Checkbox>
-              Trạng thái
-            </Checkbox>
+            <Checkbox>Trạng thái</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
