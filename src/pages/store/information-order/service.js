@@ -2,6 +2,7 @@ import axiosClient from "util/axiosClient";
 
 // get user from session. If not, get from user profile
 export const getOrderInformation = async (params) => {
+  console.log('params', params);
   const url = `/orders/me/${params}`;
-  return axiosClient.get(url, { params });
+  return axiosClient.get(url, params);
 };
