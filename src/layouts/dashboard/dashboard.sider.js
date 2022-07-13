@@ -48,50 +48,48 @@ const DashboardSider = () => {
         </div>
       )}
       <Menu theme="light" mode="inline" className="menu-list">
-        {role === 'R03' && (
-          <>
+        <>
+          <Menu.Item
+            key="1"
+            icon={<PieChartOutlined />}
+            onClick={() => navigate('/dashboard/product')}
+          >
+            Sản phẩm
+          </Menu.Item>
+          <Menu.Item key="2" onClick={() => navigate('/dashboard/customer')}>
+            Customer
+          </Menu.Item>
+          <Menu.Item
+            key="3"
+            // icon={<OrderIconSvg />}
+            onClick={() => navigate('/dashboard/order')}
+          >
+            Order
+          </Menu.Item>
+          <Menu.Item
+            key="4"
+            // icon={<PostIconSvg />}
+            onClick={() => navigate('/dashboard/post')}
+          >
+            Post
+          </Menu.Item>
+          <Menu.Item
+            key="5"
+            // icon={<PostIconSvg />}
+            onClick={() => navigate('/dashboard/slider')}
+          >
+            Slider
+          </Menu.Item>
+          {role === 'R00' && (
             <Menu.Item
-              key="1"
-              icon={<PieChartOutlined />}
-              onClick={() => navigate('/dashboard/product')}
-            >
-              Sản phẩm
-            </Menu.Item>
-            <Menu.Item key="2" onClick={() => navigate('/dashboard/customer')}>
-              Customer
-            </Menu.Item>
-            <Menu.Item
-              key="3"
-              // icon={<OrderIconSvg />}
-              onClick={() => navigate('/dashboard/order')}
-            >
-              Order
-            </Menu.Item>
-            <Menu.Item
-              key="4"
+              key="6"
               // icon={<PostIconSvg />}
-              onClick={() => navigate('/dashboard/post')}
+              onClick={() => navigate('/dashboard/user')}
             >
-              Post
+              User
             </Menu.Item>
-            <Menu.Item
-              key="5"
-              // icon={<PostIconSvg />}
-              onClick={() => navigate('/dashboard/slider')}
-            >
-              Slider
-            </Menu.Item>
-            {role === 'R00' && (
-              <Menu.Item
-                key="6"
-                // icon={<PostIconSvg />}
-                onClick={() => navigate('/dashboard/user')}
-              >
-                User
-              </Menu.Item>
-            )}
-          </>
-        )}
+          )}
+        </>
       </Menu>
     </Sider>
   );

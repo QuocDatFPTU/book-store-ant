@@ -97,6 +97,14 @@ export const logoutInitiate = () => {
     //Delete local storeage
     localStorage.removeItem('__role');
     localStorage.removeItem('__token');
+    dispatch(
+      logoutSuccess({
+        loading: false,
+        currentUser: null,
+        error: null,
+        role: 'R02',
+      })
+    );
   };
 };
 

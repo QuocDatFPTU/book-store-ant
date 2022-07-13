@@ -30,6 +30,8 @@ import BlogList from 'pages/store/blog';
 import BlogListDetail from 'pages/store/blog-detail';
 import ManageSliderList from 'pages/dashboard/slider/slider-list.container';
 import AccountList from 'pages/dashboard/student/account-list.container';
+import ManageOrderList from 'pages/dashboard/orders/order-list.container';
+import ManageCustomerList from 'pages/dashboard/customers/customer-list.container';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -65,31 +67,27 @@ const App = () => {
             </Route>
             {/* </Route> */}
           </Routes>
-
           <Routes>
             <Route path="/login" element={<Login />} />
-            {role === 'R03' && (
-              <Route
-                path="dashboard"
-                element={
-                  <DashboardLayout sider={<DashboardSider />} title="Admin" />
-                }
-              >
-                <Route path="product" element={<ManageProductList />} />
-                <Route path="customer" element={<ManageProductList />} />
-                <Route path="order" element={<ManageProductList />} />
-                <Route path="post" element={<ManagePostList />} />
-                <Route path="slider" element={<ManageSliderList />} />
-
-                {role === 'R00' && (
-                  <Route path="user" element={<AccountList />} />
-                )}
-              </Route>
-            )}
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
+          </Routes>
+          <Routes>
+            <Route
+              path="dashboard"
+              element={
+                <DashboardLayout sider={<DashboardSider />} title="Admin" />
+              }
+            >
+              <Route path="product" element={<ManageProductList />} />
+              <Route path="customer" element={<ManageCustomerList />} />
+              <Route path="order" element={<ManageOrderList />} />
+              <Route path="post" element={<ManagePostList />} />
+              <Route path="slider" element={<ManageSliderList />} />
+              <Route path="user" element={<AccountList />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </PersistGate>

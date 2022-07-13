@@ -28,35 +28,57 @@ const Login = (props) => {
   const navigate = useNavigate();
   const { role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const [isLogin, setIsLogin] = useState(false);
 
   async function handleSubmit(value) {
     const { username, password } = value;
     dispatch(loginStart({ username, password }));
-    if (role === 'R03') {
-      message.success('Đăng nhập thành công');
-      setLoading(true);
-      navigate('/dashboard/product');
-      return;
-    }
+    setIsLogin(true);
+  }
 
-    if (localStorage.getItem('__role') === 'R01') {
-          console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
+  useEffect(async () => {
+    //đang đăng nhập
+    //+ bình thường: isLogin=false, role=R02
+    //+ đang load: isLogin=true, role=R02, local=null
+    //+ load xong fail: isLogin=true, role=R02, local=null báo lỗi
+    //+ load xong success: isLogin=true, role=R03, local=R03,navigate
+
+    //đang đăng nhập
+    //+ đang load: role=R02
+    //+ load xong fail: role=R02
+    //+ load xong success: role=R03
+    console.log(role);
+    console.log(isLogin);
+    console.log(role !== 'R02');
+    if (isLogin) {
+      //Load xong success
+      if (role !== 'R02') {
+        if (role === 'R03') {
+          message.success('Đăng nhập thành công');
+          setLoading(true);
+          navigate('/dashboard/product');
+          return;
+        }
+
+        if (role === 'R04') {
+          message.success('Đăng nhập thành công');
+          setLoading(true);
+          navigate('/dashboard/order');
+          return;
+        }
+
+        if (role === 'R01') {
           try {
             //Take all cart item of guest to customer
             const cartGuest = await request('/cart/guest', {}, 'GET');
-            console.log(cartGuest);
             for (let i = 0; i < cartGuest.items.length; i++) {
               const productId = cartGuest.items[i].product._id;
               const quantity = cartGuest.items[i].quantity;
-              console.log(productId, quantity, '------------');
-  
               //Update lại cart item của customer:
               try {
                 await request('/cart', { productId, quantity }, 'POST');
               } catch (error) {
-                console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
                 console.log(error);
-                console.log('++++++++++++++++++++');
               }
             }
           } catch (error) {
@@ -65,61 +87,106 @@ const Login = (props) => {
           //Delete session: dù fail hoặc sucess lấy cart item
           await axiosClient.delete('/session');
         }
+
         message.success('Đăng nhập thành công');
         setTimeout(() => {
-              navigate('/');
-            }, 3000);
-            return true;
-          }
-    //LOGIN SUCESS
-    // .then(async (result) => {
-    //   if (localStorage.getItem('__role') === 'R01') {
-    //     console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
-    //     try {
-    //       //Take all cart item of guest to customer
-    //       const cartGuest = await axiosClient.get('/cart/guest');
-    //       console.log('CART CỦA GUEST NÀY---------------');
-    //       console.log(cartGuest);
-    //       for (let i = 0; i < cartGuest.items.length; i++) {
-    //         const productId = cartGuest.items[i].product._id;
-    //         const quantity = cartGuest.items[i].quantity;
-    //         console.log(productId, quantity, '------------');
+          navigate('/');
+        }, 3000);
 
-    //         //Update lại cart item của customer:
-    //         try {
-    //           await axiosClient.post('/cart', { productId, quantity });
-    //         } catch (error) {
-    //           console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
-    //           console.log(error);
-    //           console.log('++++++++++++++++++++');
-    //         }
-    //       }
-    //     } catch (error) {
-    //       console.log(error.response);
+        setIsLogin(false);
+      }
+    }
+
+    // if (isLogin && role) {
+    //   //When login Success
+    //   if (role && role !== 'R02') {
+    //     if (role === 'R03') {
+    //       message.success('Đăng nhập thành công');
+    //       setLoading(true);
+    //       navigate('/dashboard/product');
+    //       return;
     //     }
-    //     //Delete session: dù fail hoặc sucess lấy cart item
-    //     await axiosClient.delete('/session');
-    //   }
-    //   if (localStorage.getItem('__role') === 'R03') {
-    //     message.success('Login success');
-    //     setLoading(true);
-    //     navigate('/dashboard/product');
-    //     return;
-    //   }
 
-    //   // Move to User homepage
-    //   message.success('Đăng nhập thành công');
-    //   setLoading(true);
-    //   setTimeout(() => {
-    //     navigate('/');
-    //   }, 3000);
-    //   return true;
-    // })
-    // //LOGIN FAIL
-    // .catch((error) => {
-    //   console.log(error.message);
-    //   message.error('Đăng nhập không thành công');
-    // });
+    //     if (role === 'R01') {
+    //       try {
+    //         //Take all cart item of guest to customer
+    //         const cartGuest = await request('/cart/guest', {}, 'GET');
+    //         for (let i = 0; i < cartGuest.items.length; i++) {
+    //           const productId = cartGuest.items[i].product._id;
+    //           const quantity = cartGuest.items[i].quantity;
+    //           //Update lại cart item của customer:
+    //           try {
+    //             await request('/cart', { productId, quantity }, 'POST');
+    //           } catch (error) {
+    //             console.log(error);
+    //           }
+    //         }
+    //       } catch (error) {
+    //         console.log(error.response);
+    //       }
+    //       //Delete session: dù fail hoặc sucess lấy cart item
+    //       await axiosClient.delete('/session');
+    //     }
+    //     message.success('Đăng nhập thành công');
+    //     setTimeout(() => {
+    //       navigate('/');
+    //     }, 3000);
+    //   } //When login fail
+    //   else message.error('Đăng nhập không thành công');
+    //   //Set is Login to false
+    //   setIsLogin(false);
+    // }
+  });
+
+  //LOGIN SUCESS
+  // .then(async (result) => {
+  //   if (localStorage.getItem('__role') === 'R01') {
+  //     console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
+  //     try {
+  //       //Take all cart item of guest to customer
+  //       const cartGuest = await axiosClient.get('/cart/guest');
+  //       console.log('CART CỦA GUEST NÀY---------------');
+  //       console.log(cartGuest);
+  //       for (let i = 0; i < cartGuest.items.length; i++) {
+  //         const productId = cartGuest.items[i].product._id;
+  //         const quantity = cartGuest.items[i].quantity;
+  //         console.log(productId, quantity, '------------');
+
+  //         //Update lại cart item của customer:
+  //         try {
+  //           await axiosClient.post('/cart', { productId, quantity });
+  //         } catch (error) {
+  //           console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
+  //           console.log(error);
+  //           console.log('++++++++++++++++++++');
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.log(error.response);
+  //     }
+  //     //Delete session: dù fail hoặc sucess lấy cart item
+  //     await axiosClient.delete('/session');
+  //   }
+  //   if (localStorage.getItem('__role') === 'R03') {
+  //     message.success('Login success');
+  //     setLoading(true);
+  //     navigate('/dashboard/product');
+  //     return;
+  //   }
+
+  //   // Move to User homepage
+  //   message.success('Đăng nhập thành công');
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     navigate('/');
+  //   }, 3000);
+  //   return true;
+  // })
+  // //LOGIN FAIL
+  // .catch((error) => {
+  //   console.log(error.message);
+  //   message.error('Đăng nhập không thành công');
+  // });
 
   // Listen to the Firebase Auth state and set the local state.
 
