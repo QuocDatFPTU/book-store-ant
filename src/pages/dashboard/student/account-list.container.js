@@ -1,93 +1,134 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from "antd";
-import { pickBy } from "lodash";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import TableCustom from "../../../components/TableCustom";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from 'antd';
+import TableCustom from 'components/CustomTable';
+import { pickBy } from 'lodash';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   defaultPage,
   formatDate,
   formatDateTime,
-  formatDateTimeFull
-} from "../../../util/constant";
-import { getListAccount } from "./account.service";
+  formatDateTimeFull,
+} from '../../../util/constant';
+import AccountEdit from './account.edit';
+import { getRoleList, getUserList } from './student.service';
 
 const defaultSort = {
-  "is-ascending": "true",
-  "order-by": "Id"
+  'is-ascending': 'true',
+  'order-by': 'Id',
 };
 const AccountList = () => {
   const navigate = useNavigate();
   const [uniList, setUniList] = useState([]);
   const [loading, setLoading] = useState(false);
   // Pagination
+  const [roleList, setRoleList] = useState([]);
+  const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
+  const [isEditModal, setIsEditModal] = useState(false);
   const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
-  const fetchUni = (params, sortedInfo) => {
+  const fetchUserList = (params, sortedInfo) => {
     setLoading(true);
-    getProductList({ ...params, ...sortedInfo })
+    getUserList({ ...params })
       .then((result) => {
-        setUniList([...result.data.items]);
-        setTotalItem(result.data["total-count"]);
+        setUniList([...result?.users]);
+        setTotalItem(result?.count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
   };
 
-  useEffect(() => {
-    fetchUni(params, sortedInfo);
-  }, [params, sortedInfo]);
+  const fetchRoleList = (params) => {
+    getRoleList({ ...params })
+      .then((result) => {
+        setRoleList([...result]);
+        // setTotalItem(result.data["total-count"]);
+      })
+      .catch((e) => {
+        return false;
+      });
+  };
 
+  useEffect(() => {
+    fetchUserList(params);
+  }, [params]);
+
+  useEffect(() => {
+    fetchRoleList(params);
+  }, []);
   const columns = [
     {
-      title: "Username",
-      dataIndex: "user-name",
-      width: "12%",
+      title: 'Họ tên ',
+      dataIndex: 'fullName',
+      width: '12%',
       ellipsis: true,
       render: (text, record) => {
         return (
-          <Button
-            size="small"
-            type="link"
-            onClick={() => navigate(`${record.id}`)}
-          >
+          <Button size="small" type="link" onClick={() => {}}>
             {text}
           </Button>
         );
-      }
+      },
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      width: "12%"
+      title: 'Email',
+      dataIndex: 'email',
+      width: '12%',
     },
     {
-      title: "Role name",
-      dataIndex: "name",
-      width: "12%"
+      title: 'Giới tính',
+      dataIndex: 'gender',
+      width: '12%',
+      render: (text) => {
+        if (text === 'M') {
+          return 'Male';
+        } else if (text === 'F') {
+          return 'Female';
+        } else {
+          return 'Others';
+        }
+      },
     },
     {
-      title: "Action",
-      align: "center",
-      width: "8%",
-      fixed: "right",
+      title: 'Role ',
+      dataIndex: 'role',
+      width: '12%',
+      render: (text) => text?.name,
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
       render: (text, record) => (
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
           <Button
             type="link"
             size="small"
             icon={<EditOutlined />}
             onClick={() => {
-              navigate(`/admin/edit-account/${record.id}`);
+              setCurrentRow(record);
+              setIsEditModal(true);
             }}
           />
+          <Button
+            type="link"
+            size="small"
+            icon={<DeleteOutlined />}
+            onClick={() => {}}
+          />
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const extraButton = [
@@ -95,23 +136,24 @@ const AccountList = () => {
       key="btn-complete"
       type="primary"
       onClick={() => {
-        navigate("/admin/create-account");
+        setCurrentRow(undefined);
+        setIsEditModal(true);
       }}
     >
-      {"Create"}
+      {'Create'}
       <PlusOutlined />
-    </Button>
+    </Button>,
   ];
 
   const routes = [
     {
-      path: "/dashboard",
-      breadcrumbName: "Home"
+      path: '/dashboard',
+      breadcrumbName: 'Dashboard',
     },
     {
-      path: "/dashboard",
-      breadcrumbName: "University"
-    }
+      path: '/user',
+      breadcrumbName: 'user',
+    },
   ];
 
   return (
@@ -132,12 +174,12 @@ const AccountList = () => {
             onFinish={(value) => {
               const cleanValue = pickBy(
                 value,
-                (v) => v !== undefined && v !== ""
+                (v) => v !== undefined && v !== ''
               );
               setParams({
                 ...cleanValue,
-                "page-number": 1,
-                "page-size": params["page-size"]
+                page: 1,
+                limit: params['limit'],
               });
             }}
           >
@@ -155,7 +197,7 @@ const AccountList = () => {
                     icon={<SearchOutlined />}
                     htmlType="submit"
                   >
-                    {"Search"}
+                    {'Tìm kiếm'}
                   </Button>
                 </Form.Item>
               </Col>
@@ -166,7 +208,7 @@ const AccountList = () => {
           title={() => (
             <Row>
               <Col span={12}>
-                <h3> {"University List"}</h3>
+                <h3> {'Danh sách người dùng'}</h3>
               </Col>
             </Row>
           )}
@@ -176,22 +218,32 @@ const AccountList = () => {
           columns={columns}
           dataSource={uniList}
           onChange={(pagination, filters, sorter) => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            if (pagination.pageSize !== params["page-size"]) {
-              params["page-number"] = 1;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (pagination.pageSize !== params.limit) {
+              params.page = 1;
             } else {
-              params["page-number"] = pagination.current;
+              params.page = pagination.current;
             }
-            params["page-size"] = pagination.pageSize;
+            params.limit = pagination.pageSize;
             setParams({ ...params });
           }}
           pagination={{
             total: totalItem,
             showSizeChanger: true,
-            pageSize: params["page-size"],
-            current: params["page-number"]
+            pageSize: params.limit,
+            current: params.page,
           }}
           scroll={{ x: 1200 }}
+        />
+        <AccountEdit
+          currentRow={currentRow}
+          onCallback={(value) => {
+            setParams({ ...defaultPage });
+            setIsEditModal(false);
+          }}
+          isEditModal={isEditModal}
+          setIsEditModal={setIsEditModal}
+          roleList={roleList}
         />
       </Layout.Content>
     </Layout>

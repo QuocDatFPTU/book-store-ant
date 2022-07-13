@@ -5,7 +5,11 @@ import logo from 'assets/logo-new.png';
 import './styles.less';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { CustomerIconSvg, OrderIconSvg, PostIconSvg } from 'components/icon-svg';
+import {
+  CustomerIconSvg,
+  OrderIconSvg,
+  PostIconSvg,
+} from 'components/icon-svg';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -14,7 +18,6 @@ const DashboardSider = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { role } = useSelector((state) => state.auth);
-
 
   return (
     <Sider
@@ -45,7 +48,7 @@ const DashboardSider = () => {
         </div>
       )}
       <Menu theme="light" mode="inline" className="menu-list">
-        {role === 'R03' &&
+        {role === 'R03' && (
           <>
             <Menu.Item
               key="1"
@@ -54,11 +57,7 @@ const DashboardSider = () => {
             >
               Sản phẩm
             </Menu.Item>
-            <Menu.Item
-              key="2"
-
-              onClick={() => navigate('/dashboard/customer')}
-            >
+            <Menu.Item key="2" onClick={() => navigate('/dashboard/customer')}>
               Customer
             </Menu.Item>
             <Menu.Item
@@ -82,8 +81,17 @@ const DashboardSider = () => {
             >
               Slider
             </Menu.Item>
+            {role === 'R00' && (
+              <Menu.Item
+                key="6"
+                // icon={<PostIconSvg />}
+                onClick={() => navigate('/dashboard/user')}
+              >
+                User
+              </Menu.Item>
+            )}
           </>
-        }
+        )}
       </Menu>
     </Sider>
   );
