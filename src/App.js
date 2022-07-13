@@ -29,6 +29,7 @@ import ManagePostList from 'pages/dashboard/posts/post-list.container';
 import BlogList from 'pages/store/blog';
 import BlogListDetail from 'pages/store/blog-detail';
 import ManageSliderList from 'pages/dashboard/slider/slider-list.container';
+import AccountList from 'pages/dashboard/student/account-list.container';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -45,7 +46,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<StoreLayoutContainer />}>
-            //Public route
+              //Public route
               {/* <Route element={<ProtectedRoute />}> */}
               <Route path="/" element={<HomePage />}></Route>
               <Route path="/product-list/:id" element={<ProductList />} />
@@ -54,7 +55,7 @@ const App = () => {
               <Route path="/cart" element={<Cart />} />
               <Route path="/cart-contact" element={<CartContact />} />
               {/* </Route> */}
-            //Protected route
+              //Protected route
               {/* <Route element={<ProtectedRoute allowed={['customer']} />}> */}
               <Route path="/order-list" element={<OrderList />} />
               <Route path="/information-order" element={<InformationOrder />} />
@@ -79,6 +80,10 @@ const App = () => {
                 <Route path="order" element={<ManageProductList />} />
                 <Route path="post" element={<ManagePostList />} />
                 <Route path="slider" element={<ManageSliderList />} />
+
+                {role === 'R00' && (
+                  <Route path="user" element={<AccountList />} />
+                )}
               </Route>
             )}
             <Route path="/register" element={<Register />} />
