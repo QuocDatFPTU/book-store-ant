@@ -17,7 +17,9 @@ import StoreLayoutContainer from 'layouts/store/store.layout';
 import { getCategoyList, getProductListFearture } from './service';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { MoneyFormat } from 'components/format';
+import { DateFormat, MoneyFormat } from 'components/format';
+import axios from 'axios';
+import axiosClient from 'util/axiosClient';
 
 const dataPostFeature = [
   {
@@ -62,8 +64,7 @@ const dataListCates = [
   },
   {
     name: 'Sách giáo khoa',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/c/o/combo-8_3.jpg',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/c/o/combo-8_3.jpg',
   },
   {
     name: 'Tâm lý kỹ năng',
@@ -87,11 +88,13 @@ const dataListCates = [
   },
   {
     name: 'Foreigns Books',
-    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/9/7/9786041055421.jpg',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786041055421.jpg',
   },
   {
     name: 'Thiếu nhi',
-    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
   },
   {
     name: 'Sách học ngoại ngữ',
@@ -100,9 +103,9 @@ const dataListCates = [
   },
   {
     name: 'Văn phòng phẩm',
-    imgLink:
-      'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
-  },{
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
+  },
+  {
     name: 'Đồ chơi',
     imgLink:
       'https://cdn0.fahasa.com/media/catalog/product/e/b/eb7f9af9bc5cb8e852f206448b13d556.jpg',
@@ -117,9 +120,33 @@ const HomePage = () => {
   //Hook
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sliders, setSliders] = useState();
+  const [posts, setPosts] = useState();
   const navigate = useNavigate();
 
   //Method
+  const getSliders = () => {
+    axiosClient
+      .get('/sliders')
+      .then((result) => {
+        console.log(result);
+        setSliders(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getPosts = () => {
+    axiosClient
+      .get('/blogs', { featured: true, status: true })
+      .then((result) => {
+        console.log(result);
+        const posts = result.posts;
+        for (const post of posts) {
+          post.thumbnail = 'url(' + post.thumbnail + ')';
+        }
+        setPosts(posts);
+      })
+      .catch((e) => console.log(e));
+  };
   const getProducts = () => {
     getProductListFearture()
       .then((result) => {
@@ -143,43 +170,43 @@ const HomePage = () => {
   useEffect(() => {
     getProducts();
     getCategories();
+    getSliders();
+    getPosts();
   }, []);
 
+  console.log(posts);
   return (
     <>
       <WrapperConentContainer className="home-sliders">
         <Row style={{ height: '100%' }}>
           <Col className="slider-main" span={16}>
             <Carousel style={{ width: '98.5%' }} autoplay>
-              {[
-                'https://cdn0.fahasa.com/media/wysiwyg/Thang-06-2022/1980_1920.png',
-                'https://cdn0.fahasa.com/media/wysiwyg/Duy-VHDT/DoChoi/Thang5/Trang_Thi_u_nhi_1.1_1920x700.jpg',
-                'https://cdn0.fahasa.com/media/wysiwyg/Thang-05-2022/FAHASA_fs_1920x400.png',
-              ].map((img) => (
-                <a
-                  style={{ borderRadius: '10px', display: 'block' }}
-                  href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3"
-                >
-                  <Image
-                    preview={false}
-                    style={{ borderRadius: '10px' }}
-                    height={'35vh'}
-                    src={img}
-                  />
-                </a>
-              ))}
+              {sliders &&
+                sliders.map((slider) => (
+                  <a
+                    style={{ borderRadius: '10px', display: 'block' }}
+                    href={slider.backlink}
+                  >
+                    <Image
+                      preview={false}
+                      style={{ borderRadius: '10px' }}
+                      height={'35vh'}
+                      src={slider.image.img}
+                    />
+                  </a>
+                ))}
             </Carousel>
           </Col>
           <Col className="slider-sides" span={8}>
             <Row style={{ height: '100%' }} gutter={[0, 10]}>
               <Col className="slider-side" span={24}>
-                <a href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3">
-                  <img src="https://cdn0.fahasa.com/media/wysiwyg/Thang-05-2022/Mega_saleldp062022_1920x400.jpg" />
+                <a href={sliders && sliders[0]?.backlink}>
+                  <img src={sliders && sliders[0]?.image?.img} />
                 </a>
               </Col>
               <Col className="slider-side slider-side-bottom" span={24}>
-                <a href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3">
-                  <img src="https://cdn0.fahasa.com/media/wysiwyg/Thang-06-2022/shopeepay_1920x400.png" />
+                <a href={sliders && sliders[1]?.backlink}>
+                  <img src={sliders && sliders[1]?.image?.img} />
                 </a>
               </Col>
             </Row>
@@ -188,21 +215,24 @@ const HomePage = () => {
       </WrapperConentContainer>
       <Row className="home-posts">
         <Col span={16} offset={4}>
-          <a href="https://gvn360.com/tin-game/ark-va-capcom-arcade-stadium-dang-mien-phi-cung-nhieu-game-khac-giam-gia-sap-san-tren-steam/">
+          <a onClick={() => navigate(`/blog/${posts && posts[0]._id}`)}>
             <div
               className="post-lasted"
               style={{
-                backgroundImage:
-                  'linear-gradient(to right, #23252627, #41434525), url(https://gstatic.gvn360.com/2022/06/ARK-Survival-Evolved-Update-2.64-Featured-Image-1068x580.jpg)',
+                // backgroundImage: `linear-gradient(to right, #23252627, #41434525), url(${
+                //   posts && posts[0].thumbnail
+                // })`,
+
+                backgroundImage: posts ? posts[0].thumbnail : undefined,
               }}
             >
               <div className="post-content">
                 <Typography.Title level={3} className="post-title">
-                  Mời bạn khám phá “tranh vô cực”, nơi tiềm thức bị dẫn dụ bởi
-                  thị giác
+                  {posts && posts[0].title}
                 </Typography.Title>
                 <Typography.Text className="post-info">
-                  Bởi <a href="#">Axium Fox</a> - 14/06/2022
+                  Bởi <a href="#">{posts && posts[0].author}</a> -{' '}
+                  <DateFormat>{posts && posts[0].updatedAt}</DateFormat>
                 </Typography.Text>
               </div>
             </div>
@@ -212,13 +242,13 @@ const HomePage = () => {
       <Row className="home-posts-feature">
         <Col span={16} offset={4}>
           <Row justify="space-between" style={{ height: '100%' }}>
-            {dataPostFeature.map((item) => (
+            {posts.map((post) => (
               <Col flex={'24.5%'}>
-                <a href="https://gvn360.com/tin-game/ark-va-capcom-arcade-stadium-dang-mien-phi-cung-nhieu-game-khac-giam-gia-sap-san-tren-steam/">
+                <a onClick={() => navigate(`/blog/${post._id}`)}>
                   <div
                     className="post-lasted"
                     style={{
-                      backgroundImage: `linear-gradient(to right, #23252627, #41434525), url(${item.imgLink})`,
+                      backgroundImage: post.thumbnail,
                     }}
                   >
                     <div className="post-content post-feature">

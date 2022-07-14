@@ -42,11 +42,6 @@ const Login = (props) => {
     //+ đang load: isLogin=true, role=R02, local=null
     //+ load xong fail: isLogin=true, role=R02, local=null báo lỗi
     //+ load xong success: isLogin=true, role=R03, local=R03,navigate
-
-    //đang đăng nhập
-    //+ đang load: role=R02
-    //+ load xong fail: role=R02
-    //+ load xong success: role=R03
     console.log(role);
     console.log(isLogin);
     console.log(role !== 'R02');
@@ -64,6 +59,13 @@ const Login = (props) => {
           message.success('Đăng nhập thành công');
           setLoading(true);
           navigate('/dashboard/order');
+          return;
+        }
+
+        if (role === 'R00') {
+          message.success('Đăng nhập thành công');
+          setLoading(true);
+          navigate('/dashboard/user');
           return;
         }
 
