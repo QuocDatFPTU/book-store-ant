@@ -10,6 +10,7 @@ import { pickBy } from 'lodash';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosClient from 'util/axiosClient';
 import {
   defaultPage,
   formatDate,
@@ -67,10 +68,18 @@ const AccountList = () => {
   }, []);
   const columns = [
     {
-      title: 'Họ tên ',
+      title: 'ID',
+      dataIndex: '_id',
+      width: '12%',
+      ellipsis: true,
+      sorter: (a, b) => a._id.length - b._id.length,
+    },
+    {
+      title: 'Họ tên',
       dataIndex: 'fullName',
       width: '12%',
       ellipsis: true,
+      sorter: (a, b) => a.fullName.length - b.fullName.length,
       render: (text, record) => {
         return (
           <Button size="small" type="link" onClick={() => {}}>
@@ -83,6 +92,7 @@ const AccountList = () => {
       title: 'Email',
       dataIndex: 'email',
       width: '12%',
+      sorter: (a, b) => a.email.length - b.email.length,
     },
     {
       title: 'Giới tính',
@@ -99,10 +109,18 @@ const AccountList = () => {
       },
     },
     {
+      title: 'Số điện thoại',
+      dataIndex: 'phone',
+      width: '12%',
+      key: 'phone',
+      sorter: (a, b) => a.phone.length - b.phone.length,
+    },
+    {
       title: 'Role ',
       dataIndex: 'role',
       width: '12%',
       render: (text) => text?.name,
+      sorter: (a, b) => a?.role?.name?.length - b?.role?.name?.length,
     },
     {
       title: 'Action',
@@ -120,14 +138,22 @@ const AccountList = () => {
               setIsEditModal(true);
             }}
           />
-          <Button
+          {/* <Button
             type="link"
             size="small"
             icon={<DeleteOutlined />}
             onClick={() => {}}
-          />
+          /> */}
         </div>
       ),
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      sorter: (a, b) => a.status > b.status,
+      render: (text, record) => <p>{text ? 'true' : 'false'}</p>,
     },
   ];
 
@@ -171,16 +197,18 @@ const AccountList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchUserList();
+
+              const sliderSearch = await axiosClient.post(
+                '/user/admin/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
               );
-              setParams({
-                ...cleanValue,
-                page: 1,
-                limit: params['limit'],
-              });
+              setUniList(sliderSearch);
             }}
           >
             <Row gutter={16}>

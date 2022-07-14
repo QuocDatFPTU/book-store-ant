@@ -117,8 +117,8 @@ const PostEdit = ({
             id: currentRow?._id,
             thumbnail: updateImageUrl,
           };
-          const { author, updateDataFinal } = updateData;
-          await updateProduct(updateDataFinal)
+          const { author, category, ...updateDataFinal } = updateData;
+          await updatePost(updateDataFinal)
             .then((result) => {
               console.log(result);
               message.success('Cập nhật sản phẩm thành công!');
@@ -136,7 +136,8 @@ const PostEdit = ({
             id: currentRow?._id,
             thumbnail: currentRow?.thumbnail,
           };
-          updatePost(updateData)
+          const { author, category, ...updateDataFinal } = updateData;
+          updatePost(updateDataFinal)
             .then((result) => {
               message.success('Cập nhật sản phẩm thành công!');
               setLoading(false);
@@ -184,7 +185,7 @@ const PostEdit = ({
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
       : undefined,
-    category: currentRow ? currentRow?.category?.name : undefined,
+    category: currentRow ? currentRow?.category.name : undefined,
   };
   return (
     <Modal
@@ -267,11 +268,15 @@ const PostEdit = ({
               },
             ]}
           >
-            <Select placeholder="Hãy chọn thể loại" options={categoryOptions} />
+            <Select
+              disabled
+              placeholder="Hãy chọn thể loại"
+              options={categoryOptions}
+            />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
+          <Form.Item label="Đặc biệt" name="featured" valuePropName="checked">
             <Checkbox>Đặc biệt</Checkbox>
           </Form.Item>
         </Col>

@@ -257,7 +257,8 @@ const CustomerEdit = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={18} className="infor-wait">
+        <Col span={18} className="infor-wait" style={{ marginBottom: '20px' }}>
+          <h3>Trạng thái</h3>
           {currentRow?.status}
         </Col>
 

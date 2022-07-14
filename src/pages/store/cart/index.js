@@ -147,7 +147,7 @@ const Cart = () => {
             > */}
               {cart.items?.map((item) => (
                 <div className="cart-value">
-                  <span style={{ color: 'red' }}>{item.product.quantity}</span>
+                  {/* <span style={{ color: 'red' }}>{item.product.quantity}</span> */}
                   <Row className="cart-form" align="middle">
                     {/* <Col span={1}>
                       <Checkbox value={item._id} />
@@ -233,7 +233,7 @@ const Cart = () => {
                           defaultValue={item.quantity}
                         />
                       </div>
-                      <h5>{item.quantity}</h5>
+                      {/* <h5>{item.quantity}</h5> */}
                     </Col>
                     <Col
                       className="cart-productitem-saleprice"

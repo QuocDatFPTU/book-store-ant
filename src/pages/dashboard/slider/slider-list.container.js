@@ -22,6 +22,7 @@ import { getCategoryList, getSliderList } from './slider.service';
 import ProductEdit from './slider.edit';
 import TableCustom from 'components/CustomTable';
 import SliderEdit from './slider.edit';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -172,16 +173,18 @@ const ManageSliderList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchSliderList();
+
+              const sliderSearch = await axiosClient.post(
+                '/sliders/marketing/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
               );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+              setSliderList(sliderSearch);
             }}
           >
             <Row gutter={16}>

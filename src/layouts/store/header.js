@@ -20,6 +20,7 @@ import {
   Layout,
   Affix,
   Button,
+  Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
@@ -231,8 +232,16 @@ const HeaderContainer = () => {
                         : menuUser
                     }
                   >
-                    <Space style={{ color: 'white' }}>
-                      {username}
+                    <Space>
+                      <Typography.Text
+                        style={{ color: 'white' }}
+                        ellipsis={{
+                          rows: 1,
+                          // expandable: true,
+                        }}
+                      >
+                        {username}
+                      </Typography.Text>
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
                     </Space>
                   </Dropdown>

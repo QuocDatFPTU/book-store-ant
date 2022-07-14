@@ -1,7 +1,6 @@
 import {
   Button,
   Col,
-  Layout,
   Row,
   Select,
   Avatar,
@@ -10,7 +9,7 @@ import {
   Input,
   message,
 } from 'antd';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   HomeOutlined,
@@ -19,12 +18,9 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import StoreLayoutContainer from 'layouts/store/store.layout';
 import { getUserInformation, updateUserInformation } from './service';
 // import './styles.less';
 const { Option } = Select;
-
-const { RangePicker } = DatePicker;
 
 const layout = {
   labelCol: {

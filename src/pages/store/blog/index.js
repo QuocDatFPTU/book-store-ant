@@ -117,19 +117,19 @@ const BlogList = () => {
                       width: '100%',
                     }}
                     alt="example"
-                    src={blogList[0]?.thumbnail}
+                    src={blogList[1]?.thumbnail}
                   />
                 </div>
                 <div className="blog-fearture__detail">
                   <div className="blog-fearture__title">
                     <Link
-                      to={`${blogList[0]?._id}`}
+                      to={`${blogList[1]?._id}`}
                       style={{
                         outline: 'none',
                         textDecoration: 'none',
                       }}
                     >
-                      <h3>{blogList[0]?.title}</h3>
+                      <h3>{blogList[1]?.title}</h3>
                     </Link>
                   </div>
                   <div className="blog-container__info blog-fearture__info">
@@ -140,7 +140,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      {blogList[0]?.author}
+                      {blogList[1]?.author}
                     </span>
                     <span
                       style={{ color: 'white' }}
@@ -155,7 +155,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      <DateFormat>{blogList[0]?.updatedDate}</DateFormat>
+                      <DateFormat>{blogList[1]?.updatedDate}</DateFormat>
                     </span>
                   </div>
                 </div>
@@ -171,19 +171,19 @@ const BlogList = () => {
                       width: '100%',
                     }}
                     alt="example"
-                    src={blogList[0]?.thumbnail}
+                    src={blogList[2]?.thumbnail}
                   />
                 </div>
                 <div className="blog-fearture__detail ">
                   <div className="blog-fearture__title">
                     <Link
-                      to={`${blogList[0]?._id}`}
+                      to={`${blogList[2]?._id}`}
                       style={{
                         outline: 'none',
                         textDecoration: 'none',
                       }}
                     >
-                      <h3>{blogList[0]?.title}</h3>
+                      <h3>{blogList[2]?.title}</h3>
                     </Link>
                   </div>
                   <div className="blog-container__info blog-fearture__info">
@@ -194,7 +194,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      {blogList[0]?.author}
+                      {blogList[2]?.author}
                     </span>
                     <span
                       style={{ color: 'white' }}
@@ -209,7 +209,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      <DateFormat>{blogList[0]?.updatedDate}</DateFormat>
+                      <DateFormat>{blogList[2]?.updatedDate}</DateFormat>
                     </span>
                   </div>
                 </div>

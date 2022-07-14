@@ -27,6 +27,7 @@ import TableCustom from 'components/CustomTable';
 import PostEdit from './post.edit';
 import { getCategoryList, getPostList, getProductList } from './post.service';
 import { async } from '@firebase/util';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -186,31 +187,31 @@ const ManagePostList = () => {
         <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
       ),
     },
-    {
-      title: 'Hành động',
-      key: 'action',
-      dataIndex: 'action',
-      width: '12%',
-      align: 'center',
-      render: (_, value) => (
-        <Popconfirm
-          title={'Bạn có muốn xóa blog này không'}
-          okText={'Có'}
-          cancelText={'Không'}
-          onConfirm={async () => {
-            console.log('oke');
-          }}
-          icon={<ExclamationCircleOutlined />}
-        >
-          <Button
-            icon={<DeleteOutlined />}
-            type="primary"
-            danger
-            style={{ borderRadius: '6px' }}
-          />
-        </Popconfirm>
-      ),
-    },
+    // {
+    //   title: 'Hành động',
+    //   key: 'action',
+    //   dataIndex: 'action',
+    //   width: '12%',
+    //   align: 'center',
+    //   render: (_, value) => (
+    //     <Popconfirm
+    //       title={'Bạn có muốn xóa blog này không'}
+    //       okText={'Có'}
+    //       cancelText={'Không'}
+    //       onConfirm={async () => {
+    //         console.log('oke');
+    //       }}
+    //       icon={<ExclamationCircleOutlined />}
+    //     >
+    //       <Button
+    //         icon={<DeleteOutlined />}
+    //         type="primary"
+    //         danger
+    //         style={{ borderRadius: '6px' }}
+    //       />
+    //     </Popconfirm>
+    //   ),
+    // },
   ];
 
   const extraButton = [
@@ -253,16 +254,15 @@ const ManagePostList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
-              );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchBlogList();
+
+              const sliderSearch = await axiosClient.post('/posts/search', {
+                search: form.getFieldValue('search-value'),
+                limit: 100,
               });
+              setBlogList(sliderSearch);
             }}
           >
             <Row gutter={16}>

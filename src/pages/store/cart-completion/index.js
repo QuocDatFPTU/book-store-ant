@@ -130,7 +130,7 @@ const CartCompletion = () => {
                   fontSize: '22px',
                 }}
               >
-                Mã đơn hàng: {order._id}
+                Thông tin đơn hàng
               </h2>
               {localStorage.getItem('__role') !== 'R02' && (
                 <Button

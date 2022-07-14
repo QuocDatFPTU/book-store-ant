@@ -89,7 +89,7 @@ const ProductEdit = ({
       await updateOrder(updateData)
         .then((result) => {
           console.log(result);
-          message.success('Cập nhật sản phẩm thành công!');
+          message.success('Cập nhật đơn hàng thành công!');
           setLoading(false);
           onCallback();
         })

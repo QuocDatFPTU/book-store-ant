@@ -136,14 +136,15 @@ const HomePage = () => {
   };
   const getPosts = () => {
     axiosClient
-      .get('/blogs', { featured: true, status: true })
+      .get('/blogs')
       .then((result) => {
         console.log(result);
         const posts = result.posts;
         for (const post of posts) {
           post.thumbnail = 'url(' + post.thumbnail + ')';
         }
-        setPosts(posts);
+        const postsArr = [posts[0], posts[1], posts[2], posts[3]];
+        setPosts(postsArr);
       })
       .catch((e) => console.log(e));
   };
@@ -242,33 +243,35 @@ const HomePage = () => {
       <Row className="home-posts-feature">
         <Col span={16} offset={4}>
           <Row justify="space-between" style={{ height: '100%' }}>
-            {posts.map((post) => (
-              <Col flex={'24.5%'}>
-                <a onClick={() => navigate(`/blog/${post._id}`)}>
-                  <div
-                    className="post-lasted"
-                    style={{
-                      backgroundImage: post.thumbnail,
-                    }}
-                  >
-                    <div className="post-content post-feature">
-                      <Typography.Paragraph
-                        ellipsis={{
-                          rows: 2,
-                          // expandable: true,
-                        }}
-                        className="post-title-feature"
-                      >
-                        {item.title}
-                      </Typography.Paragraph>
-                      <Typography.Text className="post-info post-info-feature">
-                        Bởi <a href="#">{item.author}</a> - {item.date}
-                      </Typography.Text>
+            {posts &&
+              posts.map((post) => (
+                <Col flex={'24.5%'}>
+                  <a onClick={() => navigate(`/blog/${post?._id}`)}>
+                    <div
+                      className="post-lasted"
+                      style={{
+                        backgroundImage: post?.thumbnail,
+                      }}
+                    >
+                      <div className="post-content post-feature">
+                        <Typography.Paragraph
+                          ellipsis={{
+                            rows: 2,
+                            // expandable: true,
+                          }}
+                          className="post-title-feature"
+                        >
+                          {post?.title}
+                        </Typography.Paragraph>
+                        <Typography.Text className="post-info post-info-feature">
+                          Bởi <a href="#">{post?.author}</a> -{' '}
+                          <DateFormat>{post?.updatedDate}</DateFormat>
+                        </Typography.Text>
+                      </div>
                     </div>
-                  </div>
-                </a>
-              </Col>
-            ))}
+                  </a>
+                </Col>
+              ))}
           </Row>
         </Col>
       </Row>

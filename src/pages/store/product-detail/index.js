@@ -152,6 +152,8 @@ const ProductDetail = () => {
   const [moreProductDetail, setMoreProductDetail] = useState({});
   const [categoryName, setCategoryName] = useState('');
   const [products, setProducts] = useState([]);
+  const [productFeatures, setProductFeatures] = useState([]);
+
   const navigate = useNavigate('/cart');
   const { id } = useParams();
 
@@ -220,6 +222,15 @@ const ProductDetail = () => {
       })
       .catch((e) => console.log(e));
   };
+  const getProductFeatureds = () => {
+    getProductListFearture()
+      .then((result) => {
+        console.log(result);
+        setProductFeatures(result);
+      })
+      .catch((e) => console.log(e));
+  };
+
   //RUN
   useEffect(() => {
     if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
@@ -232,6 +243,10 @@ const ProductDetail = () => {
     getProductById(id);
     getProducts();
   }, [id]);
+
+  useEffect(() => {
+    getProductFeatureds();
+  }, []);
 
   return productDetail.status === false ? (
     <>
@@ -409,7 +424,7 @@ const ProductDetail = () => {
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
-            {dataProductSameCates.map((item) => (
+            {productFeatures.map((item) => (
               <Col flex={'19%'} style={{ marginBottom: '30px' }}>
                 <Card
                   className="product-card"
@@ -424,7 +439,7 @@ const ProductDetail = () => {
                         margin: '0 auto',
                       }}
                       alt="example"
-                      src={item.imgLink}
+                      src={item.thumbnail}
                     />
                   }
                 >
@@ -435,12 +450,14 @@ const ProductDetail = () => {
                       // expandable: true,
                     }}
                   >
-                    <a href="">{item.name}</a>
+                    <a onClick={() => navigate(`/product-detail/${item._id}`)}>
+                      {item.title}
+                    </a>
                   </Typography.Paragraph>
                   <Typography.Text className="product-price">
-                    {item.price}đ
+                    <MoneyFormat>{item.salePrice}</MoneyFormat>
                   </Typography.Text>
-                  <Rate className="product-rate" value={item.rate} />
+                  <Rate className="product-rate" value={5} />
                 </Card>
               </Col>
             ))}

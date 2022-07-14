@@ -86,6 +86,7 @@ const ManageCustomerList = () => {
       ellipsis: {
         showTitle: false,
       },
+      sorter: (a, b) => a.fullName.length - b.fullName.length,
       render: (title, record) => {
         return <p>{title}</p>;
       },
@@ -104,6 +105,7 @@ const ManageCustomerList = () => {
       ellipsis: {
         showTitle: false,
       },
+      sorter: (a, b) => a.email.length - b.email.length,
       render: (title, record) => {
         return <p>{title}</p>;
       },
@@ -112,12 +114,14 @@ const ManageCustomerList = () => {
       title: 'Số điện thoại',
       dataIndex: 'phone',
       key: 'phone',
+      sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      sorter: (a, b) => a.status.length - b.status.length,
     },
   ];
 
@@ -162,16 +166,15 @@ const ManageCustomerList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
-              );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchCustomerList();
+
+              const sliderSearch = await axiosClient.post('/customers/search', {
+                search: form.getFieldValue('search-value'),
+                limit: 100,
               });
+              setCustomerList(sliderSearch);
             }}
           >
             <Row gutter={16}>

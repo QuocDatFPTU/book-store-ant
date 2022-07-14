@@ -107,19 +107,20 @@ const AccountEdit = ({
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      // create\
+      // create
       if (!currentRow) {
         const imageUrl = await uploadFileToFirebase(
           values?.avatar[0]?.originFileObj
         );
         const createData = {
           ...values,
-          avatar: imageUrl,
+          avatar: { img: imageUrl },
         };
+        console.log(createData);
         await createUser(createData)
           .then((result) => {
             if (result) {
-              message.success('Thêm mới sản phẩm thành công!');
+              message.success('Thêm mới người dùng thành công!');
             }
           })
           .catch((error) => message.error(error.message));
@@ -140,7 +141,7 @@ const AccountEdit = ({
           await updateUser(updateData)
             .then((result) => {
               console.log(result);
-              message.success('Cập nhật sản phẩm thành công!');
+              message.success('Cập nhật người dùng thành công!');
               setLoading(false);
               onCallback();
             })
@@ -293,6 +294,24 @@ const AccountEdit = ({
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Giới tính"
+            name="gender"
+            rules={[
+              {
+                required: true,
+                message: 'Chọn giới tính',
+              },
+            ]}
+          >
+            <Select placeholder="Giới tính" allowClear>
+              <Select.Option value="M">male</Select.Option>
+              <Select.Option value="F">female</Select.Option>
+              <Select.Option value="D">other</Select.Option>
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
             <Checkbox>Trạng thái</Checkbox>
           </Form.Item>
@@ -311,6 +330,22 @@ const AccountEdit = ({
             <Select placeholder="Hãy chọn chức vụ" options={roleOptions} />
           </Form.Item>
         </Col>
+        {!currentRow && (
+          <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+            <Form.Item
+              label="Mật khẩu"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Cần nhập mật khẩu',
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        )}
 
         <div
           className="ant-modal-footer"

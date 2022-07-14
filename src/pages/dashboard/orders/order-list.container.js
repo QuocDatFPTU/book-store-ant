@@ -83,6 +83,7 @@ const ManageOrderList = () => {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: '12%',
+      sorter: (a, b) => a.createdAt > b.createdAt,
       render: (text, record) => {
         return <DateFormat>{text}</DateFormat>;
       },
@@ -92,6 +93,7 @@ const ManageOrderList = () => {
       dataIndex: 'receiverName',
       key: 'receiverName',
       width: '12%',
+      sorter: (a, b) => a.receiverName.length - b.receiverName.length,
     },
     {
       title: 'Tên sản phẩm',
@@ -118,6 +120,7 @@ const ManageOrderList = () => {
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: '12%',
+      sorter: (a, b) => a.totalCost - b.totalCost,
       render: (text, record) => {
         return <MoneyFormat>{text}</MoneyFormat>;
       },
@@ -127,6 +130,7 @@ const ManageOrderList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      sorter: (a, b) => a.status.length - b.status.length,
     },
   ];
   console.log(orderList);
@@ -157,16 +161,19 @@ const ManageOrderList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchOrderList();
+
+              const sliderSearch = await axiosClient.post(
+                '/orders/saler/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
               );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+              setOrderList(sliderSearch);
+              console.log(sliderSearch);
             }}
           >
             <Row gutter={16}>

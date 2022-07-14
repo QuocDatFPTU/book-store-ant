@@ -20,6 +20,7 @@ import { defaultPage } from 'util/constant';
 import { getCategoryList, getProductList } from './product.service';
 import ProductEdit from './product.edit';
 import TableCustom from 'components/CustomTable';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -46,6 +47,7 @@ const ManageProductList = () => {
       })
       .catch((e) => setLoading(false));
   };
+
   const fetchCategoryList = (params) => {
     getCategoryList({ ...params })
       .then((result) => {
@@ -185,16 +187,21 @@ const ManageProductList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchProductList();
+
+              const productsSearch = await axiosClient.post(
+                '/products/search/marketing',
+                { searchText: form.getFieldValue('search-value') }
               );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+              setProductList(productsSearch);
+
+              // setParams({
+              //   ...cleanValue,
+              //   "page-number": 1,
+              //   "page-size": params["page-size"]
+              // });
             }}
           >
             <Row gutter={16}>

@@ -192,7 +192,7 @@ const ProductList = () => {
                   <Option value="best-month">Bán chạy tháng</Option>
                   <Option value="best-year">Bán chạy năm</Option>
                 </Select>
-                <Select
+                {/* <Select
                   className="select-product"
                   defaultValue="12"
                   style={{
@@ -203,7 +203,7 @@ const ProductList = () => {
                   <Option value="12">12 sản phẩm</Option>
                   <Option value="24">24 sản phẩm</Option>
                   <Option value="48">48 sản phẩm</Option>
-                </Select>
+                </Select> */}
               </Col>
               <Divider style={{ margin: '0 14px' }} />
             </Row>
