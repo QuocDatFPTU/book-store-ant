@@ -182,7 +182,7 @@ const ManageProductList = () => {
         className="customPageHeader"
       />
       <Layout.Content>
-        <Card size="small" className="cardSearch">
+        {/* <Card size="small" className="cardSearch">
           <Form
             form={form}
             layout="horizontal"
@@ -224,7 +224,7 @@ const ManageProductList = () => {
               </Col>
             </Row>
           </Form>
-        </Card>
+        </Card> */}
         <TableCustom
           title={() => (
             <Row>

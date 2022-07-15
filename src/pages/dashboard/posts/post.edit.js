@@ -254,7 +254,7 @@ const PostEdit = ({
               },
             ]}
           >
-            <Input disabled />
+            <Input  />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
@@ -269,7 +269,7 @@ const PostEdit = ({
             ]}
           >
             <Select
-              disabled
+              // disabled
               placeholder="Hãy chọn thể loại"
               options={categoryOptions}
             />
