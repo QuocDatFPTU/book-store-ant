@@ -6,6 +6,8 @@ import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
+import axiosClient from 'util/axiosClient';
+import { async } from '@firebase/util';
 
 const validateMessages = {
   required: 'Nhập ${label}!',
@@ -26,28 +28,22 @@ const ForgetPassword = (props) => {
 
   const dispatch = useDispatch();
 
+  const checkEmailExist = async (email) => {
+    console.log(email);
+    try {
+      await axiosClient.post('/user/forgotten', { email });
+      message.success('Gửi gmail thành công');
+    } catch (error) {
+      message.error('Email không tồn tại!');
+    }
+  };
   async function handleSubmit(value) {
-    console.log(value);
-    // await dispatch(loginInitiate(username, password));
-    // .then((result) => {
-    // 	if (!result?.error) {
-    // 		let role = localStorage.getItem("__role");
-    // 		if (role === "SystemAdministrator") {
-    // 			navigate("/admin");
-    // 		} else if (role === "SchoolAdmin") {
-    // 			navigate("/dashboard");
-    // 		} else if (role === "ClubAdmin") {
-    // 			navigate("/club");
-    // 		}
-    // 	}
-    // })
-    // .catch((error) => message.error(error));
-    message.success('Gửi gmail thành công');
     setLoading(true);
+    checkEmailExist(value.email);
+    setLoading(false);
+    // console.log(value);
     return true;
   }
-
-  // Listen to the Firebase Auth state and set the local state.
 
   return (
     <div className="login-page">
@@ -121,9 +117,7 @@ const ForgetPassword = (props) => {
                     </Form.Item>
                     <div style={{ color: '#bfbfbf', marginBottom: '10px' }}>
                       <span style={{ color: 'red' }}>(*) </span>
-                      <span style={{ fontWeight: 'bold' }}>
-                        Quên mật khẩu?
-                      </span>{' '}
+                      <span style={{ fontWeight: 'bold' }}>Quên mật khẩu?</span>
                       Chúng tôi sẽ gửi đến địa chỉ email một link liên kết giúp
                       bạn đặt lại mật khẩu.
                     </div>
