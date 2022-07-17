@@ -43,14 +43,12 @@ const priceOptions = [
 
 const ProductList = () => {
   //State
+  const { id: categoryId } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState('');
   const [products, setProducts] = useState([]);
   const [totalProduct, setTotalProduct] = useState(0);
-
-  const { id: categoryId } = useParams();
-  // const { pathname } = useLocation();
 
   const getCategories = () => {
     getCategoyList()
@@ -111,6 +109,7 @@ const ProductList = () => {
       // navigate(`/product-list/${categoryId}`);
     }
   };
+
   useEffect(() => {
     if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
       console.log('not have jwt store in localStorage');

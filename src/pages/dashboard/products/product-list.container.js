@@ -1,4 +1,9 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -7,7 +12,9 @@ import {
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Row,
+  Switch,
   Tooltip,
 } from 'antd';
 import { pickBy } from 'lodash';
@@ -34,6 +41,7 @@ const ManageProductList = () => {
   const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
+  const [filterCategories, setFilterCategories] = useState([]);
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
@@ -52,7 +60,13 @@ const ManageProductList = () => {
     getCategoryList({ ...params })
       .then((result) => {
         setCategoryList([...result]);
-        // setTotalItem(result.data["total-count"]);
+        result.forEach((cate) => {
+          if (
+            filterCategories.some((cateFilter) => cateFilter.name === cate.name)
+          )
+            return;
+          filterCategories.push({ text: cate.name, value: cate.name });
+        });
       })
       .catch((e) => {
         return false;
@@ -125,8 +139,11 @@ const ManageProductList = () => {
       dataIndex: 'category',
       key: 'category',
       width: '12%',
+      filterSearch: true,
+      filters: filterCategories,
+      onFilter: (value, record) => record.category.name === value,
       sorter: (a, b) => a.category?.name.length - b.category?.name.length,
-      render: (_, value) => value?.category?.name,
+      render: (_, value) => value?.category?.name || 'Không có dữ liệu',
     },
     {
       title: 'Đặc biệt',
@@ -135,14 +152,55 @@ const ManageProductList = () => {
       width: '12%',
       sorter: (a, b) => a.feartured - b.feartured,
       render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
+      render: (text, _) => {
+        return (
+          <Popconfirm
+            title={
+              <div>
+                <span>Bạn có muốn chuyển trạng thái blog này không ?</span>
+              </div>
+            }
+            onConfirm={async () => {
+              console.log('value');
+            }}
+            icon={<ExclamationCircleOutlined />}
+            okText={'Có'}
+            cancelText={'Không'}
+          >
+            <Switch checked={text}></Switch>
+          </Popconfirm>
+        );
+      },
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      align: 'center',
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status - b.status,
-      render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
+      render: (text, _) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn ẩn blog này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            console.log(value);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
     },
   ];
 

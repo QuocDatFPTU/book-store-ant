@@ -14,12 +14,17 @@ import './styles.less';
 import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import StoreLayoutContainer from 'layouts/store/store.layout';
-import { getCategoyList, getProductListFearture } from './service';
+import {
+  getCategoyList,
+  getProductListFearture,
+  getSliderList,
+} from './service';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DateFormat, MoneyFormat } from 'components/format';
 import axios from 'axios';
 import axiosClient from 'util/axiosClient';
+import { getBlogList } from '../blog/service';
 
 const dataPostFeature = [
   {
@@ -126,32 +131,32 @@ const HomePage = () => {
 
   //Method
   const getSliders = () => {
-    axiosClient
-      .get('/sliders')
+    getSliderList({ limit: 10 })
       .then((result) => {
-        console.log(result);
         setSliders(result);
       })
       .catch((e) => console.log(e));
   };
   const getPosts = () => {
-    axiosClient
-      .get('/blogs')
+    getBlogList({
+      limit: 4,
+      sortedBy: 'updatedAt_desc',
+      status: true,
+      featured: true,
+    })
       .then((result) => {
-        console.log(result);
         const posts = result.posts;
+        console.log(result);
         for (const post of posts) {
           post.thumbnail = 'url(' + post.thumbnail + ')';
         }
-        const postsArr = [posts[0], posts[1], posts[2], posts[3]];
-        setPosts(postsArr);
+        setPosts(posts);
       })
       .catch((e) => console.log(e));
   };
   const getProducts = () => {
-    getProductListFearture()
+    getProductListFearture({ feartured: true, status: true, limit: 8, page: 1 })
       .then((result) => {
-        console.log(result);
         setProducts(result);
       })
       .catch((e) => console.log(e));
@@ -159,7 +164,6 @@ const HomePage = () => {
   const getCategories = () => {
     getCategoyList()
       .then((result) => {
-        console.log(result);
         setCategories(result);
       })
       .catch((e) => {
@@ -244,7 +248,7 @@ const HomePage = () => {
         <Col span={16} offset={4}>
           <Row justify="space-between" style={{ height: '100%' }}>
             {posts &&
-              posts.map((post) => (
+              posts.map((post, index) => (
                 <Col flex={'24.5%'}>
                   <a onClick={() => navigate(`/blog/${post?._id}`)}>
                     <div

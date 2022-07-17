@@ -1,4 +1,9 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -7,7 +12,9 @@ import {
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Row,
+  Switch,
   Tooltip,
   Typography,
 } from 'antd';
@@ -128,7 +135,29 @@ const ManageSliderList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
-      render: (text, record) => <p>{text ? 'true' : 'false'}</p>,
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, _) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn ẩn blog này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            console.log(value);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
     },
   ];
 

@@ -1,10 +1,25 @@
 import {
+  BorderlessTableOutlined,
   DeleteOutlined,
   EditOutlined,
+  ExclamationCircleOutlined,
+  ManOutlined,
   PlusOutlined,
   SearchOutlined,
+  WomanOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Layout,
+  PageHeader,
+  Popconfirm,
+  Row,
+  Switch,
+} from 'antd';
 import TableCustom from 'components/CustomTable';
 import { pickBy } from 'lodash';
 import moment from 'moment';
@@ -66,6 +81,7 @@ const AccountList = () => {
   useEffect(() => {
     fetchRoleList(params);
   }, []);
+
   const columns = [
     {
       title: 'ID',
@@ -97,14 +113,25 @@ const AccountList = () => {
     {
       title: 'Giới tính',
       dataIndex: 'gender',
+      key: 'gender',
       width: '12%',
-      render: (text) => {
-        if (text === 'M') {
-          return 'Male';
-        } else if (text === 'F') {
-          return 'Female';
-        } else {
-          return 'Others';
+      filters: [
+        { text: 'Male', value: 'M' },
+        { text: 'Female', value: 'F' },
+        { text: 'Other', value: 'D' },
+      ],
+      onFilter: (value, record) => record.gender === value,
+
+      render: (text, record) => {
+        switch (text) {
+          case 'M':
+            return <ManOutlined />;
+          case 'F':
+            return <WomanOutlined />;
+          case 'D':
+            return <BorderlessTableOutlined />;
+          default:
+            <p>{text}</p>;
         }
       },
     },
@@ -119,6 +146,14 @@ const AccountList = () => {
       title: 'Role ',
       dataIndex: 'role',
       width: '12%',
+      filters: [
+        { text: 'customer', value: 'customer' },
+        { text: 'admin', value: 'admin' },
+        { text: 'marketing', value: 'marketing' },
+        { text: 'saler', value: 'saler' },
+        { text: 'saleManager', value: 'saleManager' },
+      ],
+      onFilter: (text, record) => record?.role?.name === text,
       render: (text) => text?.name,
       sorter: (a, b) => a?.role?.name?.length - b?.role?.name?.length,
     },
@@ -152,8 +187,30 @@ const AccountList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
-      sorter: (a, b) => a.status > b.status,
-      render: (text, record) => <p>{text ? 'true' : 'false'}</p>,
+      align: 'center',
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, _) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn ẩn blog này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            console.log(value);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
     },
   ];
 

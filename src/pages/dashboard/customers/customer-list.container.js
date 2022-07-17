@@ -1,4 +1,11 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  BorderlessTableOutlined,
+  EditOutlined,
+  ManOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  WomanOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -96,7 +103,18 @@ const ManageCustomerList = () => {
       dataIndex: 'gender',
       key: 'gender',
       width: '12%',
-      render: (text, record) => <p>{text}</p>,
+      render: (text, record) => {
+        switch (text) {
+          case 'M':
+            return <ManOutlined />;
+          case 'F':
+            return <WomanOutlined />;
+          case 'D':
+            return <BorderlessTableOutlined />;
+          default:
+            <p>{text}</p>;
+        }
+      },
     },
     {
       title: 'Email',
@@ -121,6 +139,12 @@ const ManageCustomerList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      filters: [
+        { text: 'contact', value: 'contact' },
+        { text: 'potential', value: 'potential' },
+        { text: 'customer', value: 'customer' },
+      ],
+      onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status.length - b.status.length,
     },
   ];

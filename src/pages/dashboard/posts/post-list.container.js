@@ -41,6 +41,7 @@ const ManagePostList = () => {
   const [totalItem, setTotalItem] = useState();
   const [blogList, setBlogList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
+  const [filterCategories, setFilterCategories] = useState([]);
 
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
@@ -59,6 +60,13 @@ const ManagePostList = () => {
     getCategoryList({ ...params })
       .then((result) => {
         setCategoryList([...result]);
+        result.forEach((cate) => {
+          if (
+            filterCategories.some((cateFilter) => cateFilter.name === cate.name)
+          )
+            return;
+          filterCategories.push({ text: cate.name, value: cate.name });
+        });
         // setTotalItem(result.data["total-count"]);
       })
       .catch((e) => {
@@ -123,6 +131,9 @@ const ManagePostList = () => {
       dataIndex: 'category',
       key: 'category',
       width: '12%',
+      filterSearch: true,
+      filters: filterCategories,
+      onFilter: (value, record) => record.category.name === value,
       sorter: (a, b) => a.category?.name.length - b.category?.name.length,
       render: (_, value) => value?.category?.name || 'Không có dữ liệu',
     },
@@ -132,9 +143,15 @@ const ManagePostList = () => {
       key: 'status',
       width: '12%',
       align: 'center',
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status - b.status,
       render: (text, _) => (
         <Popconfirm
+          icon={<ExclamationCircleOutlined />}
           title={
             <div>
               <span>Bạn có muốn ẩn blog này không ?</span>
@@ -143,7 +160,6 @@ const ManagePostList = () => {
           onConfirm={async (value) => {
             console.log(value);
           }}
-          icon={<ExclamationCircleOutlined />}
           okText={'Có'}
           cancelText={'Không'}
         >
@@ -157,7 +173,12 @@ const ManagePostList = () => {
       key: 'featured',
       align: 'center',
       width: '12%',
-      sorter: (a, b) => a.feartured - b.feartured,
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.featured,
+      sorter: (a, b) => a.featured - b.featured,
       render: (text, _) => {
         return (
           <Popconfirm
