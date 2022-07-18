@@ -19,6 +19,7 @@ import { createProduct, updateOrder } from './order.service';
 import { uploadFileToFirebase, uuidv4 } from 'util/file';
 import moment from 'moment';
 import { DateFormat, MoneyFormat } from 'components/format';
+import StatusFormat from 'components/format-status';
 const ProductEdit = ({
   currentRow,
   onCallback,
@@ -89,7 +90,7 @@ const ProductEdit = ({
       await updateOrder(updateData)
         .then((result) => {
           console.log(result);
-          message.success('Cập nhật sản phẩm thành công!');
+          message.success('Cập nhật đơn hàng thành công!');
           setLoading(false);
           onCallback();
         })
@@ -110,6 +111,7 @@ const ProductEdit = ({
     id: currentRow ? currentRow?._id : undefined,
     status: currentRow ? currentRow?.status : undefined,
   };
+
   return (
     <Modal
       title={'Cập nhật hóa đơn'}
@@ -124,6 +126,35 @@ const ProductEdit = ({
       }}
       onCancel={onCancel}
     >
+      {currentRow?.owner && (
+        <Row>
+          <Col span={12} style={{ width: '95%' }}>
+            <Row className="infor-title" style={{ width: '98%' }}>
+              <Col span={24}>
+                <h1>{'Thông tin khách hàng'}</h1>
+                <Row>
+                  <Col className="order-title-receiver" span={6}>
+                    Họ và tên
+                  </Col>
+                  <Col span={18}>{currentRow.owner.fullName}</Col>
+                </Row>
+                <Row>
+                  <Col className="order-title-receiver" span={6}>
+                    Email
+                  </Col>
+                  <Col span={18}>{currentRow.owner.email}</Col>
+                </Row>
+                <Row>
+                  <Col className="order-title-receiver" span={6}>
+                    Số điện thoại
+                  </Col>
+                  <Col span={18}>{currentRow.owner.phone}</Col>
+                </Row>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      )}
       <Form
         colon={false}
         form={form}
@@ -137,12 +168,18 @@ const ProductEdit = ({
           <Col span={12} style={{ width: '95%' }}>
             <Row className="infor-title" style={{ width: '98%' }}>
               <Col span={24}>
-                <h1>{currentRow?.receiverName}</h1>
+                <h1>{'Thông tin người nhận hàng'}</h1>
+                <Row>
+                  <Col className="order-title-receiver" span={6}>
+                    Họ và tên
+                  </Col>
+                  <Col span={18}>{currentRow?.receiverName}</Col>
+                </Row>
                 <Row>
                   <Col className="order-title-receiver" span={6}>
                     Giới tính
                   </Col>
-                  <Col span={18}>Nữ</Col>
+                  <Col span={18}>{currentRow?.gender}</Col>
                 </Row>
                 <Row>
                   <Col className="order-title-receiver" span={6}>
@@ -180,6 +217,12 @@ const ProductEdit = ({
                 </Row>
                 <Row>
                   <Col className="order-title-receiver" span={6}>
+                    Saler
+                  </Col>
+                  <Col span={18}>{currentRow?.saler?.fullName}</Col>
+                </Row>
+                <Row>
+                  <Col className="order-title-receiver" span={6}>
                     Ngày đặt hàng
                   </Col>
                   <Col span={18}>
@@ -201,32 +244,48 @@ const ProductEdit = ({
                     )}
                   </Col>
                 </Row>
-                <Row>
-                  <Col
-                    className="order-title-receiver s
+                {currentRow?.status === 'submitted' && (
+                  <Row>
+                    <Col
+                      className="order-title-receiver s
                   tatus"
-                    span={6}
-                  >
-                    Trạng Thái
-                  </Col>
-                  <Col span={18} className="infor-wait">
-                    <Form.Item
-                      name="status"
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Cần chọn trạng thái',
-                        },
-                      ]}
+                      span={6}
                     >
-                      <Select>
-                        <Option value="submitted">submitted</Option>
-                        <Option value="cancelled">cancelled</Option>
-                        <Option value="success">success</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
+                      Trạng Thái
+                    </Col>
+                    <Col span={18} className="infor-wait">
+                      <Form.Item
+                        name="status"
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Cần chọn trạng thái',
+                          },
+                        ]}
+                      >
+                        <Select>
+                          <Option value="submitted">submitted</Option>
+                          <Option value="cancelled">cancelled</Option>
+                          <Option value="success">success</Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                )}
+                {currentRow?.status !== 'submitted' && (
+                  <Row>
+                    <Col
+                      className="order-title-receiver s
+                  tatus"
+                      span={6}
+                    >
+                      Trạng Thái
+                    </Col>
+                    <Col span={18} className="infor-wait">
+                      <StatusFormat>{currentRow?.status}</StatusFormat>
+                    </Col>
+                  </Row>
+                )}
               </Col>
             </Row>
           </Col>
@@ -282,7 +341,6 @@ const ProductEdit = ({
             </Col>
           </Row>
         ))}
-
         <div
           className="ant-modal-footer"
           style={{ marginLeft: -24, marginRight: -24, marginBottom: -24 }}
@@ -300,19 +358,20 @@ const ProductEdit = ({
               >
                 {'Cancel'}
               </Button>
-              {loading === false ? (
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ fontWeight: 'bold' }}
-                >
-                  {'Save'}
-                </Button>
-              ) : (
-                <Button type="primary" loading style={{ fontWeight: 'bold' }}>
-                  {'Loading'}
-                </Button>
-              )}
+              {currentRow?.status === 'submitted' &&
+                (loading === false ? (
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    style={{ fontWeight: 'bold' }}
+                  >
+                    {'Save'}
+                  </Button>
+                ) : (
+                  <Button type="primary" loading style={{ fontWeight: 'bold' }}>
+                    {'Loading'}
+                  </Button>
+                ))}
             </Col>
           </Row>
         </div>

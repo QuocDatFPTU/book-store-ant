@@ -41,55 +41,50 @@ const Register = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  //Redux
-  const user = useSelector((state) => state.user);
-  console.log(user);
-
   async function handleSubmit(value) {
-    setLoading(true);
+    // setLoading(true);
     await dispatch(registerInitiate(value))
       //REGISTER SUCESS
       .then(async (result) => {
-        if (localStorage.getItem('__role') === 'R01') {
-          console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
-          try {
-            //Take all cart item of guest to customer
-            const cartGuest = await axiosClient.get('/cart/guest');
-            console.log('CART CỦA GUEST NÀY---------------');
-            console.log(cartGuest);
-            for (let i = 0; i < cartGuest.items.length; i++) {
-              const productId = cartGuest.items[i].product._id;
-              const quantity = cartGuest.items[i].quantity;
-              console.log(productId, quantity, '------------');
+        // if (localStorage.getItem('__role') === 'R01') {
+        //   console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
+        //   try {
+        //     //Take all cart item of guest to customer
+        //     const cartGuest = await axiosClient.get('/cart/guest');
+        //     console.log('CART CỦA GUEST NÀY---------------');
+        //     console.log(cartGuest);
+        //     for (let i = 0; i < cartGuest.items.length; i++) {
+        //       const productId = cartGuest.items[i].product._id;
+        //       const quantity = cartGuest.items[i].quantity;
+        //       console.log(productId, quantity, '------------');
 
-              //Update lại cart item của customer:
-              try {
-                await axiosClient.post('/cart', { productId, quantity });
-              } catch (error) {
-                console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
-                console.log(error);
-                console.log('++++++++++++++++++++');
-              }
-            }
-          } catch (error) {
-            console.log(error.response);
-          }
-          //Delete session: dù fail hoặc sucess lấy cart item
-          await axiosClient.delete('/session');
-        }
+        //       //Update lại cart item của customer:
+        //       try {
+        //         await axiosClient.post('/cart', { productId, quantity });
+        //       } catch (error) {
+        //         console.log('LỖI Ở CUSTOMER CART ITEM++++++++++++');
+        //         console.log(error);
+        //         console.log('++++++++++++++++++++');
+        //       }
+        //     }
+        //   } catch (error) {
+        //     console.log(error.response);
+        //   }
+        //   //Delete session: dù fail hoặc sucess lấy cart item
+        //   await axiosClient.delete('/session');
+        // }
 
         // Move to User homepage
+
         message.success('Đăng ký thành công');
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
         return true;
       })
       .catch((error) => {
+        console.log(error);
+        console.log(error.response);
         setLoading(false);
         message.error(error.message);
       });
-
     return true;
   }
 
@@ -201,9 +196,8 @@ const Register = (props) => {
                     { min: 8, message: 'Mật khẩu phải có ít nhất độ dài là 8' },
                   ]}
                 >
-                  <Input
+                  <Input.Password
                     prefix={<LockOutlined className="site-form-item-icon" />}
-                    type="password"
                     placeholder="Mật khẩu"
                     autoComplete="new-password"
                   />

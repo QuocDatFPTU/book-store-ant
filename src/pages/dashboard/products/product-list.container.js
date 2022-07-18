@@ -1,13 +1,21 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
   Col,
   Form,
+  Image,
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Row,
+  Switch,
   Tooltip,
 } from 'antd';
 import { pickBy } from 'lodash';
@@ -17,9 +25,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getCategoryList, getProductList } from './product.service';
+import {
+  getCategoryList,
+  getProductList,
+  updateProduct,
+} from './product.service';
 import ProductEdit from './product.edit';
 import TableCustom from 'components/CustomTable';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -33,6 +46,7 @@ const ManageProductList = () => {
   const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
+  const [filterCategories, setFilterCategories] = useState([]);
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
@@ -46,11 +60,18 @@ const ManageProductList = () => {
       })
       .catch((e) => setLoading(false));
   };
+
   const fetchCategoryList = (params) => {
     getCategoryList({ ...params })
       .then((result) => {
         setCategoryList([...result]);
-        // setTotalItem(result.data["total-count"]);
+        result.forEach((cate) => {
+          if (
+            filterCategories.some((cateFilter) => cateFilter.name === cate.name)
+          )
+            return;
+          filterCategories.push({ text: cate.name, value: cate.name });
+        });
       })
       .catch((e) => {
         return false;
@@ -70,22 +91,14 @@ const ManageProductList = () => {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      sorter: (a, b) => a.title.length - b.title.length,
       ellipsis: {
         showTitle: false,
       },
       render: (text, record) => {
         return (
           <Tooltip placement="topLeft" title={text}>
-            <Button
-              size="small"
-              type="link"
-              onClick={() => {
-                setCurrentRow(record);
-                setIsEditModal(true);
-              }}
-            >
-              {text}
-            </Button>
+            <h3>{text}</h3>
           </Tooltip>
         );
       },
@@ -95,12 +108,14 @@ const ManageProductList = () => {
       dataIndex: 'listPrice',
       key: 'listPrice',
       width: '12%',
+      sorter: (a, b) => a.listPrice - b.listPrice,
     },
     {
       title: 'Giá giảm giá',
       dataIndex: 'salePrice',
       key: 'salePrice',
       width: '12%',
+      sorter: (a, b) => a.salePrice - b.salePrice,
     },
     {
       title: 'Số lượng',
@@ -113,14 +128,98 @@ const ManageProductList = () => {
       dataIndex: 'thumbnail',
       key: 'thumbnail',
       width: '12%',
-      render: (text, _) => <img src={text} width={100} alt="img" />,
+      render: (text, _) => (
+        <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
+      ),
     },
     {
       title: 'Thể loại',
       dataIndex: 'category',
       key: 'category',
       width: '12%',
-      render: (_, value) => value?.category?.name,
+      filterSearch: true,
+      filters: filterCategories,
+      onFilter: (value, record) => record.category.name === value,
+      sorter: (a, b) => a.category?.name.length - b.category?.name.length,
+      render: (_, value) => value?.category?.name || 'Không có dữ liệu',
+    },
+    {
+      title: 'Đặc biệt',
+      dataIndex: 'feartured',
+      key: 'feartured',
+      width: '12%',
+      sorter: (a, b) => a.feartured - b.feartured,
+      render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
+      render: (text, record) => {
+        return (
+          <Popconfirm
+            title={
+              <div>
+                <span>Bạn có muốn thay đổi đặc biệt sản phẩm này không ?</span>
+              </div>
+            }
+            onConfirm={async (value) => {
+              await updateProduct({ id: record._id, feartured: !text });
+              fetchProductList(params);
+            }}
+            icon={<ExclamationCircleOutlined />}
+            okText={'Có'}
+            cancelText={'Không'}
+          >
+            <Switch checked={text}></Switch>
+          </Popconfirm>
+        );
+      },
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      align: 'center',
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, record) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn thay đổi trạng thái sản phẩm này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            await updateProduct({ id: record._id, status: !text });
+            fetchProductList(params);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentRow(record);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -149,6 +248,7 @@ const ManageProductList = () => {
     },
   ];
 
+  console.log(productList);
   return (
     <Layout className="layoutContent">
       <PageHeader
@@ -164,16 +264,21 @@ const ManageProductList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim())
+                return fetchProductList(params);
+              const productsSearch = await axiosClient.post(
+                '/products/search/marketing',
+                { searchText: form.getFieldValue('search-value') }
               );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+              setProductList(productsSearch);
+
+              // setParams({
+              //   ...cleanValue,
+              //   "page-number": 1,
+              //   "page-size": params["page-size"]
+              // });
             }}
           >
             <Row gutter={16}>

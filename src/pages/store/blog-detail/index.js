@@ -5,6 +5,7 @@ import { getBlogListDetail } from './service';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { Avatar, Row } from 'antd';
 import './style.less';
+import { DateFormat } from 'components/format';
 export default function BlogListDetail() {
   const { blogId } = useParams();
   const [loading, setLoading] = useState(false);
@@ -25,25 +26,30 @@ export default function BlogListDetail() {
 
   return (
     <WrapperConentContainer>
-      <h1 className="BlogDetail_heading">{blog?.title}</h1>
-      <div className="BlogDetail_header">
-        <div className="BlogDetail_user">
-          <Avatar
-            style={{ outline: 'none', textDecoration: 'none' }}
-            src="https://joeschmoe.io/api/v1/random"
-          />
-          <div className="BlogDetail_info">
-            <p className="BlogDetail_name">Quốc Đạt</p>
-            <p className="BlogDetail_time">
-              "12 ngày trước " <span className="BlogDetail_dot">.</span> "7 phút
-              đọc"
-            </p>
+      <div
+        style={{
+          backgroundColor: 'white',
+          padding: '30px',
+          overflow: 'hidden',
+        }}
+      >
+        <h1 className="BlogDetail_heading">{blog?.title}</h1>
+        <div className="BlogDetail_header">
+          <div className="BlogDetail_user">
+            <Avatar
+              style={{ outline: 'none', textDecoration: 'none' }}
+              src="https://joeschmoe.io/api/v1/random"
+            />
+            <div className="BlogDetail_info">
+              <p className="BlogDetail_name">{blog?.author}</p>
+              <p className="BlogDetail_time">
+                <DateFormat>{blog?.updatedAt}</DateFormat>
+              </p>
+            </div>
           </div>
         </div>
-        <div className="BlogDetail_action"></div>
+        <div>{parse(`${blog?.description}`)}</div>
       </div>
-
-      {parse(`${blog?.description}`)}
     </WrapperConentContainer>
   );
 }

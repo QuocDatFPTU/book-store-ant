@@ -6,11 +6,9 @@ export const getCategoyList = async (params) => {
   return axiosClient.get(url, { params });
 };
 
-//Get all products by cart
-export const getProductListByCategory = async (params) => {
-  // eslint-disable-next-line quotes
-  const url = `/products/category/${params}?status=true&limit=12`;
-  return axiosClient.get(url);
+export const getProductListByCategory = async (categoryId, params) => {
+  const url = `/products/category/${categoryId}`;
+  return axiosClient.get(url, { params });
 };
 
 // Add to cart: customer

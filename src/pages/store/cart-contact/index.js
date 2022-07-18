@@ -249,7 +249,7 @@ const CartContact = () => {
                   ]}
                 >
                   <Select
-                    placeholder="Select a option and change input text above"
+                    placeholder="Chọn giới tính"
                     allowClear
                     disabled={updated}
                   >

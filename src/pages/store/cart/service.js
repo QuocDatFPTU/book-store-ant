@@ -1,12 +1,6 @@
 const { default: axiosClient } = require('util/axiosClient');
 
 //-----------------------------CUSTOMER
-//Get product by id
-export const getProductById = async (params) => {
-  const url = `/products/${params}`;
-  return axiosClient.get(url, { params });
-};
-
 //Get all cart items
 export const getCartItemList = async (params) => {
   const url = '/cart';

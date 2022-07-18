@@ -13,36 +13,42 @@ import jwt from 'jsonwebtoken';
 import { message } from 'antd';
 
 function* login(action) {
+  while (true) {
+    console.log('--------------');
     try {
-        const { username, password } = action.payload;
-        const data = yield call(
-            request,
-            environment.api.login,
-            {
-                email: username,
-                password,
-            },
-            'POST'
-        );
+      const { username, password } = action.payload;
+      console.log(username, password, 'redux store');
+      const data = yield call(
+        request,
+        environment.api.login,
+        {
+          email: username,
+          password,
+        },
+        'POST'
+      );
 
-        if (!data.token) {
-            return;
-        }
-        const decode_token = jwt.decode(data.token);
-        const user = _.omit(data?.user, ['tokens']);
-        localStorage.setItem('__role', decode_token?.role);
-        localStorage.setItem('__token', data.token);
+      if (!data.token) {
+        return;
+      }
+      const decode_token = jwt.decode(data.token);
+      localStorage.setItem('__role', decode_token?.role);
+      localStorage.setItem('__token', data.token);
 
-        yield put(
-            authAction.loginSuccess({
-                ...user,
-                role: decode_token?.role,
-            })
-        );
+      yield put(
+        loginSuccess({
+          ...data,
+          role: decode_token?.role,
+        })
+      );
+      break;
     } catch (error) {
-        yield put(authAction.loginFail(error?.message));
-        message.error('Đăng nhập không thành công');
+      console.log('login fail');
+      yield put(loginFail(error?.message));
+      message.error('Đăng nhập không thành công');
     }
+  }
+
 }
 
 

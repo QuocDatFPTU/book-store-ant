@@ -32,7 +32,9 @@ const Login = (props) => {
 
   async function handleSubmit(value) {
     const { username, password } = value;
-    dispatch(authAction.loginStart({ username, password }));
+    console.log({ username, password }, 'login page');
+    dispatch(loginStart({ username, password }));
+
     setIsLogin(true);
   }
   console.log('user', currentUser?.role)
@@ -42,11 +44,9 @@ const Login = (props) => {
     //+ đang load: isLogin=true, role=R02, local=null
     //+ load xong fail: isLogin=true, role=R02, local=null báo lỗi
     //+ load xong success: isLogin=true, role=R03, local=R03,navigate
-
-    //đang đăng nhập
-    //+ đang load: role=R02
-    //+ load xong fail: role=R02
-    //+ load xong success: role=R03
+    console.log(role);
+    console.log(isLogin);
+    console.log(role !== 'R02');
     if (isLogin) {
       //Load xong success
 
@@ -65,7 +65,15 @@ const Login = (props) => {
           return;
         }
 
-        if (currentUser?.role === 'R01') {
+        if (role === 'R00') {
+          message.success('Đăng nhập thành công');
+          setLoading(true);
+          navigate('/dashboard/user');
+          return;
+        }
+
+        if (role === 'R01') {
+
           try {
             //Take all cart item of guest to customer
             const cartGuest = await request('/cart/guest', {}, 'GET');
@@ -93,6 +101,8 @@ const Login = (props) => {
 
         setIsLogin(false);
       }
+
+      setIsLogin(false);
     }
 
     // if (isLogin && role) {

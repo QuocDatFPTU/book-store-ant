@@ -43,29 +43,25 @@ const priceOptions = [
 
 const ProductList = () => {
   //State
+  const { id: categoryId } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState('');
   const [products, setProducts] = useState([]);
   const [totalProduct, setTotalProduct] = useState(0);
 
-  const { id: categoryId } = useParams();
-  // const { pathname } = useLocation();
-
   const getCategories = () => {
     getCategoyList()
       .then((result) => {
-        console.log(result);
         setCategories(result);
       })
       .catch((e) => console.log(e));
   };
   const getProducts = (categoryId, page) => {
-    axiosClient
-      .get(`/products/category/${categoryId}?status=true&limit=12&page=${page}`)
-      .then((result) => {
-        console.log(result);
-        setProducts(result);
+    getProductListByCategory(categoryId, { status: true, limit: 12, page })
+      .then(({ product, count }) => {
+        setProducts(product);
+        setTotalProduct(count);
       })
       .catch((e) => console.log(e));
   };
@@ -75,14 +71,6 @@ const ProductList = () => {
         setCategoryName(result.name);
       })
       .catch((e) => console.log(e));
-  };
-  const getNumberProductCategory = (categoryId) => {
-    axiosClient
-      .get(`/products/size?category=${categoryId}&status=true`)
-      .then((result) => {
-        console.log(result, '-------------');
-        setTotalProduct(result.count);
-      });
   };
   const onChangePage = (page) => {
     //Get product list again
@@ -101,16 +89,13 @@ const ProductList = () => {
         cart = await addProudctToCartGuest(cartItem);
       else cart = await addProudctToCart(cartItem);
 
-      console.log(cart);
-
       //Go to cart or not
       message.success('Thêm vào giỏ hàng thành công', 5);
-      // navigate(`/product-list/${categoryId}`);
     } catch (error) {
       message.error(`${error.response.data.error}`, 5);
-      // navigate(`/product-list/${categoryId}`);
     }
   };
+
   useEffect(() => {
     if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
       console.log('not have jwt store in localStorage');
@@ -121,7 +106,6 @@ const ProductList = () => {
 
     getCategories();
     getCategoryName(categoryId);
-    getNumberProductCategory(categoryId);
     getProducts(categoryId, 1);
   }, [categoryId]);
 
@@ -192,7 +176,7 @@ const ProductList = () => {
                   <Option value="best-month">Bán chạy tháng</Option>
                   <Option value="best-year">Bán chạy năm</Option>
                 </Select>
-                <Select
+                {/* <Select
                   className="select-product"
                   defaultValue="12"
                   style={{
@@ -203,77 +187,82 @@ const ProductList = () => {
                   <Option value="12">12 sản phẩm</Option>
                   <Option value="24">24 sản phẩm</Option>
                   <Option value="48">48 sản phẩm</Option>
-                </Select>
+                </Select> */}
               </Col>
               <Divider style={{ margin: '0 14px' }} />
             </Row>
             <Row>
-              {products.map((item) => (
-                <Col flex={'25%'} style={{ marginBottom: '30px' }}>
-                  <Card
-                    className="product-card"
-                    hoverable={true}
-                    bordered={false}
-                    cover={
-                      <a
-                        style={{ textAlign: 'center' }}
-                        onClick={() => navigate(`/product-detail/${item._id}`)}
-                      >
-                        <img
-                          style={{
-                            width: '88%',
-                            height: '190px',
-                            // objectFit: 'cover',
-                            margin: '0 auto',
-                          }}
-                          alt="example"
-                          src={item.thumbnail}
-                        />
-                      </a>
-                    }
-                  >
-                    <Typography.Paragraph
-                      className="home-product-title"
-                      ellipsis={{
-                        rows: 2,
-                        // expandable: true,
-                      }}
-                    >
-                      <a
-                        onClick={() => navigate(`/product-detail/${item._id}`)}
-                      >
-                        {item.title}
-                      </a>
-                    </Typography.Paragraph>
-                    <Typography.Text className="product-sale">
-                      <MoneyFormat>{item.salePrice}</MoneyFormat>
-                    </Typography.Text>
-                    <Typography.Text className="product-price-old">
-                      <MoneyFormat>{item.listPrice}</MoneyFormat>
-                    </Typography.Text>
-                    <Row justify="space-between">
-                      <Col>
-                        <Rate className="product-rate" value={4} />
-                        <MessageOutlined
-                          style={{ marginLeft: '10px', fontSize: '18px' }}
-                        />
-                      </Col>
-                      <Col>
-                        <Typography.Link onClick={() => addToCart(item._id)}>
-                          <ShoppingCartOutlined
+              {products.length !== 0 &&
+                products.map((item) => (
+                  <Col flex={'25%'} style={{ marginBottom: '30px' }}>
+                    <Card
+                      className="product-card"
+                      hoverable={true}
+                      bordered={false}
+                      cover={
+                        <a
+                          style={{ textAlign: 'center' }}
+                          onClick={() =>
+                            navigate(`/product-detail/${item._id}`)
+                          }
+                        >
+                          <img
                             style={{
-                              zIndex: '199',
-                              marginRight: '10px',
-                              fontSize: '28px',
-                              color: '#C92127',
+                              width: '88%',
+                              height: '190px',
+                              // objectFit: 'cover',
+                              margin: '0 auto',
                             }}
+                            alt="example"
+                            src={item.thumbnail}
                           />
-                        </Typography.Link>
-                      </Col>
-                    </Row>
-                  </Card>
-                </Col>
-              ))}
+                        </a>
+                      }
+                    >
+                      <Typography.Paragraph
+                        className="home-product-title"
+                        ellipsis={{
+                          rows: 2,
+                          // expandable: true,
+                        }}
+                      >
+                        <a
+                          onClick={() =>
+                            navigate(`/product-detail/${item._id}`)
+                          }
+                        >
+                          {item.title}
+                        </a>
+                      </Typography.Paragraph>
+                      <Typography.Text className="product-sale">
+                        <MoneyFormat>{item.salePrice}</MoneyFormat>
+                      </Typography.Text>
+                      <Typography.Text className="product-price-old">
+                        <MoneyFormat>{item.listPrice}</MoneyFormat>
+                      </Typography.Text>
+                      <Row justify="space-between">
+                        <Col>
+                          <Rate className="product-rate" value={4} />
+                          <MessageOutlined
+                            style={{ marginLeft: '10px', fontSize: '18px' }}
+                          />
+                        </Col>
+                        <Col>
+                          <Typography.Link onClick={() => addToCart(item._id)}>
+                            <ShoppingCartOutlined
+                              style={{
+                                zIndex: '199',
+                                marginRight: '10px',
+                                fontSize: '28px',
+                                color: '#C92127',
+                              }}
+                            />
+                          </Typography.Link>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                ))}
             </Row>
             {products.length !== 0 ? (
               <Row>

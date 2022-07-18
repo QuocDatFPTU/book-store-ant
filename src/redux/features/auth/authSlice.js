@@ -18,17 +18,29 @@ const authSlice = createSlice({
     },
 
     loginSuccess(state, action) {
-      state.logging = false;
-      state.currentUser = action.payload;
+      return {
+        ...state,
+        role: action.payload.role,
+      };
     },
-    loginFail(state, action) {
-      state.logging = false;
-      state.error = action.payload;
+
+    logoutStart(state, action) {
+      return {
+        ...state,
+      };
     },
-    logout(state, action) {
-      state.isLoggedIn = false;
-      state.currentUser = { role: 'R02' };
-      state.error = undefined;
+
+    logoutSuccess(state) {
+      state.currentUser = undefined;
+      state.role = 'R02';
+    },
+
+    logoutFail(state, action) {
+      return {
+        ...state,
+        error: action.payload,
+      };
+
     },
   },
 });

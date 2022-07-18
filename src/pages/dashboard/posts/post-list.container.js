@@ -1,4 +1,10 @@
-import { DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -11,7 +17,7 @@ import {
   Popconfirm,
   Row,
   Switch,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import { pickBy } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -20,8 +26,14 @@ import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
 import TableCustom from 'components/CustomTable';
 import PostEdit from './post.edit';
-import { getCategoryList, getPostList, getProductList } from './post.service';
+import {
+  getCategoryList,
+  getPostList,
+  getProductList,
+  updatePost,
+} from './post.service';
 import { async } from '@firebase/util';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -33,8 +45,9 @@ const ManagePostList = () => {
   const [currentRow, setCurrentRow] = useState(); // Pagination
   const [params, setParams] = useState({ ...defaultPage });
   const [totalItem, setTotalItem] = useState();
-  const [blogList, setBlogList] = useState([])
+  const [blogList, setBlogList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
+  const [filterCategories, setFilterCategories] = useState([]);
 
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
@@ -53,17 +66,24 @@ const ManagePostList = () => {
     getCategoryList({ ...params })
       .then((result) => {
         setCategoryList([...result]);
+        result.forEach((cate) => {
+          if (
+            filterCategories.some((cateFilter) => cateFilter.name === cate.name)
+          )
+            return;
+          filterCategories.push({ text: cate.name, value: cate.name });
+        });
         // setTotalItem(result.data["total-count"]);
       })
       .catch((e) => {
         return false;
       });
   };
+
   useEffect(() => {
     fetchBlogList(params);
   }, [params]);
 
-
   useEffect(() => {
     fetchCategoryList(params);
   }, []);
@@ -71,29 +91,28 @@ const ManagePostList = () => {
   useEffect(() => {
     fetchCategoryList(params);
   }, []);
-
 
   const columns = [
+    {
+      title: 'ID',
+      dataIndex: '_id',
+      key: '_id',
+      ellipsis: {
+        showTitle: false,
+      },
+    },
     {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      sorter: (a, b) => a.title.length - b.title.length,
       ellipsis: {
         showTitle: false,
       },
       render: (text, record) => {
         return (
           <Tooltip placement="topLeft" title={text}>
-            <Button
-              size="small"
-              type="link"
-              onClick={() => {
-                setCurrentRow(record);
-                setIsEditModal(true);
-              }}
-            >
-              {text}
-            </Button>
+            <h4>{text}</h4>
           </Tooltip>
         );
       },
@@ -103,7 +122,7 @@ const ManagePostList = () => {
       dataIndex: 'author',
       key: 'author',
       width: '12%',
-      // render: (text, _) => <img src={text} width={100} alt="img" />,
+      sorter: (a, b) => a.author.length - b.author.length,
     },
     {
       title: 'Brief',
@@ -118,6 +137,10 @@ const ManagePostList = () => {
       dataIndex: 'category',
       key: 'category',
       width: '12%',
+      filterSearch: true,
+      filters: filterCategories,
+      onFilter: (value, record) => record.category.name === value,
+      sorter: (a, b) => a.category?.name.length - b.category?.name.length,
       render: (_, value) => value?.category?.name || 'Không có dữ liệu',
     },
     {
@@ -126,17 +149,30 @@ const ManagePostList = () => {
       key: 'status',
       width: '12%',
       align: 'center',
-      render: (text, _) => (
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, record) => (
         <Popconfirm
-          title={<div><span>Bạn có muốn ẩn blog này không ?</span></div>}
-          onConfirm={async (value) => { console.log(value) }}
           icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn đổi trạng thái blog này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            await updatePost({ id: record._id, status: !text });
+            fetchBlogList(params);
+          }}
           okText={'Có'}
           cancelText={'Không'}
         >
           <Switch checked={text}></Switch>
         </Popconfirm>
-      )
+      ),
     },
     {
       title: 'Nổi bật',
@@ -144,18 +180,31 @@ const ManagePostList = () => {
       key: 'featured',
       align: 'center',
       width: '12%',
-      render: (text, _) => {
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.featured,
+      sorter: (a, b) => a.featured - b.featured,
+      render: (text, record) => {
         return (
           <Popconfirm
-            title={<div><span>Bạn có muốn chuyển trạng thái blog này không ?</span></div>}
-            onConfirm={async () => { console.log('value') }}
             icon={<ExclamationCircleOutlined />}
+            title={
+              <div>
+                <span>Bạn có muốn đổi Nổi bật blog này không ?</span>
+              </div>
+            }
+            onConfirm={async (value) => {
+              await updatePost({ id: record._id, featured: !text });
+              fetchBlogList(params);
+            }}
             okText={'Có'}
             cancelText={'Không'}
           >
             <Switch checked={text}></Switch>
           </Popconfirm>
-        )
+        );
       },
     },
     {
@@ -163,24 +212,27 @@ const ManagePostList = () => {
       dataIndex: 'thumbnail',
       key: 'thumbnail',
       width: '12%',
-      render: (text, _) => <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />,
+      render: (text, _) => (
+        <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
+      ),
     },
     {
-      title: 'Hành động',
-      key: 'action',
-      dataIndex: 'action',
-      width: '12%',
+      title: 'Action',
       align: 'center',
-      render: (_, value) => (
-        <Popconfirm
-          title={"Bạn có muốn xóa blog này không"}
-          okText={"Có"}
-          cancelText={"Không"}
-          onConfirm={async () => { console.log('oke') }}
-          icon={<ExclamationCircleOutlined />}
-        >
-          <Button icon={<DeleteOutlined />} type="primary" danger style={{ borderRadius: '6px' }} />
-        </Popconfirm>
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentRow(record);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
       ),
     },
   ];
@@ -225,16 +277,15 @@ const ManagePostList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
-              );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
+            onFinish={async (value) => {
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) return fetchBlogList();
+
+              const sliderSearch = await axiosClient.post('/posts/search', {
+                search: form.getFieldValue('search-value'),
+                limit: 100,
               });
+              setBlogList(sliderSearch);
             }}
           >
             <Row gutter={16}>

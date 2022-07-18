@@ -1,8 +1,21 @@
+import { async } from '@firebase/util';
 import axiosClient from 'util/axiosClient';
 
 // Get all products
 export const getProductListFearture = async (params) => {
-  const url = '/products?feartured=true&status=true&limit=8&page=1';
+  const url = '/products';
+  return axiosClient.get(url, { params });
+};
+
+// Get all sliders
+export const getSliderList = async (params) => {
+  const url = '/sliders';
+  return axiosClient.get(url, { params });
+};
+
+// Get all sliders
+export const getBlogList = async (params) => {
+  const url = '/blogs';
   return axiosClient.get(url, { params });
 };
 
