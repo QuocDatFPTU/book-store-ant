@@ -50,7 +50,7 @@ const Login = (props) => {
           return;
         }
 
-        if (currentUser?.role === 'R04') {
+        if (currentUser?.role === 'R04' || currentUser?.role === 'R05') {
           message.success('Đăng nhập thành công');
           setLoading(true);
           navigate('/dashboard/order');

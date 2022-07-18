@@ -202,8 +202,8 @@ const HeaderContainer = () => {
                 </Col>
                 <Col
                   className="header-item"
-                  span={5}
-                  offset={4}
+                  span={7}
+                  offset={2}
                   style={{ display: 'flex', justifyContent: 'right' }}
                 >
                   <div
@@ -231,10 +231,10 @@ const HeaderContainer = () => {
                         : menuUser
                     }
                   >
-                    <Space style={{ color: 'white' }}>
+                    <div style={{ color: 'white' }}>
                       {username}
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
-                    </Space>
+                    </div>
                   </Dropdown>
                   <Button type="link" onClick={() => navigate('/blog')}>
                     Blog

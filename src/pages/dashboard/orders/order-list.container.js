@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getOrderList } from './order.service';
+import { getOrderList, getOrderListSaleManager } from './order.service';
 import ProductEdit from './order.edit';
 import TableCustom from 'components/CustomTable';
 import axiosClient from 'util/axiosClient';
@@ -50,8 +50,21 @@ const ManageOrderList = () => {
       .catch((e) => setLoading(false));
   };
 
+  const fetchOrderListSaleManager = (params, sortedInfo) => {
+    setLoading(true);
+    getOrderListSaleManager({ ...params })
+      .then((result) => {
+        setOrderList([...result?.orders]);
+        setTotalItem(result?.count);
+        setLoading(false);
+      })
+      .catch((e) => setLoading(false));
+  };
+
   useEffect(() => {
-    fetchOrderList(params);
+    if (localStorage.getItem('__role') === 'R04') return fetchOrderList(params);
+    if (localStorage.getItem('__role') === 'R05')
+      return fetchOrderListSaleManager(params);
   }, [params]);
 
   const columns = [
@@ -134,11 +147,18 @@ const ManageOrderList = () => {
             size="small"
             icon={<EditOutlined />}
             onClick={async () => {
-              const orderUpdate = await axiosClient.get(
-                `/orders/saler/${record._id}`
-              );
-              console.log(orderUpdate);
-              setCurrentRow(orderUpdate);
+              if (localStorage.getItem('__role') === 'R04') {
+                const orderUpdate = await axiosClient.get(
+                  `/orders/saler/${record._id}`
+                );
+                setCurrentRow(orderUpdate);
+              }
+              if (localStorage.getItem('__role') === 'R05') {
+                const orderUpdate = await axiosClient.get(
+                  `/orders/saleManager/getOne?orderId=${record._id}`
+                );
+                setCurrentRow(orderUpdate);
+              }
               setIsEditModal(true);
             }}
           />
@@ -175,17 +195,34 @@ const ManageOrderList = () => {
             layout="horizontal"
             className="customFormSearch"
             onFinish={async (value) => {
-              if (!form.getFieldValue('search-value').trim())
-                return fetchOrderList();
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) {
+                if (localStorage.getItem('__role') === 'R04')
+                  return fetchOrderList(params);
+                if (localStorage.getItem('__role') === 'R05')
+                  return fetchOrderListSaleManager(params);
+              }
 
-              const sliderSearch = await axiosClient.post(
-                '/orders/saler/search',
-                {
-                  search: form.getFieldValue('search-value'),
-                  limit: 100,
-                }
-              );
-              setOrderList(sliderSearch);
+              if (localStorage.getItem('__role') === 'R04') {
+                const sliderSearch = await axiosClient.post(
+                  '/orders/saler/search',
+                  {
+                    search: form.getFieldValue('search-value'),
+                    limit: 100,
+                  }
+                );
+                setOrderList(sliderSearch);
+              }
+              if (localStorage.getItem('__role') === 'R05') {
+                const sliderSearch = await axiosClient.post(
+                  '/orders/saleManager/search',
+                  {
+                    search: form.getFieldValue('search-value'),
+                    limit: 100,
+                  }
+                );
+                setOrderList(sliderSearch);
+              }
             }}
           >
             <Row gutter={16}>

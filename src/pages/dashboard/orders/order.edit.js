@@ -15,7 +15,7 @@ import {
   Typography,
 } from 'antd';
 import 'moment/locale/vi';
-import { createProduct, updateOrder } from './order.service';
+import { updateOrder, updateOrderSaleManager } from './order.service';
 import { uploadFileToFirebase, uuidv4 } from 'util/file';
 import moment from 'moment';
 import { DateFormat, MoneyFormat } from 'components/format';
@@ -87,18 +87,34 @@ const ProductEdit = ({
       const updateData = { id: currentRow._id, ...values };
       setLoading(true);
       // Update
-      await updateOrder(updateData)
-        .then((result) => {
-          console.log(result);
-          message.success('Cập nhật đơn hàng thành công!');
-          setLoading(false);
-          onCallback();
-        })
-        .catch((error) => {
-          console.log('error2', error);
-          message.error(error.message);
-          setLoading(false);
-        });
+      if (localStorage.getItem('__role') === 'R04') {
+        await updateOrder(updateData)
+          .then((result) => {
+            console.log(result);
+            message.success('Cập nhật đơn hàng thành công!');
+            setLoading(false);
+            onCallback();
+          })
+          .catch((error) => {
+            console.log('error2', error);
+            message.error(error.message);
+            setLoading(false);
+          });
+      }
+      if (localStorage.getItem('__role') === 'R05') {
+        await updateOrderSaleManager(updateData)
+          .then((result) => {
+            console.log(result);
+            message.success('Cập nhật đơn hàng thành công!');
+            setLoading(false);
+            onCallback();
+          })
+          .catch((error) => {
+            console.log('error2', error);
+            message.error(error.message);
+            setLoading(false);
+          });
+      }
     } catch (error) {
       console.log('errorTong', error);
       message.error(error.message);

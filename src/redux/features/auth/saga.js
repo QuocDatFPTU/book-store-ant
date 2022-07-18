@@ -53,6 +53,7 @@ function* login(action) {
 }
 
 function* logout(action) {
+  console.log('sao eo remove');
   yield call(request, '/user/logoutAll', {});
   yield localStorage.removeItem('__role');
   yield localStorage.removeItem('__token');

@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { Layout, Menu } from 'antd';
-import Icon, { PieChartOutlined } from '@ant-design/icons';
+import Icon, {
+  ApartmentOutlined,
+  CopyOutlined,
+  OrderedListOutlined,
+  PieChartOutlined,
+  SlidersOutlined,
+  UsergroupDeleteOutlined,
+} from '@ant-design/icons';
 import logo from 'assets/logo-new.png';
 import './styles.less';
 import { useNavigate } from 'react-router-dom';
@@ -59,30 +66,32 @@ const DashboardSider = () => {
               </Menu.Item>
               <Menu.Item
                 key="2"
+                icon={<ApartmentOutlined />}
                 onClick={() => navigate('/dashboard/customer')}
               >
                 Customer
-              </Menu.Item>{' '}
+              </Menu.Item>
               <Menu.Item
                 key="4"
-                // icon={<PostIconSvg />}
+                icon={<CopyOutlined />}
                 onClick={() => navigate('/dashboard/post')}
               >
                 Post
               </Menu.Item>
               <Menu.Item
                 key="5"
-                // icon={<PostIconSvg />}
+                icon={<SlidersOutlined />}
                 onClick={() => navigate('/dashboard/slider')}
               >
                 Slider
               </Menu.Item>
             </>
           )}
-          {localStorage.getItem('__role') === 'R04' && (
+          {(localStorage.getItem('__role') === 'R04' ||
+            localStorage.getItem('__role') === 'R05') && (
             <Menu.Item
               key="3"
-              // icon={<OrderIconSvg />}
+              icon={<OrderedListOutlined />}
               onClick={() => navigate('/dashboard/order')}
             >
               Order
@@ -91,6 +100,7 @@ const DashboardSider = () => {
           {localStorage.getItem('__role') === 'R00' && (
             <Menu.Item
               key="6"
+              icon={<UsergroupDeleteOutlined />}
               // icon={<PostIconSvg />}
               onClick={() => navigate('/dashboard/user')}
             >

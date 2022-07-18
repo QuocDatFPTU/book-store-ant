@@ -33,6 +33,7 @@ import AccountList from 'pages/dashboard/student/account-list.container';
 import ManageOrderList from 'pages/dashboard/orders/order-list.container';
 import ManageCustomerList from 'pages/dashboard/customers/customer-list.container';
 import CartCompletion from 'pages/store/cart-completion';
+import VerifyAccountPage from 'pages/home/verify-account';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -77,8 +78,9 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password/:id" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/verify-account/:id" element={<VerifyAccountPage />} />
           </Routes>
           <Routes>
             <Route
