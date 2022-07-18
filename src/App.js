@@ -43,7 +43,7 @@ const AppWrapper = () => {
   );
 };
 const App = () => {
-  const { role } = useSelector((state) => state.auth);
+  const { currentUser } = useSelector((state) => state.auth);
   return (
     <>
       {/* <HomePage /> */}

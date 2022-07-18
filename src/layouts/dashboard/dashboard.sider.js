@@ -17,8 +17,7 @@ const DashboardSider = () => {
   const [collapse, setCollapse] = useState(true);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { role } = useSelector((state) => state.auth);
-
+  const { currentUser } = useSelector((state) => state.auth);
   return (
     <Sider
       className="sider"
@@ -47,6 +46,7 @@ const DashboardSider = () => {
           />
         </div>
       )}
+
       <Menu theme="light" mode="inline" className="menu-list">
         <>
           {role === 'R03' && (

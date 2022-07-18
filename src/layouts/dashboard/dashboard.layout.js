@@ -9,19 +9,21 @@ import {
 } from '@ant-design/icons';
 import './styles.less';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
-import { logoutStart } from 'redux/features/auth/authSlice';
+import { authAction, logoutStart } from 'redux/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 const { Header } = Layout;
 
 // import logo from "assets/logo.png";
 
 const DashboardLayout = (props) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const menu = (
     <Menu
       onClick={(e) => {
         if (e.key == 1) {
-          localStorage.clear();
-          navigate('/');
+          dispatch(authAction.logout());
+          navigate('/login');
         }
       }}
     >
@@ -32,8 +34,7 @@ const DashboardLayout = (props) => {
       <Menu.Item key="1">
         <LoginOutlined
           onClick={() => {
-            dispatch(logoutStart());
-            navigate('/login');
+
           }}
         />
         {'Log out'}

@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  loading: false,
-  currentUser: null,
+  logging: false,
+  currentUser: {
+    role: 'R02'
+  },
   error: null,
-  role: 'R02',
+  isLoggedIn: false,
 };
 
 const authSlice = createSlice({
@@ -12,11 +14,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     loginStart(state, action) {
-      return {
-        ...state,
-        loading: false,
-        currentUser: action.payload,
-      };
+      state.logging = true;
     },
 
     loginSuccess(state, action) {
@@ -42,17 +40,10 @@ const authSlice = createSlice({
         ...state,
         error: action.payload,
       };
+
     },
   },
 });
 
-export const {
-  loginStart,
-  loginFail,
-  loginSuccess,
-  logoutSuccess,
-  logoutFail,
-  logoutStart,
-} = authSlice.actions;
-
+export const authAction = authSlice.actions;
 export default authSlice.reducer;
