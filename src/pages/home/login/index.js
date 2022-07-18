@@ -8,7 +8,7 @@ import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
-import { loginStart } from 'redux/features/auth/authSlice';
+import { authAction, loginStart, selectRole } from 'redux/features/auth/authSlice';
 import { result } from 'lodash';
 import request from 'util/request';
 
@@ -26,16 +26,16 @@ import request from 'util/request';
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { role } = useSelector((state) => state.auth);
+  const { currentUser } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(false);
 
   async function handleSubmit(value) {
     const { username, password } = value;
-    dispatch(loginStart({ username, password }));
+    dispatch(authAction.loginStart({ username, password }));
     setIsLogin(true);
   }
-
+  console.log('user', currentUser?.role)
   useEffect(async () => {
     //đang đăng nhập
     //+ bình thường: isLogin=false, role=R02
@@ -47,27 +47,25 @@ const Login = (props) => {
     //+ đang load: role=R02
     //+ load xong fail: role=R02
     //+ load xong success: role=R03
-    console.log(role);
-    console.log(isLogin);
-    console.log(role !== 'R02');
     if (isLogin) {
       //Load xong success
-      if (role !== 'R02') {
-        if (role === 'R03') {
+
+      if (currentUser?.role !== 'R02') {
+        if (currentUser?.role === 'R03') {
           message.success('Đăng nhập thành công');
           setLoading(true);
           navigate('/dashboard/product');
           return;
         }
 
-        if (role === 'R04') {
+        if (currentUser?.role === 'R04') {
           message.success('Đăng nhập thành công');
           setLoading(true);
           navigate('/dashboard/order');
           return;
         }
 
-        if (role === 'R01') {
+        if (currentUser?.role === 'R01') {
           try {
             //Take all cart item of guest to customer
             const cartGuest = await request('/cart/guest', {}, 'GET');

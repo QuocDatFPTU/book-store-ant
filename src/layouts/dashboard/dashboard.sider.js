@@ -17,8 +17,7 @@ const DashboardSider = () => {
   const [collapse, setCollapse] = useState(true);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { role } = useSelector((state) => state.auth);
-
+  const { currentUser } = useSelector((state) => state.auth);
   return (
     <Sider
       className="sider"
@@ -28,27 +27,27 @@ const DashboardSider = () => {
       theme="light"
     >
       {collapse === true
-? (
-        <div className="logo-wrapper">
-          <img
-            src={logo}
-            alt="logo"
-            style={{ height: 60 }}
-            className="logo"
-            onClick={() => navigate("/dashboard")}
-          />
-        </div>
-      )
-: (
-        <div className="logo-wrapper">
-          <img
-            src={logo}
-            alt="logo"
-            style={{ width: 80, height: 60 }}
-            className="logoCollapse"
-          />
-        </div>
-      )}
+        ? (
+          <div className="logo-wrapper">
+            <img
+              src={logo}
+              alt="logo"
+              style={{ height: 60 }}
+              className="logo"
+              onClick={() => navigate("/dashboard")}
+            />
+          </div>
+        )
+        : (
+          <div className="logo-wrapper">
+            <img
+              src={logo}
+              alt="logo"
+              style={{ width: 80, height: 60 }}
+              className="logoCollapse"
+            />
+          </div>
+        )}
       <Menu theme="light" mode="inline" className="menu-list">
         <>
           <Menu.Item
