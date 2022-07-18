@@ -18,6 +18,12 @@ import { uploadFileToFirebase, uuidv4 } from 'util/file';
 
 import { createCustomer, updateCustomer } from './customer.service';
 import TableCustom from 'components/CustomTable';
+import {
+  BorderlessTableOutlined,
+  ManOutlined,
+  WomanOutlined,
+} from '@ant-design/icons';
+import { DateFormat } from 'components/format';
 
 const CustomerEdit = ({
   currentRow,
@@ -28,6 +34,7 @@ const CustomerEdit = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+  console.log(currentRow?.history);
   useEffect(() => {
     return () => {
       form.resetFields();
@@ -67,7 +74,7 @@ const CustomerEdit = ({
         await updateCustomer(updateData)
           .then((result) => {
             console.log(result);
-            message.success('Cập nhật sliders thành công!');
+            message.success('Cập nhật khách hàng thành công!');
             setLoading(false);
             onCallback();
           })
@@ -102,7 +109,11 @@ const CustomerEdit = ({
         showTitle: false,
       },
       render: (title, record) => {
-        return <p>{title}</p>;
+        return (
+          <Tooltip placement="topLeft" title={title}>
+            <p>{title}</p>
+          </Tooltip>
+        );
       },
     },
     {
@@ -110,7 +121,18 @@ const CustomerEdit = ({
       dataIndex: 'gender',
       key: 'gender',
       width: '12%',
-      render: (text, record) => <p>{text}</p>,
+      render: (text, record) => {
+        switch (text) {
+          case 'M':
+            return <ManOutlined />;
+          case 'F':
+            return <WomanOutlined />;
+          case 'D':
+            return <BorderlessTableOutlined />;
+          default:
+            <p>{text}</p>;
+        }
+      },
     },
     {
       title: 'Email',
@@ -120,7 +142,11 @@ const CustomerEdit = ({
         showTitle: false,
       },
       render: (title, record) => {
-        return <p>{title}</p>;
+        return (
+          <Tooltip placement="topLeft" title={title}>
+            <p>{title}</p>
+          </Tooltip>
+        );
       },
     },
     {
@@ -155,6 +181,7 @@ const CustomerEdit = ({
       ellipsis: {
         showTitle: false,
       },
+      render: (text) => <DateFormat>{text}</DateFormat>,
     },
   ];
   return (
@@ -257,7 +284,8 @@ const CustomerEdit = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={18} className="infor-wait">
+        <Col span={18} className="infor-wait" style={{ marginBottom: '20px' }}>
+          <h3>Trạng thái</h3>
           {currentRow?.status}
         </Col>
 

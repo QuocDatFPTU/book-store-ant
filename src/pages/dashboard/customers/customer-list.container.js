@@ -1,4 +1,11 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  BorderlessTableOutlined,
+  EditOutlined,
+  ManOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  WomanOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -61,23 +68,6 @@ const ManageCustomerList = () => {
       title: 'ID',
       dataIndex: '_id',
       key: '_id',
-      render: (text, record) => {
-        return (
-          <Button
-            size="small"
-            type="link"
-            onClick={async () => {
-              const customerUpdate = await axiosClient.get(
-                `/customers/${text}`
-              );
-              setCurrentRow(customerUpdate);
-              setIsEditModal(true);
-            }}
-          >
-            {text}
-          </Button>
-        );
-      },
     },
     {
       title: 'Họ và tên',
@@ -86,6 +76,7 @@ const ManageCustomerList = () => {
       ellipsis: {
         showTitle: false,
       },
+      sorter: (a, b) => a.fullName.length - b.fullName.length,
       render: (title, record) => {
         return <p>{title}</p>;
       },
@@ -95,7 +86,18 @@ const ManageCustomerList = () => {
       dataIndex: 'gender',
       key: 'gender',
       width: '12%',
-      render: (text, record) => <p>{text}</p>,
+      render: (text, record) => {
+        switch (text) {
+          case 'M':
+            return <ManOutlined />;
+          case 'F':
+            return <WomanOutlined />;
+          case 'D':
+            return <BorderlessTableOutlined />;
+          default:
+            <p>{text}</p>;
+        }
+      },
     },
     {
       title: 'Email',
@@ -104,6 +106,7 @@ const ManageCustomerList = () => {
       ellipsis: {
         showTitle: false,
       },
+      sorter: (a, b) => a.email.length - b.email.length,
       render: (title, record) => {
         return <p>{title}</p>;
       },
@@ -112,12 +115,42 @@ const ManageCustomerList = () => {
       title: 'Số điện thoại',
       dataIndex: 'phone',
       key: 'phone',
+      sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      filters: [
+        { text: 'contact', value: 'contact' },
+        { text: 'potential', value: 'potential' },
+        { text: 'customer', value: 'customer' },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status.length - b.status.length,
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={async () => {
+              const customerUpdate = await axiosClient.get(
+                `/customers/${record._id}`
+              );
+              setCurrentRow(customerUpdate);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -162,16 +195,15 @@ const ManageCustomerList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
-              );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchCustomerList();
+
+              const sliderSearch = await axiosClient.post('/customers/search', {
+                search: form.getFieldValue('search-value'),
+                limit: 100,
               });
+              setCustomerList(sliderSearch);
             }}
           >
             <Row gutter={16}>

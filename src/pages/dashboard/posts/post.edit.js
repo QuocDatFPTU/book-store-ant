@@ -1,8 +1,16 @@
 /* eslint-disable react/prop-types */
 import { PlusOutlined } from '@ant-design/icons';
 import {
-  Button, Checkbox, Col,
-  Form, Input, message, Modal, Row, Select, Upload
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Upload,
 } from 'antd';
 import TextEditor from 'components/TextEditor';
 import 'moment/locale/vi';
@@ -12,7 +20,7 @@ import {
   fakeUpload,
   normFile,
   uploadFileToFirebase,
-  uuidv4
+  uuidv4,
 } from 'util/file';
 import { createPost, updatePost } from './post.service';
 
@@ -21,7 +29,7 @@ const PostEdit = ({
   onCallback,
   isEditModal,
   setIsEditModal,
-  categoryList
+  categoryList,
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -30,7 +38,6 @@ const PostEdit = ({
   const [defaultFileList, setDefaultFileList] = useState([]);
   const { TextArea } = Input;
   const { Option } = Select;
-
 
   const getDefaultFileList = (record) => {
     return [
@@ -54,6 +61,7 @@ const PostEdit = ({
       </div>
     </div>
   );
+
   useEffect(() => {
     return () => {
       form.resetFields();
@@ -66,7 +74,7 @@ const PostEdit = ({
       {
         uid: uuidv4(),
         name: 'image',
-        url: currentRow?.thumbnail,
+        url: Row?.thumbnail,
       },
     ]);
     return () => {
@@ -77,15 +85,21 @@ const PostEdit = ({
   const onCancel = () => {
     setIsEditModal(false);
   };
+
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      // create\
-
+      // create
       if (!currentRow) {
+        if (!values.thumbnail || values?.thumbnail.length === 0) {
+          setLoading(false);
+          return message.error('Bạn phải up thêm ảnh nữa');
+        }
         const imageUrl = await uploadFileToFirebase(
           values?.thumbnail[0]?.originFileObj
         );
+        if (values.status === undefined) values.status = false;
+        if (values.featured === undefined) values.featured = false;
         const createData = {
           ...values,
           thumbnail: imageUrl,
@@ -93,13 +107,16 @@ const PostEdit = ({
         await createPost(createData)
           .then((result) => {
             if (result) {
-              message.success('Thêm mới sản phẩm thành công!');
+              message.success('Thêm mới post thành công!');
             }
           })
-          .catch((error) => message.error(error.message));
+          .catch((error) => message.error(error?.response?.data?.error));
         setLoading(false);
         onCallback();
-      } else {
+      }
+      //Edit
+      else {
+        //Update có ảnh
         if (values?.thumbnail[0]?.originFileObj) {
           const updateImageUrl = await uploadFileToFirebase(
             values?.thumbnail[0]?.originFileObj
@@ -110,33 +127,36 @@ const PostEdit = ({
             id: currentRow?._id,
             thumbnail: updateImageUrl,
           };
-          await updateProduct(updateData)
+          await updatePost(updateData)
             .then((result) => {
-              console.log(result);
-              message.success('Cập nhật sản phẩm thành công!');
+              // console.log(result);
+              message.success('Cập nhật post thành công!');
               setLoading(false);
               onCallback();
             })
             .catch((error) => {
-              message.error(error.message);
+              message.error(error?.response?.data?.error);
               setLoading(false);
             });
-        } else {
+        }
+        //Không update ảnh
+        else {
           delete values.thumbnail;
           const updateData = {
             ...values,
             id: currentRow?._id,
             thumbnail: currentRow?.thumbnail,
           };
+          // const { author, category, ...updateDataFinal } = updateData;
           updatePost(updateData)
             .then((result) => {
-              message.success('Cập nhật sản phẩm thành công!');
+              message.success('Cập nhật post thành công!');
               setLoading(false);
               onCallback();
             })
             .catch((error) => {
               console.log('error2', error);
-              message.error(error.message);
+              message.error(error?.response?.data?.error);
               setLoading(false);
             });
         }
@@ -176,8 +196,9 @@ const PostEdit = ({
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
       : undefined,
-    category: currentRow ? currentRow?.category?.name : undefined,
+    category: currentRow ? currentRow?.category._id : undefined,
   };
+  console.log(initalValue.thumbnail);
   return (
     <Modal
       title={currentRow ? 'Cập nhật blog' : 'Tạo blog'}
@@ -234,7 +255,7 @@ const PostEdit = ({
             />
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+        {/* <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item
             label="Tác giả"
             name="author"
@@ -247,32 +268,29 @@ const PostEdit = ({
           >
             <Input />
           </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
-          <Form.Item label="Loại" name="category" rules={[
-            {
-              required: true,
-              message: 'Cần chọn loại !',
-            },
-          ]}>
-            <Select
-              placeholder="Hãy chọn thể loại"
-              options={categoryOptions}
-            ></Select>
+        </Col> */}
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Loại"
+            name="category"
+            rules={[
+              {
+                required: true,
+                message: 'Cần chọn loại !',
+              },
+            ]}
+          >
+            <Select placeholder="Hãy chọn thể loại" options={categoryOptions} />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
-            <Checkbox>
-              Đặc biệt
-            </Checkbox>
+          <Form.Item label="Đặc biệt" name="featured" valuePropName="checked">
+            <Checkbox>Đặc biệt</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
-            <Checkbox>
-              Trạng thái
-            </Checkbox>
+            <Checkbox>Trạng thái</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>

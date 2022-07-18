@@ -32,11 +32,7 @@ const DashboardLayout = (props) => {
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="1">
-        <LoginOutlined
-          onClick={() => {
-
-          }}
-        />
+        <LoginOutlined onClick={() => {}} />
         {'Log out'}
       </Menu.Item>
     </Menu>
@@ -54,7 +50,12 @@ const DashboardLayout = (props) => {
         <Header className="header">
           {
             <div className="header-container">
-              <p style={{ color: 'white' }}>{props.title}</p>
+              <p style={{ color: 'white' }}>
+                {localStorage.getItem('__role') === 'R03' && 'Marketing'}
+                {localStorage.getItem('__role') === 'R04' && 'Saler'}
+                {localStorage.getItem('__role') === 'R05' && 'Sale Manager'}
+                {localStorage.getItem('__role') === 'R00' && 'Admin'}
+              </p>
               <div className="profile-container">
                 <Dropdown overlay={menu}>
                   <div className="profile">

@@ -1,6 +1,7 @@
 import { Button, Col, Divider, List, Result, Row, Typography } from 'antd';
 import Item from 'antd/lib/list/Item';
 import { DateFormat, MoneyFormat } from 'components/format';
+import StatusFormat from 'components/format-status';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import React, { useEffect, useState } from 'react';
@@ -8,58 +9,15 @@ import { useNavigate } from 'react-router-dom';
 import { getOrderList } from './service';
 import './styles.less';
 const OrderList = () => {
-  const statusColor = (status) => {
-    if (status === 'submitted')
-      return (
-        <h3
-          style={{
-            color: '#fa8c16',
-            textTransform: 'uppercase',
-            fontWeight: 'bold',
-            margin: 0,
-          }}
-        >
-          đợi xác nhận
-        </h3>
-      );
-    else if (status === 'cancelled')
-      return (
-        <h3
-          style={{
-            color: '#f5222d',
-            textTransform: 'uppercase',
-            fontWeight: 'bold',
-            margin: 0,
-          }}
-        >
-          đã hủy
-        </h3>
-      );
-    else
-      return (
-        <h3
-          style={{
-            color: '#7cb305',
-            textTransform: 'uppercase',
-            fontWeight: 'bold',
-            margin: 0,
-          }}
-        >
-          Thành công
-        </h3>
-      );
-  };
-
   // State
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
   // Use Effect
   useEffect(() => {
-    getOrderList()
-      .then((lstOrders) => {
-        console.log(lstOrders);
-        setOrders(lstOrders);
+    getOrderList({ sortedBy: 'updatedAt_desc' })
+      .then(({ orders, count }) => {
+        setOrders(orders);
       })
       .catch((error) => {
         console.log(error.response);
@@ -117,7 +75,7 @@ const OrderList = () => {
                   <Col span={4}>{item.address}</Col>
                   <Col span={4}>{item.phone}</Col>
                   <Col className="order-status" span={4}>
-                    {statusColor(item.status)}
+                    <StatusFormat>{item.status}</StatusFormat>
                   </Col>
                 </Row>
                 <Divider style={{ margin: '15px 0 ' }} />

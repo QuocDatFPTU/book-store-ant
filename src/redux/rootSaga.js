@@ -3,7 +3,5 @@ import authSaga from './features/auth/saga';
 import watchAuth from './features/auth/saga';
 
 export default function* rootSaga() {
-  yield all([
-    authSaga()
-  ]);
+  yield all([authSaga()]);
 }

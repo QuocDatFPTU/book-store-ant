@@ -36,6 +36,7 @@ import CartCompletion from 'pages/store/cart-completion';
 import MarketingDashboard from 'pages/marketing';
 import SaleDashboard from 'pages/sale';
 import AdminDashboard from 'pages/admin'
+import VerifyAccountPage from 'pages/home/verify-account';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -80,8 +81,9 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password/:id" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/verify-account/:id" element={<VerifyAccountPage />} />
           </Routes>
           <Routes>
             <Route

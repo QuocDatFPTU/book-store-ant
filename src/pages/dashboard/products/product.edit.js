@@ -103,15 +103,20 @@ const ProductEdit = ({
     setIsEditModal(false);
   };
   const onFinish = async (values) => {
+    console.log(values);
     try {
       setLoading(true);
-      // create\
-
-
+      // create
       if (!currentRow) {
+        if (!values.thumbnail || values?.thumbnail.length === 0) {
+          setLoading(false);
+          return message.error('Bạn phải up thêm ảnh nữa');
+        }
         const imageUrl = await uploadFileToFirebase(
           values?.thumbnail[0]?.originFileObj
         );
+        if (values.status === undefined) values.status = false;
+        if (values.feartured === undefined) values.feartured = false;
         const createData = {
           ...values,
           thumbnail: imageUrl,
@@ -127,10 +132,13 @@ const ProductEdit = ({
               message.success('Thêm mới sản phẩm thành công!');
             }
           })
-          .catch((error) => message.error(error.message));
+          .catch((error) => message.error(error?.response?.data?.error));
         setLoading(false);
         onCallback();
-      } else {
+      }
+      //Edit
+      else {
+        //Có up ảnh
         if (values?.thumbnail[0]?.originFileObj) {
           const updateImageUrl = await uploadFileToFirebase(
             values?.thumbnail[0]?.originFileObj
@@ -154,10 +162,12 @@ const ProductEdit = ({
               onCallback();
             })
             .catch((error) => {
-              message.error(error.message);
+              message.error(error?.response?.data?.error);
               setLoading(false);
             });
-        } else {
+        }
+        //Không up ảnh
+        else {
           delete values.thumbnail;
           const updateData = {
             ...values,
@@ -179,7 +189,7 @@ const ProductEdit = ({
             })
             .catch((error) => {
               console.log('error2', error);
-              message.error(error.message);
+              message.error(error?.response?.data?.error);
               setLoading(false);
             });
         }
@@ -210,15 +220,15 @@ const ProductEdit = ({
     thumbnail: currentRow
       ? getDefaultFileList(currentRow?.thumbnail)
       : undefined,
-    category: currentRow ? currentRow?.category?.name : undefined,
+    category: currentRow ? currentRow?.category._id : undefined,
     briefInformation: currentRow
       ? {
-        author: currentRow?.briefInformation?.author,
-        language: currentRow?.briefInformation?.language,
-        pages: currentRow?.briefInformation?.pages,
-        publicDate: moment(currentRow?.briefInformation?.publicDate),
-        publisher: currentRow?.briefInformation?.publisher,
-      }
+          author: currentRow?.briefInformation?.author,
+          language: currentRow?.briefInformation?.language,
+          pages: currentRow?.briefInformation?.pages,
+          publicDate: moment(currentRow?.briefInformation?.publicDate),
+          publisher: currentRow?.briefInformation?.publisher,
+        }
       : undefined,
   };
   return (
@@ -302,20 +312,25 @@ const ProductEdit = ({
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Đặc biệt" name="feartured" valuePropName="checked">
-            <Checkbox>
-              Đặc biệt
-            </Checkbox>
+            <Checkbox>Đặc biệt</Checkbox>
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
-            <Checkbox>
-              Trạng thái
-            </Checkbox>
+            <Checkbox>Trạng thái</Checkbox>
           </Form.Item>
         </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }} >
-          <Form.Item label="Loại" name="category">
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Loại"
+            name="category"
+            rules={[
+              {
+                required: true,
+                message: 'Cần chọn loại !',
+              },
+            ]}
+          >
             <Select
               placeholder="Hãy chọn thể loại"
               options={categoryOptions}
@@ -432,7 +447,7 @@ const ProductEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
-            // fileList={fileList}
+              // fileList={fileList}
             >
               {uploadButton}
             </Upload>

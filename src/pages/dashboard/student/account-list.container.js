@@ -1,15 +1,33 @@
 import {
+  BorderlessTableOutlined,
   DeleteOutlined,
   EditOutlined,
+  ExclamationCircleOutlined,
+  ManOutlined,
   PlusOutlined,
   SearchOutlined,
+  WomanOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Layout, PageHeader, Row } from 'antd';
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Form,
+  Image,
+  Input,
+  Layout,
+  PageHeader,
+  Popconfirm,
+  Row,
+  Switch,
+} from 'antd';
 import TableCustom from 'components/CustomTable';
 import { pickBy } from 'lodash';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosClient from 'util/axiosClient';
 import {
   defaultPage,
   formatDate,
@@ -17,7 +35,7 @@ import {
   formatDateTimeFull,
 } from '../../../util/constant';
 import AccountEdit from './account.edit';
-import { getRoleList, getUserList } from './student.service';
+import { getRoleList, getUserList, updateUser } from './student.service';
 
 const defaultSort = {
   'is-ascending': 'true',
@@ -41,6 +59,7 @@ const AccountList = () => {
     getUserList({ ...params })
       .then((result) => {
         setUniList([...result?.users]);
+        console.log(result.count);
         setTotalItem(result?.count);
         setLoading(false);
       })
@@ -50,6 +69,7 @@ const AccountList = () => {
   const fetchRoleList = (params) => {
     getRoleList({ ...params })
       .then((result) => {
+        result = result.filter(({ name }) => name !== 'guest');
         setRoleList([...result]);
         // setTotalItem(result.data["total-count"]);
       })
@@ -65,44 +85,123 @@ const AccountList = () => {
   useEffect(() => {
     fetchRoleList(params);
   }, []);
+
   const columns = [
     {
-      title: 'Họ tên ',
+      title: 'ID',
+      dataIndex: '_id',
+      width: '12%',
+      ellipsis: true,
+      sorter: (a, b) => a._id.length - b._id.length,
+    },
+    {
+      title: 'Họ tên',
       dataIndex: 'fullName',
       width: '12%',
       ellipsis: true,
-      render: (text, record) => {
-        return (
-          <Button size="small" type="link" onClick={() => {}}>
-            {text}
-          </Button>
-        );
-      },
+      sorter: (a, b) => a.fullName.length - b.fullName.length,
     },
     {
       title: 'Email',
       dataIndex: 'email',
       width: '12%',
+      sorter: (a, b) => a.email.length - b.email.length,
     },
     {
       title: 'Giới tính',
       dataIndex: 'gender',
+      key: 'gender',
       width: '12%',
-      render: (text) => {
-        if (text === 'M') {
-          return 'Male';
-        } else if (text === 'F') {
-          return 'Female';
-        } else {
-          return 'Others';
+      filters: [
+        { text: 'Male', value: 'M' },
+        { text: 'Female', value: 'F' },
+        { text: 'Other', value: 'D' },
+      ],
+      onFilter: (value, record) => record.gender === value,
+
+      render: (text, record) => {
+        switch (text) {
+          case 'M':
+            return <ManOutlined />;
+          case 'F':
+            return <WomanOutlined />;
+          case 'D':
+            return <BorderlessTableOutlined />;
+          default:
+            <p>{text}</p>;
         }
       },
+    },
+    {
+      title: 'Số điện thoại',
+      dataIndex: 'phone',
+      width: '12%',
+      key: 'phone',
+      sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
       title: 'Role ',
       dataIndex: 'role',
       width: '12%',
+      filters: [
+        { text: 'customer', value: 'customer' },
+        { text: 'admin', value: 'admin' },
+        { text: 'marketing', value: 'marketing' },
+        { text: 'saler', value: 'saler' },
+        { text: 'saleManager', value: 'saleManager' },
+      ],
+      onFilter: (text, record) => record?.role?.name === text,
       render: (text) => text?.name,
+      sorter: (a, b) => a?.role?.name?.length - b?.role?.name?.length,
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      align: 'center',
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, record) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn đổi trạng thái account này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            await updateUser({ id: record._id, status: !text });
+            fetchUserList(params);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Avatar',
+      dataIndex: 'avatar',
+      key: 'avatar',
+      width: '12%',
+      render: (text, record) => {
+        if (record.avatar) {
+          return (
+            <Image
+              style={{ cursor: 'pointer' }}
+              src={record?.avatar?.img}
+              width={100}
+              alt="img"
+            />
+          );
+        } else return <Avatar src="https://joeschmoe.io/api/v1/random" />;
+      },
     },
     {
       title: 'Action',
@@ -119,12 +218,6 @@ const AccountList = () => {
               setCurrentRow(record);
               setIsEditModal(true);
             }}
-          />
-          <Button
-            type="link"
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => {}}
           />
         </div>
       ),
@@ -171,16 +264,18 @@ const AccountList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              if (!form.getFieldValue('search-value').trim())
+                return fetchUserList();
+
+              const sliderSearch = await axiosClient.post(
+                '/user/admin/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
               );
-              setParams({
-                ...cleanValue,
-                page: 1,
-                limit: params['limit'],
-              });
+              setUniList(sliderSearch);
             }}
           >
             <Row gutter={16}>

@@ -9,19 +9,13 @@ import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
 import { authAction, loginStart, selectRole } from 'redux/features/auth/authSlice';
+import {
+  authAction,
+  loginStart,
+  selectRole,
+} from 'redux/features/auth/authSlice';
 import { result } from 'lodash';
 import request from 'util/request';
-
-// if (!result?.error) {
-// 	let role = localStorage.getItem("__role");
-// 	if (role === "SystemAdministrator") {
-// 		navigate("/admin");
-// 	} else if (role === "SchoolAdmin") {
-// 		navigate("/dashboard");
-// 	} else if (role === "ClubAdmin") {
-// 		navigate("/club");
-// 	}
-// }
 
 const Login = (props) => {
   const [loading, setLoading] = useState(false);
@@ -35,7 +29,7 @@ const Login = (props) => {
     dispatch(authAction.loginStart({ username, password }));
     setIsLogin(true);
   }
-  console.log('user', currentUser?.role)
+  console.log('user', currentUser?.role);
   useEffect(async () => {
     //đang đăng nhập
     //+ bình thường: isLogin=false, role=R02
@@ -49,7 +43,6 @@ const Login = (props) => {
     //+ load xong success: role=R03
     if (isLogin) {
       //Load xong success
-
       if (currentUser?.role !== 'R02') {
         if (currentUser?.role === 'R03') {
           message.success('Đăng nhập thành công');
@@ -58,10 +51,17 @@ const Login = (props) => {
           return;
         }
 
-        if (currentUser?.role === 'R04') {
+        if (currentUser?.role === 'R04' || currentUser?.role === 'R05') {
           message.success('Đăng nhập thành công');
           setLoading(true);
           navigate('/dashboard/order');
+          return;
+        }
+
+        if (currentUser?.role === 'R00') {
+          message.success('Đăng nhập thành công');
+          setLoading(true);
+          navigate('/dashboard/user');
           return;
         }
 

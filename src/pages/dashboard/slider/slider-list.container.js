@@ -1,13 +1,21 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
   Col,
   Form,
+  Image,
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Row,
+  Switch,
   Tooltip,
   Typography,
 } from 'antd';
@@ -18,10 +26,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getCategoryList, getSliderList } from './slider.service';
+import { getSliderList, updateSlider } from './slider.service';
 import ProductEdit from './slider.edit';
 import TableCustom from 'components/CustomTable';
 import SliderEdit from './slider.edit';
+import axiosClient from 'util/axiosClient';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -29,7 +38,6 @@ import SliderEdit from './slider.edit';
 const ManageSliderList = () => {
   const [sliderList, setSliderList] = useState([]);
   const [product, setProduct] = useState();
-  const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModal, setIsEditModal] = useState(false);
   const [currentRow, setCurrentRow] = useState(); // Pagination
@@ -49,24 +57,10 @@ const ManageSliderList = () => {
       })
       .catch((e) => setLoading(false));
   };
-  const fetchCategoryList = (params) => {
-    getCategoryList({ ...params })
-      .then((result) => {
-        setCategoryList([...result]);
-        // setTotalItem(result.data["total-count"]);
-      })
-      .catch((e) => {
-        return false;
-      });
-  };
 
   useEffect(() => {
     fetchSliderList(params);
   }, [params]);
-
-  useEffect(() => {
-    fetchCategoryList(params);
-  }, []);
 
   const columns = [
     //sliders' id, title, image, backlink, status
@@ -74,20 +68,7 @@ const ManageSliderList = () => {
       title: 'ID',
       dataIndex: '_id',
       key: '_id',
-      render: (text, record) => {
-        return (
-          <Button
-            size="small"
-            type="link"
-            onClick={async () => {
-              setCurrentRow(record);
-              setIsEditModal(true);
-            }}
-          >
-            {text}
-          </Button>
-        );
-      },
+      width: '15%',
     },
     {
       title: 'Tiêu đề',
@@ -106,7 +87,14 @@ const ManageSliderList = () => {
       key: 'image',
       width: '12%',
       render: (image, _) => {
-        return <img src={image?.img} width={100} alt="img" />;
+        return (
+          <Image
+            style={{ cursor: 'pointer' }}
+            src={image?.img}
+            width={100}
+            alt="img"
+          />
+        );
       },
     },
     {
@@ -127,7 +115,49 @@ const ManageSliderList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
-      render: (text, record) => <p>{text ? 'true' : 'false'}</p>,
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, record) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn thay đổi trạng thái slider này không ?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            await updateSlider({ id: record._id, status: !text });
+            fetchSliderList(params);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentRow(record);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -172,16 +202,18 @@ const ManageSliderList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
+            onFinish={async (value) => {
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) return fetchSliderList();
+
+              const sliderSearch = await axiosClient.post(
+                '/sliders/marketing/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
               );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+              setSliderList(sliderSearch);
             }}
           >
             <Row gutter={16}>
@@ -244,7 +276,6 @@ const ManageSliderList = () => {
           }}
           isEditModal={isEditModal}
           setIsEditModal={setIsEditModal}
-          categoryList={categoryList}
         />
       </Layout.Content>
     </Layout>

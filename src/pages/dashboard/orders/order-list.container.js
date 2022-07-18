@@ -17,11 +17,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getOrderList } from './order.service';
+import { getOrderList, getOrderListSaleManager } from './order.service';
 import ProductEdit from './order.edit';
 import TableCustom from 'components/CustomTable';
 import axiosClient from 'util/axiosClient';
 import { DateFormat, MoneyFormat } from 'components/format';
+import StatusFormat from 'components/format-status';
 // const defaultSort = {
 // 	"is-ascending": "true",
 // 	"order-by": "Id",
@@ -49,8 +50,21 @@ const ManageOrderList = () => {
       .catch((e) => setLoading(false));
   };
 
+  const fetchOrderListSaleManager = (params, sortedInfo) => {
+    setLoading(true);
+    getOrderListSaleManager({ ...params })
+      .then((result) => {
+        setOrderList([...result?.orders]);
+        setTotalItem(result?.count);
+        setLoading(false);
+      })
+      .catch((e) => setLoading(false));
+  };
+
   useEffect(() => {
-    fetchOrderList(params);
+    if (localStorage.getItem('__role') === 'R04') return fetchOrderList(params);
+    if (localStorage.getItem('__role') === 'R05')
+      return fetchOrderListSaleManager(params);
   }, [params]);
 
   const columns = [
@@ -59,30 +73,13 @@ const ManageOrderList = () => {
       title: 'ID',
       dataIndex: '_id',
       key: '_id',
-      render: (text, record) => {
-        return (
-          <Button
-            size="small"
-            type="link"
-            onClick={async () => {
-              const orderUpdate = await axiosClient.get(
-                `/orders/saler/${text}`
-              );
-              console.log(orderUpdate);
-              setCurrentRow(orderUpdate);
-              setIsEditModal(true);
-            }}
-          >
-            {text}
-          </Button>
-        );
-      },
     },
     {
       title: 'Ngày đặt hàng',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: '12%',
+      sorter: (a, b) => a.createdAt > b.createdAt,
       render: (text, record) => {
         return <DateFormat>{text}</DateFormat>;
       },
@@ -92,6 +89,7 @@ const ManageOrderList = () => {
       dataIndex: 'receiverName',
       key: 'receiverName',
       width: '12%',
+      sorter: (a, b) => a.receiverName.length - b.receiverName.length,
     },
     {
       title: 'Tên sản phẩm',
@@ -101,7 +99,7 @@ const ManageOrderList = () => {
         showTitle: false,
       },
       render: (items, record) => {
-        return <p>{items[0]?.title}</p>;
+        return <Tooltip title={items[0]?.title}>{items[0]?.title}</Tooltip>;
       },
     },
     {
@@ -118,6 +116,7 @@ const ManageOrderList = () => {
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: '12%',
+      sorter: (a, b) => a.totalCost - b.totalCost,
       render: (text, record) => {
         return <MoneyFormat>{text}</MoneyFormat>;
       },
@@ -127,6 +126,44 @@ const ManageOrderList = () => {
       dataIndex: 'status',
       key: 'status',
       width: '12%',
+      filters: [
+        { text: 'submitted', value: 'submitted' },
+        { text: 'cancelled', value: 'cancelled' },
+        { text: 'success', value: 'success' },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status.length - b.status.length,
+      render: (text, record) => <StatusFormat>{text}</StatusFormat>,
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={async () => {
+              if (localStorage.getItem('__role') === 'R04') {
+                const orderUpdate = await axiosClient.get(
+                  `/orders/saler/${record._id}`
+                );
+                setCurrentRow(orderUpdate);
+              }
+              if (localStorage.getItem('__role') === 'R05') {
+                const orderUpdate = await axiosClient.get(
+                  `/orders/saleManager/getOne?orderId=${record._id}`
+                );
+                setCurrentRow(orderUpdate);
+              }
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
     },
   ];
   console.log(orderList);
@@ -157,16 +194,35 @@ const ManageOrderList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={(value) => {
-              const cleanValue = pickBy(
-                value,
-                (v) => v !== undefined && v !== ''
-              );
-              setParams({
-                ...cleanValue,
-                // "page-number": 1,
-                // "page-size": params["page-size"]
-              });
+            onFinish={async (value) => {
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) {
+                if (localStorage.getItem('__role') === 'R04')
+                  return fetchOrderList(params);
+                if (localStorage.getItem('__role') === 'R05')
+                  return fetchOrderListSaleManager(params);
+              }
+
+              if (localStorage.getItem('__role') === 'R04') {
+                const sliderSearch = await axiosClient.post(
+                  '/orders/saler/search',
+                  {
+                    search: form.getFieldValue('search-value'),
+                    limit: 100,
+                  }
+                );
+                setOrderList(sliderSearch);
+              }
+              if (localStorage.getItem('__role') === 'R05') {
+                const sliderSearch = await axiosClient.post(
+                  '/orders/saleManager/search',
+                  {
+                    search: form.getFieldValue('search-value'),
+                    limit: 100,
+                  }
+                );
+                setOrderList(sliderSearch);
+              }
             }}
           >
             <Row gutter={16}>

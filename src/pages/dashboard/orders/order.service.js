@@ -1,5 +1,6 @@
 import axiosClient from 'util/axiosClient';
 
+//saler
 export const getOrderList = async (params) => {
   const url = '/orders/saler';
   return axiosClient.get(url, { params });
@@ -14,15 +15,18 @@ export async function updateOrder(payload) {
   return axiosClient.patch(url, updateValue);
 }
 
-export async function createProduct(payload) {
-  const url = '/products';
-  const newProduct = {
-    ...payload,
-  };
-  return axiosClient.post(url, newProduct);
-}
-
 export const getCategoryList = async (params) => {
   const url = '/categories';
   return axiosClient.get(url, { params });
 };
+
+//saleManger
+export const getOrderListSaleManager = async (params) => {
+  const url = '/orders/saleManager';
+  return axiosClient.get(url, { params });
+};
+
+export async function updateOrderSaleManager(payload) {
+  const url = `/orders/saleManager`;
+  return axiosClient.patch(url, payload);
+}

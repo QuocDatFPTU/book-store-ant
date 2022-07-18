@@ -71,17 +71,21 @@ export const loginInitiate = (email, password) => async (dispatch) => {
 export const registerInitiate = (registerUser) => async (dispatch) => {
   dispatch(registerStart);
   try {
-    const auth_token = await axiosClient.post('/user/register', registerUser, {
+    await axiosClient.post('/user/register', registerUser, {
       headers: { 'Content-Type': 'application/json' },
     });
-    const decode_token = jwt.decode(auth_token.token);
-    const user = { ...decode_token };
-    localStorage.setItem('__token', auth_token?.token);
-    localStorage.setItem('__role', user.role);
-    dispatch(registerSuccess(user));
+    // const auth_token = await axiosClient.post('/user/register', registerUser, {
+    //   headers: { 'Content-Type': 'application/json' },
+    // });
+    // const decode_token = jwt.decode(auth_token.token);
+    // const user = { ...decode_token };
+    // localStorage.setItem('__token', auth_token?.token);
+    // localStorage.setItem('__role', user.role);
+    // dispatch(registerSuccess(user));
+    dispatch(registerSuccess());
   } catch (error) {
-    dispatch(registerFail(error.response.data.error));
-    throw new Error(error.response.data.error);
+    dispatch(registerFail());
+    throw new Error(error?.response?.data?.error);
   }
 };
 

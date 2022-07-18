@@ -130,15 +130,17 @@ const CartCompletion = () => {
                   fontSize: '22px',
                 }}
               >
-                Mã đơn hàng: {order._id}
+                Thông tin đơn hàng
               </h2>
-              <Button
-                onClick={() => navigate(`/order-information/${order._id}`)}
-                type="link"
-              >
-                Xem chi tiết đơn hàng
-              </Button>
-            </Row>{' '}
+              {localStorage.getItem('__role') !== 'R02' && (
+                <Button
+                  onClick={() => navigate(`/order-information/${order._id}`)}
+                  type="link"
+                >
+                  Xem chi tiết đơn hàng
+                </Button>
+              )}
+            </Row>
             <Divider style={{ margin: '6px 0' }} />
             {order.items?.map((item) => (
               <Row

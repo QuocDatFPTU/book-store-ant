@@ -8,6 +8,7 @@ import {
   message,
   Result,
   Button,
+  Spin,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
@@ -38,14 +39,10 @@ const Cart = () => {
   // state
   const navigate = useNavigate();
   const [cart, setCart] = useState({});
+  const [loading, setLoading] = useState(true);
 
   //Hook
   useEffect(() => {
-    console.log(localStorage.getItem('__token'));
-    console.log(localStorage.getItem('__role'));
-    console.log(
-      !localStorage.getItem('__token') && !localStorage.getItem('__role')
-    );
     if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
       console.log('not have jwt store in localStorage');
       axiosClient.post('/user/guest').then((result) => {
@@ -71,6 +68,8 @@ const Cart = () => {
           console.log(error.response);
         });
     }
+
+    setLoading(false);
   }, []);
 
   //Method
@@ -78,7 +77,6 @@ const Cart = () => {
     try {
       if (localStorage.getItem('__role') === 'R02') await onCheckoutGuest();
       else await onCheckout();
-      console.log('Sucess==============');
       navigate('/cart-contact');
     } catch (error) {
       const msgError = error.response.data.error.map((error) => (
@@ -91,10 +89,8 @@ const Cart = () => {
     }
   };
 
-  console.log(cart);
-
   return (
-    <>
+    <Spin spinning={loading} tip="Chủ nhân hãy đợi một tý nhé...">
       <WrapperConentContainer>
         <div className="cart-content">Giỏ hàng</div>
       </WrapperConentContainer>
@@ -147,7 +143,7 @@ const Cart = () => {
             > */}
               {cart.items?.map((item) => (
                 <div className="cart-value">
-                  <span style={{ color: 'red' }}>{item.product.quantity}</span>
+                  {/* <span style={{ color: 'red' }}>{item.product.quantity}</span> */}
                   <Row className="cart-form" align="middle">
                     {/* <Col span={1}>
                       <Checkbox value={item._id} />
@@ -233,7 +229,7 @@ const Cart = () => {
                           defaultValue={item.quantity}
                         />
                       </div>
-                      <h5>{item.quantity}</h5>
+                      {/* <h5>{item.quantity}</h5> */}
                     </Col>
                     <Col
                       className="cart-productitem-saleprice"
@@ -331,7 +327,7 @@ const Cart = () => {
           </Row>
         </WrapperConentContainer>
       )}
-    </>
+    </Spin>
   );
 };
 
