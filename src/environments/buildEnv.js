@@ -11,6 +11,10 @@ export default function ({ NODE_ENV = 'development' } = {}) {
       getBlogDetail: 'blogs',
       getUserList: 'user/admin',
       getRoleList: 'roles',
+      marketingDashboard: 'dashboards/marketing',
+      saleDashboard: 'dashboards/saler',
+      adminDashboard: 'dashboards/admin',
+
     },
     isDevelopment: NODE_ENV === 'development',
   };

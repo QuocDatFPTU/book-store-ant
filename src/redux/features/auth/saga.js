@@ -55,7 +55,6 @@ function* logout(action) {
 
 function* watchLoginFlown() {
     while (true) {
-        debugger;
         const isLoginIn = Boolean(localStorage.getItem('__token'));
         if (!isLoginIn) {
             const action = yield take(authAction.loginStart.type)

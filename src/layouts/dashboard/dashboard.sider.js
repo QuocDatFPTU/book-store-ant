@@ -51,6 +51,13 @@ const DashboardSider = () => {
       <Menu theme="light" mode="inline" className="menu-list">
         <>
           <Menu.Item
+            key="0"
+            // icon={<PieChartOutlined />}
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </Menu.Item>
+          <Menu.Item
             key="1"
             icon={<PieChartOutlined />}
             onClick={() => navigate("/dashboard/product")}
