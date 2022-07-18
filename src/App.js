@@ -33,6 +33,9 @@ import AccountList from 'pages/dashboard/student/account-list.container';
 import ManageOrderList from 'pages/dashboard/orders/order-list.container';
 import ManageCustomerList from 'pages/dashboard/customers/customer-list.container';
 import CartCompletion from 'pages/store/cart-completion';
+import MarketingDashboard from 'pages/marketing';
+import SaleDashboard from 'pages/sale';
+import AdminDashboard from 'pages/admin'
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -87,6 +90,7 @@ const App = () => {
                 <DashboardLayout sider={<DashboardSider />} title="Admin" />
               }
             >
+              <Route path="" element={<AdminDashboard />} />
               <Route path="product" element={<ManageProductList />} />
               <Route path="customer" element={<ManageCustomerList />} />
               <Route path="order" element={<ManageOrderList />} />
