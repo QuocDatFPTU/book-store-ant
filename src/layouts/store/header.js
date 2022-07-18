@@ -29,7 +29,7 @@ import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logoutInitiate } from 'redux/action';
 import request from 'util/request';
-import { logoutStart } from 'redux/features/auth/authSlice';
+import { authAction, logoutStart } from 'redux/features/auth/authSlice';
 const { Header } = Layout;
 
 const HeaderContainer = () => {
@@ -83,7 +83,7 @@ const HeaderContainer = () => {
     }
   };
   const onLogout = async () => {
-    dispatch(logoutStart());
+    dispatch(authAction.logout());
     navigate('/login');
   };
   const menuGuest = (
@@ -226,7 +226,7 @@ const HeaderContainer = () => {
                   <Dropdown
                     overlay={
                       localStorage.getItem('__role') === 'R02' ||
-                      !localStorage.getItem('__role')
+                        !localStorage.getItem('__role')
                         ? menuGuest
                         : menuUser
                     }
