@@ -17,8 +17,7 @@ const DashboardSider = () => {
   const [collapse, setCollapse] = useState(true);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { role } = useSelector((state) => state.auth);
-
+  const { currentUser } = useSelector((state) => state.auth);
   return (
     <Sider
       className="sider"
@@ -49,7 +48,7 @@ const DashboardSider = () => {
       )}
       <Menu theme="light" mode="inline" className="menu-list">
         <>
-          {role === 'R03' && (
+          {localStorage.getItem('__role') === 'R03' && (
             <>
               <Menu.Item
                 key="1"
@@ -80,28 +79,23 @@ const DashboardSider = () => {
               </Menu.Item>
             </>
           )}
-          {role === 'R04' && (
-            <>
-              {' '}
-              <Menu.Item
-                key="3"
-                // icon={<OrderIconSvg />}
-                onClick={() => navigate('/dashboard/order')}
-              >
-                Order
-              </Menu.Item>
-            </>
+          {localStorage.getItem('__role') === 'R04' && (
+            <Menu.Item
+              key="3"
+              // icon={<OrderIconSvg />}
+              onClick={() => navigate('/dashboard/order')}
+            >
+              Order
+            </Menu.Item>
           )}
-          {role === 'R00' && (
-            <>
-              <Menu.Item
-                key="6"
-                // icon={<PostIconSvg />}
-                onClick={() => navigate('/dashboard/user')}
-              >
-                User
-              </Menu.Item>
-            </>
+          {localStorage.getItem('__role') === 'R00' && (
+            <Menu.Item
+              key="6"
+              // icon={<PostIconSvg />}
+              onClick={() => navigate('/dashboard/user')}
+            >
+              User
+            </Menu.Item>
           )}
         </>
       </Menu>

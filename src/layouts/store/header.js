@@ -20,7 +20,6 @@ import {
   Layout,
   Affix,
   Button,
-  Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './styles.less';
@@ -30,7 +29,7 @@ import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logoutInitiate } from 'redux/action';
 import request from 'util/request';
-import { logoutStart } from 'redux/features/auth/authSlice';
+import { authAction, logoutStart } from 'redux/features/auth/authSlice';
 const { Header } = Layout;
 
 const HeaderContainer = () => {
@@ -84,7 +83,7 @@ const HeaderContainer = () => {
     }
   };
   const onLogout = async () => {
-    dispatch(logoutStart());
+    dispatch(authAction.logout());
     navigate('/login');
   };
   const menuGuest = (
@@ -232,16 +231,8 @@ const HeaderContainer = () => {
                         : menuUser
                     }
                   >
-                    <Space>
-                      <Typography.Text
-                        style={{ color: 'white' }}
-                        ellipsis={{
-                          rows: 1,
-                          // expandable: true,
-                        }}
-                      >
-                        {username}
-                      </Typography.Text>
+                    <Space style={{ color: 'white' }}>
+                      {username}
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
                     </Space>
                   </Dropdown>
