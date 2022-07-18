@@ -9,11 +9,7 @@ import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
 import { authAction, loginStart, selectRole } from 'redux/features/auth/authSlice';
-import {
-  authAction,
-  loginStart,
-  selectRole,
-} from 'redux/features/auth/authSlice';
+
 import { result } from 'lodash';
 import request from 'util/request';
 
