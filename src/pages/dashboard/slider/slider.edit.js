@@ -99,15 +99,22 @@ const SliderEdit = ({
   const onCancel = () => {
     setIsEditModal(false);
   };
+
   const onFinish = async (values) => {
     console.log(values);
     try {
       setLoading(true);
       // create
       if (!currentRow) {
+        console.log(values);
+        if (!values.image.img || values?.image.img.length === 0) {
+          setLoading(false);
+          return message.error('Bạn phải up thêm ảnh nữa');
+        }
         const imageUrl = await uploadFileToFirebase(
           values?.image?.img[0]?.originFileObj
         );
+        if (values.status === undefined) values.status = false;
         const createData = {
           ...values,
           status: values.status ? true : false,
@@ -119,7 +126,7 @@ const SliderEdit = ({
               message.success('Thêm mới sliders thành công!');
             }
           })
-          .catch((error) => message.error(error.message));
+          .catch((error) => message.error(error?.response?.data?.error));
         setLoading(false);
         onCallback();
       } else {
@@ -147,7 +154,7 @@ const SliderEdit = ({
             onCallback();
           })
           .catch((error) => {
-            message.error(error.message);
+            message.error(error?.response?.data?.error);
             setLoading(false);
           });
       }
@@ -173,9 +180,10 @@ const SliderEdit = ({
         }
       : undefined,
   };
+
   return (
     <Modal
-      title={currentRow ? 'Cập nhật slider' : 'Tạo sản phẩm'}
+      title={currentRow ? 'Cập nhật slider' : 'Tạo slider'}
       visible={isEditModal}
       width={900}
       centered

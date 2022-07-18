@@ -68,23 +68,6 @@ const ManageCustomerList = () => {
       title: 'ID',
       dataIndex: '_id',
       key: '_id',
-      render: (text, record) => {
-        return (
-          <Button
-            size="small"
-            type="link"
-            onClick={async () => {
-              const customerUpdate = await axiosClient.get(
-                `/customers/${text}`
-              );
-              setCurrentRow(customerUpdate);
-              setIsEditModal(true);
-            }}
-          >
-            {text}
-          </Button>
-        );
-      },
     },
     {
       title: 'Họ và tên',
@@ -146,6 +129,28 @@ const ManageCustomerList = () => {
       ],
       onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status.length - b.status.length,
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={async () => {
+              const customerUpdate = await axiosClient.get(
+                `/customers/${record._id}`
+              );
+              setCurrentRow(customerUpdate);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
     },
   ];
 

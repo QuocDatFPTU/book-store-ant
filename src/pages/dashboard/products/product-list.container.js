@@ -9,6 +9,7 @@ import {
   Card,
   Col,
   Form,
+  Image,
   Input,
   Layout,
   PageHeader,
@@ -24,7 +25,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getCategoryList, getProductList } from './product.service';
+import {
+  getCategoryList,
+  getProductList,
+  updateProduct,
+} from './product.service';
 import ProductEdit from './product.edit';
 import TableCustom from 'components/CustomTable';
 import axiosClient from 'util/axiosClient';
@@ -93,16 +98,7 @@ const ManageProductList = () => {
       render: (text, record) => {
         return (
           <Tooltip placement="topLeft" title={text}>
-            <Button
-              size="small"
-              type="link"
-              onClick={() => {
-                setCurrentRow(record);
-                setIsEditModal(true);
-              }}
-            >
-              {text}
-            </Button>
+            <h3>{text}</h3>
           </Tooltip>
         );
       },
@@ -132,7 +128,9 @@ const ManageProductList = () => {
       dataIndex: 'thumbnail',
       key: 'thumbnail',
       width: '12%',
-      render: (text, _) => <img src={text} width={100} alt="img" />,
+      render: (text, _) => (
+        <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
+      ),
     },
     {
       title: 'Thể loại',
@@ -152,16 +150,17 @@ const ManageProductList = () => {
       width: '12%',
       sorter: (a, b) => a.feartured - b.feartured,
       render: (text, value) => <p>{text ? 'true' : 'false'}</p>,
-      render: (text, _) => {
+      render: (text, record) => {
         return (
           <Popconfirm
             title={
               <div>
-                <span>Bạn có muốn chuyển trạng thái blog này không ?</span>
+                <span>Bạn có muốn thay đổi đặc biệt sản phẩm này không ?</span>
               </div>
             }
-            onConfirm={async () => {
-              console.log('value');
+            onConfirm={async (value) => {
+              await updateProduct({ id: record._id, feartured: !text });
+              fetchProductList(params);
             }}
             icon={<ExclamationCircleOutlined />}
             okText={'Có'}
@@ -184,22 +183,42 @@ const ManageProductList = () => {
       ],
       onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status - b.status,
-      render: (text, _) => (
+      render: (text, record) => (
         <Popconfirm
           icon={<ExclamationCircleOutlined />}
           title={
             <div>
-              <span>Bạn có muốn ẩn blog này không ?</span>
+              <span>Bạn có muốn thay đổi trạng thái sản phẩm này không ?</span>
             </div>
           }
           onConfirm={async (value) => {
-            console.log(value);
+            await updateProduct({ id: record._id, status: !text });
+            fetchProductList(params);
           }}
           okText={'Có'}
           cancelText={'Không'}
         >
           <Switch checked={text}></Switch>
         </Popconfirm>
+      ),
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentRow(record);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
       ),
     },
   ];
@@ -246,9 +265,9 @@ const ManageProductList = () => {
             layout="horizontal"
             className="customFormSearch"
             onFinish={async (value) => {
-              if (!form.getFieldValue('search-value').trim())
-                return fetchProductList();
-
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim())
+                return fetchProductList(params);
               const productsSearch = await axiosClient.post(
                 '/products/search/marketing',
                 { searchText: form.getFieldValue('search-value') }

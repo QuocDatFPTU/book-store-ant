@@ -1,5 +1,6 @@
 import {
   DeleteOutlined,
+  EditOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
   SearchOutlined,
@@ -25,7 +26,12 @@ import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
 import TableCustom from 'components/CustomTable';
 import PostEdit from './post.edit';
-import { getCategoryList, getPostList, getProductList } from './post.service';
+import {
+  getCategoryList,
+  getPostList,
+  getProductList,
+  updatePost,
+} from './post.service';
 import { async } from '@firebase/util';
 import axiosClient from 'util/axiosClient';
 // const defaultSort = {
@@ -73,6 +79,7 @@ const ManagePostList = () => {
         return false;
       });
   };
+
   useEffect(() => {
     fetchBlogList(params);
   }, [params]);
@@ -87,6 +94,14 @@ const ManagePostList = () => {
 
   const columns = [
     {
+      title: 'ID',
+      dataIndex: '_id',
+      key: '_id',
+      ellipsis: {
+        showTitle: false,
+      },
+    },
+    {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
@@ -97,16 +112,7 @@ const ManagePostList = () => {
       render: (text, record) => {
         return (
           <Tooltip placement="topLeft" title={text}>
-            <Button
-              size="small"
-              type="link"
-              onClick={() => {
-                setCurrentRow(record);
-                setIsEditModal(true);
-              }}
-            >
-              {text}
-            </Button>
+            <h4>{text}</h4>
           </Tooltip>
         );
       },
@@ -149,16 +155,17 @@ const ManagePostList = () => {
       ],
       onFilter: (value, record) => value === record.status,
       sorter: (a, b) => a.status - b.status,
-      render: (text, _) => (
+      render: (text, record) => (
         <Popconfirm
           icon={<ExclamationCircleOutlined />}
           title={
             <div>
-              <span>Bạn có muốn ẩn blog này không ?</span>
+              <span>Bạn có muốn đổi trạng thái blog này không ?</span>
             </div>
           }
           onConfirm={async (value) => {
-            console.log(value);
+            await updatePost({ id: record._id, status: !text });
+            fetchBlogList(params);
           }}
           okText={'Có'}
           cancelText={'Không'}
@@ -179,18 +186,19 @@ const ManagePostList = () => {
       ],
       onFilter: (value, record) => value === record.featured,
       sorter: (a, b) => a.featured - b.featured,
-      render: (text, _) => {
+      render: (text, record) => {
         return (
           <Popconfirm
+            icon={<ExclamationCircleOutlined />}
             title={
               <div>
-                <span>Bạn có muốn chuyển trạng thái blog này không ?</span>
+                <span>Bạn có muốn đổi Nổi bật blog này không ?</span>
               </div>
             }
-            onConfirm={async () => {
-              console.log('value');
+            onConfirm={async (value) => {
+              await updatePost({ id: record._id, featured: !text });
+              fetchBlogList(params);
             }}
-            icon={<ExclamationCircleOutlined />}
             okText={'Có'}
             cancelText={'Không'}
           >
@@ -208,31 +216,25 @@ const ManagePostList = () => {
         <Image style={{ cursor: 'pointer' }} src={text} width={100} alt="img" />
       ),
     },
-    // {
-    //   title: 'Hành động',
-    //   key: 'action',
-    //   dataIndex: 'action',
-    //   width: '12%',
-    //   align: 'center',
-    //   render: (_, value) => (
-    //     <Popconfirm
-    //       title={'Bạn có muốn xóa blog này không'}
-    //       okText={'Có'}
-    //       cancelText={'Không'}
-    //       onConfirm={async () => {
-    //         console.log('oke');
-    //       }}
-    //       icon={<ExclamationCircleOutlined />}
-    //     >
-    //       <Button
-    //         icon={<DeleteOutlined />}
-    //         type="primary"
-    //         danger
-    //         style={{ borderRadius: '6px' }}
-    //       />
-    //     </Popconfirm>
-    //   ),
-    // },
+    {
+      title: 'Action',
+      align: 'center',
+      width: '8%',
+      fixed: 'right',
+      render: (text, record) => (
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentRow(record);
+              setIsEditModal(true);
+            }}
+          />
+        </div>
+      ),
+    },
   ];
 
   const extraButton = [
@@ -276,8 +278,8 @@ const ManagePostList = () => {
             layout="horizontal"
             className="customFormSearch"
             onFinish={async (value) => {
-              if (!form.getFieldValue('search-value').trim())
-                return fetchBlogList();
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) return fetchBlogList();
 
               const sliderSearch = await axiosClient.post('/posts/search', {
                 search: form.getFieldValue('search-value'),

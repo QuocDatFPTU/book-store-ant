@@ -14,6 +14,7 @@ import {
   Select,
   InputNumber,
   DatePicker,
+  Image,
 } from 'antd';
 import 'moment/locale/vi';
 
@@ -41,8 +42,6 @@ const AccountEdit = ({
   const [imageUrl, setImageUrl] = useState();
   const [fileList, setFileList] = useState([]);
   const [defaultFileList, setDefaultFileList] = useState([]);
-  const { TextArea } = Input;
-  const { Option } = Select;
   const getDefaultFileList = (record) => {
     return [
       {
@@ -53,12 +52,13 @@ const AccountEdit = ({
     ];
   };
 
-  const roleOptions = roleList.map((data) => {
+  let roleOptions = roleList.map((data) => {
     return {
       label: data?.name,
       value: data?._id,
     };
   });
+
   const handleChange = ({ fileList }) =>
     setFileList(fileList.filter((file) => file.status !== 'error'));
 
@@ -69,6 +69,7 @@ const AccountEdit = ({
 
     setFileList(newFileList);
   };
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -81,6 +82,7 @@ const AccountEdit = ({
       </div>
     </div>
   );
+
   useEffect(() => {
     return () => {
       form.resetFields();
@@ -93,7 +95,7 @@ const AccountEdit = ({
       {
         uid: uuidv4(),
         name: 'image',
-        url: currentRow?.avatar,
+        url: currentRow?.avatar?.img,
       },
     ]);
     return () => {
@@ -104,75 +106,73 @@ const AccountEdit = ({
   const onCancel = () => {
     setIsEditModal(false);
   };
+
   const onFinish = async (values) => {
     try {
       setLoading(true);
       // create
       if (!currentRow) {
-        const imageUrl = await uploadFileToFirebase(
-          values?.avatar[0]?.originFileObj
-        );
-        const createData = {
-          ...values,
-          avatar: { img: imageUrl },
-        };
-        console.log(createData);
+        //có up avatar
+        //Không up avatar
+        let createData = {};
+        console.log(values);
+        console.log(!values?.avatar?.img || values?.avatar?.img?.length === 0);
+        if (!values?.avatar?.img || values?.avatar?.img?.length === 0) {
+          console.log('khoông ảnh');
+          delete values.avatar;
+          if (values.status === undefined) values.status = false;
+          createData = {
+            ...values,
+          };
+        } else {
+          console.log('có ảnh');
+          console.log(values);
+          console.log(values?.avatar?.img[0]?.originFileObj);
+          const imageUrl = await uploadFileToFirebase(
+            values?.avatar?.img[0]?.originFileObj
+          );
+          console.log(imageUrl);
+          if (values.status === undefined) values.status = false;
+          createData = {
+            ...values,
+            avatar: { img: imageUrl },
+          };
+        }
+        console.log(createData, '?????');
         await createUser(createData)
           .then((result) => {
             if (result) {
               message.success('Thêm mới người dùng thành công!');
             }
+            onCallback();
           })
-          .catch((error) => message.error(error.message));
+          .catch((error) => message.error(error?.response?.data?.error));
         setLoading(false);
-        onCallback();
-      } else {
-        if (values?.avatar[0]?.originFileObj) {
-          const updateImageUrl = await uploadFileToFirebase(
-            values?.avatar[0]?.originFileObj
-          );
-          delete values.avatar;
-          const updateData = {
-            ...values,
-            id: currentRow?._id,
-            avatar: updateImageUrl,
-          };
-
-          await updateUser(updateData)
-            .then((result) => {
-              console.log(result);
-              message.success('Cập nhật người dùng thành công!');
-              setLoading(false);
-              onCallback();
-            })
-            .catch((error) => {
-              message.error(error.message);
-              setLoading(false);
-            });
-        } else {
-          delete values.avatar;
-          const updateData = {
-            ...values,
-            id: currentRow?._id,
-            avatar: currentRow?.avatar,
-          };
-          console.log(updateData);
-          await updateUser(updateData)
-            .then((result) => {
-              console.log(result);
-              message.success('Cập nhật sản phẩm thành công!');
-              setLoading(false);
-              onCallback();
-            })
-            .catch((error) => {
-              console.log('error2', error);
-              message.error(error.message);
-              setLoading(false);
-            });
-        }
+      }
+      // Edit
+      else {
+        delete values.avatar;
+        console.log(values);
+        const updateData = {
+          ...values,
+          id: currentRow?._id,
+        };
+        console.log(updateData);
+        await updateUser(updateData)
+          .then((result) => {
+            console.log(result);
+            message.success('Cập nhật sản phẩm thành công!');
+            setLoading(false);
+            onCallback();
+          })
+          .catch((error) => {
+            console.log('error2', error);
+            message.error(error?.response?.data?.error);
+            setLoading(false);
+          });
       }
     } catch (error) {
-      message.error(error.message);
+      message.error(error?.response?.data?.error);
       setLoading(false);
       return false;
     }
@@ -184,8 +184,10 @@ const AccountEdit = ({
     gender: currentRow ? currentRow?.gender : undefined,
     status: currentRow ? currentRow?.status : undefined,
     email: currentRow ? currentRow?.email : undefined,
-    avatar: currentRow ? getDefaultFileList(currentRow?.avatar) : undefined,
-    role: currentRow ? currentRow?.role?.name : undefined,
+    avatar: currentRow
+      ? getDefaultFileList(currentRow?.avatar?.img)
+      : undefined,
+    role: currentRow ? currentRow?.role?._id : undefined,
     address: currentRow ? currentRow?.address : undefined,
   };
   return (
@@ -211,106 +213,165 @@ const AccountEdit = ({
         labelWrap
         onFinish={(values) => onFinish(values)}
       >
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            name="avatar"
-            label={'Avatar'}
-            getValueFromEvent={normFile}
-            style={{ width: '100%' }}
-          >
-            <Upload
-              accept="image/*"
-              maxCount={1}
-              className="UploadImage"
-              listType="picture-card"
-              onChange={handleChange}
-              defaultFileList={defaultFileList}
-              beforeUpload={(file) => {
-                beforeUpload(file);
-              }}
-              showUploadList={true}
-              customRequest={fakeUpload}
-              onRemove={onRemove}
-              // fileList={fileList}
-            >
-              {uploadButton}
-            </Upload>
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Họ tên"
-            name="fullName"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập họ tên!',
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập email!',
-              },
-            ]}
-          >
-            <Input type="email" />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Địa chỉ"
-            name="address"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập địa chỉ',
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Số điện thoại"
-            name="phone"
-            rules={[
-              {
-                required: true,
-                message: 'Cần nhập số điện thoại!',
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
-          <Form.Item
-            label="Giới tính"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: 'Chọn giới tính',
-              },
-            ]}
-          >
-            <Select placeholder="Giới tính" allowClear>
-              <Select.Option value="M">male</Select.Option>
-              <Select.Option value="F">female</Select.Option>
-              <Select.Option value="D">other</Select.Option>
-            </Select>
-          </Form.Item>
-        </Col>
+        {!currentRow && (
+          <>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                name={['avatar', 'img']}
+                label={'Avatar'}
+                getValueFromEvent={normFile}
+                style={{ width: '100%' }}
+              >
+                <Upload
+                  accept="image/*"
+                  maxCount={1}
+                  className="UploadImage"
+                  listType="picture-card"
+                  onChange={handleChange}
+                  defaultFileList={defaultFileList}
+                  beforeUpload={(file) => {
+                    beforeUpload(file);
+                  }}
+                  showUploadList={true}
+                  customRequest={fakeUpload}
+                  onRemove={onRemove}
+                  // fileList={fileList}
+                >
+                  {uploadButton}
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Họ tên"
+                name="fullName"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập họ tên!',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập email!',
+                  },
+                ]}
+              >
+                <Input type="email" />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Địa chỉ"
+                name="address"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập địa chỉ',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Số điện thoại"
+                name="phone"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập số điện thoại!',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Giới tính"
+                name="gender"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Chọn giới tính',
+                  },
+                ]}
+              >
+                <Select placeholder="Giới tính" allowClear>
+                  <Select.Option value="M">male</Select.Option>
+                  <Select.Option value="F">female</Select.Option>
+                  <Select.Option value="D">other</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </>
+        )}
+        {currentRow && (
+          <>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Họ và tên
+                </Col>
+                <Col span={18}>{currentRow.fullName}</Col>
+              </Row>
+            </Col>{' '}
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Email
+                </Col>
+                <Col span={18}>{currentRow.email}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Địa chỉ
+                </Col>
+                <Col span={18}>{currentRow.address}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Số điện thoại
+                </Col>
+                <Col span={18}>{currentRow.phone}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Giới tính
+                </Col>
+                <Col span={18}>{currentRow.gender}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Avatar
+                </Col>
+                <Col span={18}>
+                  <Image width={'60px'} src={currentRow?.avatar?.img} />
+                </Col>
+              </Row>
+            </Col>
+          </>
+        )}
+
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item label="Trạng thái" name="status" valuePropName="checked">
             <Checkbox>Trạng thái</Checkbox>

@@ -21,60 +21,65 @@ import { defaultPage } from 'util/constant';
 import { getBlogList } from './service';
 import './style.less';
 const BlogList = () => {
-  const { Paragraph } = Typography;
   const { Meta } = Card;
-  const { CheckableTag } = Tag;
   const [loading, setLoading] = useState(false);
   const [blogList, setBlogList] = useState([]);
   const [blogFeaturedList, setBlogFeaturedList] = useState([]);
   const [totalItem, setTotalItem] = useState();
-  const [params, setParams] = useState({ ...defaultPage });
+  const [params, setParams] = useState({ page: 1, limit: 5 });
   // state
   const navigate = useNavigate();
 
   const fetchBlogList = (params, sortedInfo) => {
     setLoading(true);
-    getBlogList({ ...params })
-      .then((result) => {
-        setBlogList([...result.posts]);
-        setTotalItem(result?.count);
+    getBlogList({ ...params, status: true })
+      .then(({ posts, count }) => {
+        setBlogList([...posts]);
+        setTotalItem(count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
   };
   const fetchBlogFeaturedList = (params, sortedInfo) => {
-    setLoading(true);
-    getBlogList({ limit: 3 }).then((result) => {
-      setBlogFeaturedList([...result.posts]);
-    });
+    getBlogList({ limit: 3, status: true, featured: true })
+      .then((result) => {
+        setBlogFeaturedList([...result.posts]);
+      })
+      .catch((e) => console.log(e));
   };
   useEffect(() => {
+    fetchBlogFeaturedList(params);
     fetchBlogList(params);
   }, [params]);
-  console.log(blogList, totalItem);
+
+  console.log(totalItem);
   return (
     <WrapperConentContainer>
       <Row className="custom-row">
         <Col span={24}>
           <Row style={{ marginBottom: '10px' }}>
-            <Col span={24} style={{ position: 'relative' }}>
+            <Col
+              onClick={() => navigate(`${blogFeaturedList[0]?._id}`)}
+              span={24}
+              style={{ position: 'relative' }}
+            >
               <div className="blog-fearture__img">
                 <img
                   style={{ height: '280px', objectFit: 'cover', width: '100%' }}
                   alt="example"
-                  src={blogList[0]?.thumbnail}
+                  src={blogFeaturedList[0]?.thumbnail}
                 />
               </div>
               <div className="blog-fearture__detail ">
                 <div className="blog-fearture__title">
                   <Link
-                    to={`${blogList[0]?._id}`}
+                    to={`${blogFeaturedList[0]?._id}`}
                     style={{
                       outline: 'none',
                       textDecoration: 'none',
                     }}
                   >
-                    <h3>{blogList[0]?.title}</h3>
+                    <h3>{blogFeaturedList[0]?.title}</h3>
                   </Link>
                 </div>
                 <div className="blog-container__info blog-fearture__info">
@@ -85,7 +90,7 @@ const BlogList = () => {
                       fontSize: '14px',
                     }}
                   >
-                    {blogList[0]?.author}
+                    {blogFeaturedList[0]?.author}
                   </span>
                   <span
                     style={{ color: 'white' }}
@@ -100,14 +105,18 @@ const BlogList = () => {
                       fontSize: '14px',
                     }}
                   >
-                    <DateFormat>{blogList[0]?.updatedDate}</DateFormat>
+                    <DateFormat>{blogFeaturedList[0]?.updatedDate}</DateFormat>
                   </span>
                 </div>
               </div>
             </Col>
           </Row>
           <Row style={{ marginBottom: '10px' }}>
-            <Col span={12} style={{ position: 'relative' }}>
+            <Col
+              onClick={() => navigate(`${blogFeaturedList[1]?._id}`)}
+              span={12}
+              style={{ position: 'relative' }}
+            >
               <div style={{ width: '99.3%' }}>
                 <div className="blog-fearture__img">
                   <img
@@ -117,19 +126,19 @@ const BlogList = () => {
                       width: '100%',
                     }}
                     alt="example"
-                    src={blogList[1]?.thumbnail}
+                    src={blogFeaturedList[1]?.thumbnail}
                   />
                 </div>
                 <div className="blog-fearture__detail">
                   <div className="blog-fearture__title">
                     <Link
-                      to={`${blogList[1]?._id}`}
+                      to={`${blogFeaturedList[1]?._id}`}
                       style={{
                         outline: 'none',
                         textDecoration: 'none',
                       }}
                     >
-                      <h3>{blogList[1]?.title}</h3>
+                      <h3>{blogFeaturedList[1]?.title}</h3>
                     </Link>
                   </div>
                   <div className="blog-container__info blog-fearture__info">
@@ -140,7 +149,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      {blogList[1]?.author}
+                      {blogFeaturedList[1]?.author}
                     </span>
                     <span
                       style={{ color: 'white' }}
@@ -155,13 +164,19 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      <DateFormat>{blogList[1]?.updatedDate}</DateFormat>
+                      <DateFormat>
+                        {blogFeaturedList[1]?.updatedDate}
+                      </DateFormat>
                     </span>
                   </div>
                 </div>
               </div>
             </Col>
-            <Col span={12} style={{ position: 'relative' }}>
+            <Col
+              onClick={() => navigate(`${blogFeaturedList[2]?._id}`)}
+              span={12}
+              style={{ position: 'relative' }}
+            >
               <div style={{ width: '99.3%', float: 'right' }}>
                 <div className="blog-fearture__img">
                   <img
@@ -171,19 +186,19 @@ const BlogList = () => {
                       width: '100%',
                     }}
                     alt="example"
-                    src={blogList[2]?.thumbnail}
+                    src={blogFeaturedList[2]?.thumbnail}
                   />
                 </div>
                 <div className="blog-fearture__detail ">
                   <div className="blog-fearture__title">
                     <Link
-                      to={`${blogList[2]?._id}`}
+                      to={`${blogFeaturedList[2]?._id}`}
                       style={{
                         outline: 'none',
                         textDecoration: 'none',
                       }}
                     >
-                      <h3>{blogList[2]?.title}</h3>
+                      <h3>{blogFeaturedList[2]?.title}</h3>
                     </Link>
                   </div>
                   <div className="blog-container__info blog-fearture__info">
@@ -194,7 +209,7 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      {blogList[2]?.author}
+                      {blogFeaturedList[2]?.author}
                     </span>
                     <span
                       style={{ color: 'white' }}
@@ -209,7 +224,9 @@ const BlogList = () => {
                         fontSize: '14px',
                       }}
                     >
-                      <DateFormat>{blogList[2]?.updatedDate}</DateFormat>
+                      <DateFormat>
+                        {blogFeaturedList[2]?.updatedDate}
+                      </DateFormat>
                     </span>
                   </div>
                 </div>
@@ -254,7 +271,9 @@ const BlogList = () => {
                                   <p>{blog?.brief}</p>
                                 </div>
                                 <div className="blog-container__info">
-                                  <span>11 ngày trước</span>
+                                  <span>
+                                    <DateFormat>{blog?.updatedAt}</DateFormat>
+                                  </span>
                                   <span className="blog-container__dot">.</span>
                                   <span>7 phút đọc</span>
                                 </div>
@@ -271,14 +290,11 @@ const BlogList = () => {
                           <div className="blog-pagination">
                             <Pagination
                               defaultCurrent={1}
+                              current={params.page}
                               total={totalItem}
-                              onChange={(page, pageSize) => {
-                                if (pageSize !== params.limit) {
-                                  params.page = 1;
-                                } else {
-                                  params.page = page;
-                                }
-                                params.limit = pageSize;
+                              pageSize={params.limit}
+                              onChange={(page) => {
+                                params.page = page;
                                 setParams({ ...params });
                               }}
                             />

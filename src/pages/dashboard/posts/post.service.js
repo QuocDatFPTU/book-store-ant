@@ -6,22 +6,6 @@ export const getPostList = async (params) => {
   return request(environment.api.getPost, params, 'GET');
 };
 
-// export async function updateProduct(payload) {
-//   const url = `/products/${payload?.id}`;
-//   const updateValue = {
-//     ...payload,
-//   };
-//   return axiosClient.put(url, updateValue);
-// }
-
-// export async function createPost(payload) {
-//   const url = '/posts';
-//   const newPost = {
-//     ...payload,
-//   };
-//   return axiosClient.post(url, newPost);
-// }
-
 export const getCategoryList = async (params) => {
   return request(environment.api.getCategory, params, 'GET');
 };

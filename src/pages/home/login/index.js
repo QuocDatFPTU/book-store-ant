@@ -32,6 +32,7 @@ const Login = (props) => {
 
   async function handleSubmit(value) {
     const { username, password } = value;
+    console.log({ username, password }, 'login page');
     dispatch(loginStart({ username, password }));
     setIsLogin(true);
   }
@@ -97,6 +98,8 @@ const Login = (props) => {
 
         setIsLogin(false);
       }
+
+      setIsLogin(false);
     }
 
     // if (isLogin && role) {
