@@ -5,27 +5,6 @@ import { getDashboardMarketing } from './dashboard.service';
 import { firstColumns, firstData, secondColumns, secondData, labels, thridColumns, thridData } from './constants';
 import faker from 'faker';
 import './style.less'
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
 
 
 function AdminDashboard() {
@@ -86,7 +65,7 @@ function AdminDashboard() {
             >
                 <div className="site-statistic-demo-card">
                     <Row gutter={16} >
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card>
                                 <Statistic
                                     title="Đợi xác nhân"
@@ -97,7 +76,7 @@ function AdminDashboard() {
                                 />
                             </Card>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card>
                                 <Statistic
                                     title="Hoàn thành"
@@ -108,10 +87,21 @@ function AdminDashboard() {
                                 />
                             </Card>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card>
                                 <Statistic
                                     title="Hủy"
+                                    value={9}
+                                    valueStyle={{
+                                        color: '#cf1322',
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={6}>
+                            <Card>
+                                <Statistic
+                                    title="Doanh Thu"
                                     value={9}
                                     valueStyle={{
                                         color: '#cf1322',

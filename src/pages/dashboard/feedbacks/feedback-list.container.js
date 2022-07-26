@@ -7,7 +7,9 @@ import {
   Input,
   Layout,
   PageHeader,
+  Rate,
   Row,
+  Switch,
   Tooltip,
 } from 'antd';
 import { pickBy } from 'lodash';
@@ -17,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getOrderList, getOrderListSaleManager } from './feedback.service';
+import { getFeedbackList, getOrderListSaleManager } from './feedback.service';
 import ProductEdit from './feedback.edit';
 import TableCustom from 'components/CustomTable';
 import axiosClient from 'util/axiosClient';
@@ -28,7 +30,7 @@ import StatusFormat from 'components/format-status';
 // 	"order-by": "Id",
 // };
 const ManageFeedbackList = () => {
-  const [orderList, setOrderList] = useState([]);
+  const [feedbackList, setFeedbackList] = useState([]);
   const [product, setProduct] = useState();
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,133 +41,61 @@ const ManageFeedbackList = () => {
   // const [sortedInfo] = useState(defaultSort);
   const [form] = Form.useForm();
 
-  const fetchOrderList = (params, sortedInfo) => {
+  const fetchFeedbackList = (params, sortedInfo) => {
     setLoading(true);
-    getOrderList({ ...params })
+    getFeedbackList({ ...params })
       .then((result) => {
-        setOrderList([...result?.orders]);
+        setFeedbackList([...result?.feedbacks]);
         setTotalItem(result?.count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
   };
 
-  const fetchOrderListSaleManager = (params, sortedInfo) => {
-    setLoading(true);
-    getOrderListSaleManager({ ...params })
-      .then((result) => {
-        setOrderList([...result?.orders]);
-        setTotalItem(result?.count);
-        setLoading(false);
-      })
-      .catch((e) => setLoading(false));
-  };
+
 
   useEffect(() => {
-    if (localStorage.getItem('__role') === 'R04') return fetchOrderList(params);
-    if (localStorage.getItem('__role') === 'R05')
-      return fetchOrderListSaleManager(params);
+    fetchFeedbackList(params);
   }, [params]);
 
   const columns = [
     //feedbacks' contact full name, product name, rated star, status
     {
-      title: 'Tên khách hàng',
-      dataIndex: 'receiverName',
-      key: 'receiverName',
-      width: '12%',
-      sorter: (a, b) => a.receiverName.length - b.receiverName.length,
-    },
-    {
-      title: 'Ngày đặt hàng',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: '12%',
-      sorter: (a, b) => a.createdAt > b.createdAt,
-      render: (text, record) => {
-        return <DateFormat>{text}</DateFormat>;
-      },
-    },
-    {
-      title: 'Tên khách hàng',
-      dataIndex: 'receiverName',
-      key: 'receiverName',
-      width: '12%',
-      sorter: (a, b) => a.receiverName.length - b.receiverName.length,
-    },
-    {
       title: 'Tên sản phẩm',
-      dataIndex: 'items',
-      // key: 'items',
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (items, record) => {
-        return <Tooltip title={items[0]?.title}>{items[0]?.title}</Tooltip>;
-      },
+      dataIndex: 'product',
+      key: 'receiverName',
+      width: '20%',
+      render: (_, record) => record?.product?.title
     },
     {
-      title: 'số lượng sản phẩm',
-      dataIndex: 'items',
+      title: 'Tên khách hàng',
+      dataIndex: 'user',
+      key: 'user',
+      width: '12%',
+      render: (_, record) => record?.user?.fullName
+    },
+    {
+      title: 'Đánh giá',
+      dataIndex: 'star',
       // key: 'items',
       width: '12%',
-      render: (items, record) => {
-        return <p>{items?.length}</p>;
-      },
+      render: (text) => <Rate value={text} />
     },
     {
-      title: 'Chi phí',
-      dataIndex: 'totalCost',
-      key: 'totalCost',
-      width: '12%',
-      sorter: (a, b) => a.totalCost - b.totalCost,
-      render: (text, record) => {
-        return <MoneyFormat>{text}</MoneyFormat>;
-      },
+      title: 'Nội dung',
+      dataIndex: 'content',
+      // key: 'items',
+
     },
     {
-      title: 'Trạng thái',
+      title: 'Trang thái',
       dataIndex: 'status',
-      key: 'status',
-      width: '12%',
-      filters: [
-        { text: 'submitted', value: 'submitted' },
-        { text: 'cancelled', value: 'cancelled' },
-        { text: 'success', value: 'success' },
-      ],
-      onFilter: (value, record) => value === record.status,
-      sorter: (a, b) => a.status.length - b.status.length,
-      render: (text, record) => <StatusFormat>{text}</StatusFormat>,
-    },
-    {
-      title: 'Action',
+      // key: 'items',
       align: 'center',
-      width: '8%',
-      fixed: 'right',
-      render: (text, record) => (
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={async () => {
-              if (localStorage.getItem('__role') === 'R04') {
-                const orderUpdate = await axiosClient.get(
-                  `/orders/saler/${record._id}`
-                );
-                setCurrentRow(orderUpdate);
-              }
-              if (localStorage.getItem('__role') === 'R05') {
-                const orderUpdate = await axiosClient.get(
-                  `/orders/saleManager/getOne?orderId=${record._id}`
-                );
-                setCurrentRow(orderUpdate);
-              }
-              setIsEditModal(true);
-            }}
-          />
-        </div>
-      ),
+      width: '12%',
+      render: (text) => {
+        return <Switch checked={text} />
+      }
     },
   ];
 
@@ -194,36 +124,36 @@ const ManageFeedbackList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-            onFinish={async (value) => {
-              const searchVal = form.getFieldValue('search-value');
-              if (!searchVal || !searchVal.trim()) {
-                if (localStorage.getItem('__role') === 'R04')
-                  return fetchOrderList(params);
-                if (localStorage.getItem('__role') === 'R05')
-                  return fetchOrderListSaleManager(params);
-              }
+          // onFinish={async (value) => {
+          //   const searchVal = form.getFieldValue('search-value');
+          //   if (!searchVal || !searchVal.trim()) {
+          //     if (localStorage.getItem('__role') === 'R04')
+          //       return fetchOrderList(params);
+          //     if (localStorage.getItem('__role') === 'R05')
+          //       return fetchOrderListSaleManager(params);
+          //   }
 
-              if (localStorage.getItem('__role') === 'R04') {
-                const sliderSearch = await axiosClient.post(
-                  '/orders/saler/search',
-                  {
-                    search: form.getFieldValue('search-value'),
-                    limit: 100,
-                  }
-                );
-                setOrderList(sliderSearch);
-              }
-              if (localStorage.getItem('__role') === 'R05') {
-                const sliderSearch = await axiosClient.post(
-                  '/orders/saleManager/search',
-                  {
-                    search: form.getFieldValue('search-value'),
-                    limit: 100,
-                  }
-                );
-                setOrderList(sliderSearch);
-              }
-            }}
+          //   if (localStorage.getItem('__role') === 'R04') {
+          //     const sliderSearch = await axiosClient.post(
+          //       '/orders/saler/search',
+          //       {
+          //         search: form.getFieldValue('search-value'),
+          //         limit: 100,
+          //       }
+          //     );
+          //     setOrderList(sliderSearch);
+          //   }
+          //   if (localStorage.getItem('__role') === 'R05') {
+          //     const sliderSearch = await axiosClient.post(
+          //       '/orders/saleManager/search',
+          //       {
+          //         search: form.getFieldValue('search-value'),
+          //         limit: 100,
+          //       }
+          //     );
+          //     setOrderList(sliderSearch);
+          //   }
+          // }}
           >
             <Row gutter={16}>
               <Col xxl={{ span: 6 }} md={8} sm={12} xs={24}>
@@ -258,7 +188,7 @@ const ManageFeedbackList = () => {
           loading={loading}
           bordered
           columns={columns}
-          dataSource={orderList}
+          dataSource={feedbackList}
           onChange={(pagination, filters, sorter) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (pagination.pageSize !== params.limit) {

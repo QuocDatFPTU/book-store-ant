@@ -1,4 +1,4 @@
-import { Image } from "antd";
+import { Image, Rate } from "antd";
 
 export const firstColumns = [
     //contacts' id, full name, gender, email, mobile, status
@@ -7,7 +7,7 @@ export const firstColumns = [
         title: 'Ảnh',
         dataIndex: 'thumbnail',
         key: 'thumbnail',
-        render: (text,) => <Image src={text}  style={{ Width: 200 }} />
+        render: (text,) => <Image src={text} style={{ Width: 200 }} />
     },
     {
         title: 'Tiêu đề',
@@ -24,20 +24,74 @@ export const firstColumns = [
 export const secondColumns = [
     {
 
-        title: 'Tên khách hàng',
-        dataIndex: 'name',
-        key: 'name',
+        title: 'Email',
+        dataIndex: 'email',
+        key: 'email',
     },
     {
         title: 'Tổng chi',
-        dataIndex: 'amount',
-        key: 'amount',
+        dataIndex: 'spend',
+        key: 'spend',
         render: (text, record) => {
-            return record?.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return record.spend.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
     },
 ];
 
+export const fourthColumns = [
+    {
+
+        title: 'Sản phẩm',
+        dataIndex: 'product',
+        key: 'product',
+        width: '50%',
+        render: (text, record) => {
+            return record.product.title;
+        }
+    },
+    {
+        title: 'Nội dung',
+        dataIndex: 'content',
+        key: 'content',
+
+    },
+    {
+        title: 'Đánh giá',
+        dataIndex: 'star',
+        key: 'star',
+        render: (text) => {
+            return <Rate value={text} />
+        }
+    },
+];
+export const fifthColumns = [
+    {
+
+        title: 'Sản phẩm',
+        dataIndex: 'product',
+        key: 'product',
+        width: '50%',
+        render: (text, record) => {
+            return record.product.title;
+        }
+    },
+    {
+        title: 'Đã bán',
+        dataIndex: 'sold',
+        key: 'sold',
+        render: (text, record) => {
+            return record.sold.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    },
+    {
+        title: 'Số lượng',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        render: (text, record) => {
+            return record.quantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    },
+];
 export const thridColumns = [
     //contacts' id, full name, gender, email, mobile, status
     {
