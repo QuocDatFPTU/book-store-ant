@@ -1,6 +1,7 @@
 import {
   AppstoreAddOutlined,
   DownOutlined,
+  LeftOutlined,
   LoginOutlined,
   LogoutOutlined,
   RedditOutlined,
@@ -20,16 +21,18 @@ import {
   Layout,
   Affix,
   Button,
+  message,
 } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './styles.less';
 import logoImg from 'assets/logo-new.png';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logoutInitiate } from 'redux/action';
 import request from 'util/request';
 import { authAction, logoutStart } from 'redux/features/auth/authSlice';
+import { uuidv4 } from 'util/file';
 const { Header } = Layout;
 
 const HeaderContainer = () => {
@@ -40,31 +43,33 @@ const HeaderContainer = () => {
   const [categories, setCategories] = useState([]);
   const [username, setUsername] = useState([]);
   const [menuItemProduct, setMenuItemProduct] = useState([]);
-
-  //Effect
+  const searchTimeOut = useRef(null)
+  const [searchValue, setSearchValue] = useState('');
+  const [open, setOpen] = useState(false);  //Effect
   useEffect(() => {
     request('/categories', {}, 'GET').then((cates) => setCategories(cates));
-    // axiosClient
-    //   .get('/user/profile')
-    //   .then(({ user }) => setUsername(user.fullName));
   }, []);
+
   useEffect(() => {
     request('/user/profile', {}, 'GET').then(({ user }) =>
       setUsername(user?.fullName)
     );
   }, [username]);
 
-  const onSearch = async (value) => {
-    console.log(value.target.value);
+  useEffect(() => {
+    handleSearch(searchValue);
+  }, [searchValue]);
+
+
+  const handleSearch = async (data) => {
     try {
       const lstProduct = await request(
         '/products/search',
         {
-          searchText: value.target.value,
+          searchText: data,
         },
         'POST'
       );
-      console.log(lstProduct);
       let index = 0;
       let list = [];
       lstProduct.forEach((item) => {
@@ -77,19 +82,30 @@ const HeaderContainer = () => {
         });
       });
       setMenuItemProduct(list);
-      console.log(list);
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
-  };
+  }
+
+  const onSearch = async (value) => {
+    const searchedValue = value.target.value;
+
+    if (searchTimeOut.current) { clearTimeout(searchTimeOut.current); }
+
+    searchTimeOut.current = setTimeout(() => {
+      setSearchValue(searchedValue);
+    }, 300)
+  }
+
   const onLogout = async () => {
     dispatch(authAction.logout());
     navigate('/login');
   };
+
+
   const menuGuest = (
     <Menu
       className="header-custom-menu"
-      theme="dark"
       style={{ width: 140 }}
       items={[
         {
@@ -108,7 +124,6 @@ const HeaderContainer = () => {
   const menuUser = (
     <Menu
       className="header-custom-menu"
-      theme="dark"
       style={{ width: 200 }}
       items={[
         {
@@ -132,10 +147,17 @@ const HeaderContainer = () => {
     />
   );
 
+  const categoriesMenu = categories.map(item => ({
+    key: item?.name,
+    label: (
+      <Link to={`/product-list/${item?._id}`}>{item?.name}</Link>
+    ),
+  }))
+
   return (
     <div>
       <Affix offsetTop={'-20px'}>
-        <Header style={{ padding: '0', height: 'auto' }}>
+        <Header style={{ padding: '0', height: 'auto', backgroundColor: '#fff' }}>
           <Row>
             <Col span={16} offset={4}>
               <Row align="middle" style={{ padding: '3px 0' }}>
@@ -153,7 +175,7 @@ const HeaderContainer = () => {
                     overlay={
                       <Menu
                         className="header-custom-menu"
-                        theme="dark"
+                        // theme="light"
                         style={{ width: 200 }}
                       >
                         {categories.map((cate) => (
@@ -172,7 +194,7 @@ const HeaderContainer = () => {
                     placement="bottomLeft"
                   >
                     <AppstoreAddOutlined
-                      style={{ color: 'white', fontSize: '40px' }}
+                      style={{ color: 'black', fontSize: '32px' }}
                     />
                   </Dropdown>
                 </Col>
@@ -183,10 +205,11 @@ const HeaderContainer = () => {
                 >
                   <Dropdown
                     overlay={
-                      <Menu
-                        // onClick={handleMenuClick}
-                        items={menuItemProduct}
-                      />
+                      menuItemProduct?.length > 0 ?
+                        <Menu
+                          // onClick={handleMenuClick}
+                          items={menuItemProduct}
+                        /> : <div></div>
                     }
                     placement="bottom"
                   >
@@ -219,14 +242,14 @@ const HeaderContainer = () => {
                     >
                       <ShoppingCartOutlined
                         onClick={() => navigate('/cart')}
-                        style={{ color: 'white', fontSize: '32px' }}
+                        style={{ color: 'black', fontSize: '32px' }}
                       />
                     </Badge>
                   </div>
                   <Dropdown
                     overlay={
                       localStorage.getItem('__role') === 'R02' ||
-                      !localStorage.getItem('__role')
+                        !localStorage.getItem('__role')
                         ? menuGuest
                         : menuUser
                     }
@@ -236,13 +259,30 @@ const HeaderContainer = () => {
                       <Avatar src="https://joeschmoe.io/api/v1/random" />
                     </div>
                   </Dropdown>
-                  <Button type="link" onClick={() => navigate('/blog')}>
+                  {/* <Button type="link" onClick={() => navigate('/blog')}>
                     Blog
-                  </Button>
+                  </Button> */}
                 </Col>
               </Row>
             </Col>
           </Row>
+          {/* <Row>
+            <Col span={16} offset={4}>
+              <Row>
+                <Col>
+                  <Dropdown overlay={<Menu items={categoriesMenu}></Menu>} trigger={['click']}>
+                    <Button onClick={() => setOpen(!open)} style={{ width: '300px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
+                        Categories
+                        {open ? <LeftOutlined rotate={-90} style={{ fontSize: '10px' }} /> : <LeftOutlined rotate={0} style={{ fontSize: '10px' }} />}
+
+                      </div>
+                    </Button>
+                  </Dropdown>
+                </Col>
+              </Row>
+            </Col>
+          </Row> */}
         </Header>
       </Affix>
     </div>

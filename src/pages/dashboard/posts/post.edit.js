@@ -306,7 +306,7 @@ const PostEdit = ({
               onChange={handleChange}
               defaultFileList={defaultFileList}
               beforeUpload={(file) => {
-                beforeUpload(file);
+                return beforeUpload(file);
               }}
               showUploadList={true}
               customRequest={fakeUpload}

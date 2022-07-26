@@ -8,11 +8,8 @@ import logo from 'assets/logo-new.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
-import {
-  authAction,
-  loginStart,
-  selectRole,
-} from 'redux/features/auth/authSlice';
+import { authAction, loginStart, selectRole } from 'redux/features/auth/authSlice';
+
 import { result } from 'lodash';
 import request from 'util/request';
 
@@ -46,21 +43,21 @@ const Login = (props) => {
         if (currentUser?.role === 'R03') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/product');
+          navigate('/dashboard');
           return;
         }
 
         if (currentUser?.role === 'R04' || currentUser?.role === 'R05') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/order');
+          navigate('/dashboard');
           return;
         }
 
         if (currentUser?.role === 'R00') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/user');
+          navigate('/dashboard');
           return;
         }
 

@@ -327,9 +327,9 @@ const ProductEdit = ({
                         ]}
                       >
                         <Select>
-                          <Option value="submitted">submitted</Option>
-                          <Option value="cancelled">cancelled</Option>
-                          <Option value="success">success</Option>
+                          <Option value="submitted">Đợi xác nhận</Option>
+                          <Option value="cancelled">Hủy</Option>
+                          <Option value="success">Thành công</Option>
                         </Select>
                       </Form.Item>
                     </Col>

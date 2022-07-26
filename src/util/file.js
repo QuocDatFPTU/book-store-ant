@@ -1,3 +1,4 @@
+import { async } from '@firebase/util';
 import { message } from 'antd';
 import { storage } from 'firebase';
 import {
@@ -49,7 +50,6 @@ export const fakeUpload = async (options) => {
 };
 
 export const uploadFileToFirebase = async (file) => {
-  console.log('firebase', file);
   const storageRef = ref(storage, 'images/' + `${Date.now() + file.name}`);
   const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -92,4 +92,108 @@ export const uploadFileToFirebase = async (file) => {
   // 👆 getDownloadURL returns a promise too, so... yay more await
 
   return downloadURL; // 👈 return the URL to the caller
+};
+
+export const uploadMultipleFileToFirebase = async (fileList) => {
+  const urls = [];
+  const promises = [];
+  fileList.map((file) => {
+    const storageRef = ref(storage, 'images/' + `${Date.now() + file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file?.originFileObj);
+    promises.push(uploadTask);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // const progress = Math.round(
+        //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        // );
+        // setProgress(progress);
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          urls.push(url);
+          console.log('url', url)
+        });
+      }
+    );
+  });
+  // await Promise.all(promises).then(task => {
+  //   console.log('data', data);
+  // });
+  return urls;
+};
+// for (let i = 0; i < fileList.length; i++) {
+//   const storageRef = ref(storage, 'images/' + `${Date.now() + fileList[i].name}`);
+//   const uploadTask = uploadBytesResumable(storageRef, fileList[i]?.originFileObj);
+//   uploadTask.on(
+//     'state_changed',
+//     (snapshot) => {
+//       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+//       // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+//       // console.log('Upload is ' + progress + '% done');
+//       // switch (snapshot.state) {
+//       // 	case 'paused':
+//       // 		console.log('Upload is paused');
+//       // 		break;
+//       // 	case 'running':
+//       // 		console.log('Upload is running');
+//       // 		break;
+//       // }
+//     },
+//     (error) => {
+//       // A full list of error codes is available at
+//       // https://firebase.google.com/docs/storage/web/handle-errors
+//       switch (error.code) {
+//         case 'storage/unauthorized':
+//           // User doesn't have permission to access the object
+//           break;
+//         case 'storage/canceled':
+//           // User canceled the upload
+//           break;
+
+//         // ...
+
+//         case 'storage/unknown':
+//           // Unknown error occurred, inspect error.serverResponse
+//           break;
+//       }
+//     },
+//     () => {
+//       getDownloadURL(uploadTask.snapshot.ref).then(url => { console.log('url', url); urls.push(url) });
+//     }
+//   );
+// }
+
+
+
+// // await uploadTask;
+// // const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+// // // 👆 getDownloadURL returns a promise too, so... yay more await
+
+// return urls; // 👈 return the URL to the caller
+// };
+
+const uploadFileAndGetDownloadURL = async (ref, file) => {
+  try {
+    const snap = await uploadBytesResumable(ref, file);
+    const downloadURL = await getDownloadURL(snap.ref);
+    return downloadURL;
+  } catch (error) {
+    message.error("Tải ảnh lỗi vùi lòng tải lại trang!")
+  }
+};
+
+export const sendImageToFirebase = async (fileList) => {
+  const promises = [];
+  fileList.forEach((image, i) => {
+    const storageRef = ref(storage, 'images/' + `${Date.now() + image.name}`);
+    promises.push(uploadFileAndGetDownloadURL(storageRef, image));
+  });
+
+  //Your array with the urls
+  const urlsArray = await Promise.all(promises);
+  return urlsArray;
 };

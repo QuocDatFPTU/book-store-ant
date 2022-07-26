@@ -3,6 +3,7 @@ import { Layout, Menu } from 'antd';
 import Icon, {
   ApartmentOutlined,
   CopyOutlined,
+  DashboardOutlined,
   OrderedListOutlined,
   PieChartOutlined,
   SlidersOutlined,
@@ -55,8 +56,16 @@ const DashboardSider = () => {
       )}
       <Menu theme="light" mode="inline" className="menu-list">
         <>
+          <Menu.Item
+            key="0"
+            icon={<DashboardOutlined />}
+            onClick={() => navigate('/dashboard/')}
+          >
+            Dashboard
+          </Menu.Item>
           {localStorage.getItem('__role') === 'R03' && (
             <>
+
               <Menu.Item
                 key="1"
                 icon={<PieChartOutlined />}
@@ -89,14 +98,14 @@ const DashboardSider = () => {
           )}
           {(localStorage.getItem('__role') === 'R04' ||
             localStorage.getItem('__role') === 'R05') && (
-            <Menu.Item
-              key="3"
-              icon={<OrderedListOutlined />}
-              onClick={() => navigate('/dashboard/order')}
-            >
-              Order
-            </Menu.Item>
-          )}
+              <Menu.Item
+                key="3"
+                icon={<OrderedListOutlined />}
+                onClick={() => navigate('/dashboard/order')}
+              >
+                Order
+              </Menu.Item>
+            )}
           {localStorage.getItem('__role') === 'R00' && (
             <Menu.Item
               key="6"

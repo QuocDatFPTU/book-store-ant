@@ -319,7 +319,7 @@ const HomePage = () => {
                       />
                     }
                   >
-                    <a href={`/product-list/${item._id}`}>{item.name}</a>
+                    <a style={{ color: '#646464', fontSize: '1.5rem' }} href={`/product-list/${item._id}`}>{item.name}</a>
                   </Card>
                 </a>
               </Col>
