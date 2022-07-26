@@ -7,6 +7,7 @@ import Icon, {
   OrderedListOutlined,
   PieChartOutlined,
   SlidersOutlined,
+  StarOutlined,
   UsergroupDeleteOutlined,
 } from '@ant-design/icons';
 import logo from 'assets/logo-new.png';
@@ -89,10 +90,17 @@ const DashboardSider = () => {
               </Menu.Item>
               <Menu.Item
                 key="5"
-                icon={<SlidersOutlined />}
+                icon={<SlidersOutlined /> }
                 onClick={() => navigate('/dashboard/slider')}
               >
                 Slider
+              </Menu.Item>
+              <Menu.Item
+                key="9"
+                icon={<StarOutlined />} 
+                onClick={() => navigate('/dashboard/feedback')}
+              >
+                Feedback
               </Menu.Item>
             </>
           )}

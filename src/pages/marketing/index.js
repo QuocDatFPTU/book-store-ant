@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Card, Col, Layout, PageHeader, Row } from 'antd'
 import TableCustom from 'components/CustomTable'
 import { getDashboardMarketing } from './dashboard.service';
-import { firstColumns, firstData, secondColumns, secondData, labels } from './constants';
-import faker from 'faker';
-
+import { firstColumns, firstData, secondColumns, secondData, labels, fourthColumns, fifthColumns } from './constants';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -31,8 +29,24 @@ ChartJS.register(
 function MarketingDashboard() {
     const [params, setParams] = useState();
     const [loading, setLoading] = useState(false);
-    const [dataMarketing, setDataMarketing] = useState();
-    const [data, setData] = useState([]);
+    const [dataMarketing, setDataMarketing] = useState([]);
+    const [dataMarketingCustomer, setDataMarketingCustomer] = useState([]);
+    const [dataMarketingFeedback, setDataMarketingFeedback] = useState([]);
+    const [dataMarketingProduct, setDataMarketingProduct] = useState([]);
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        const result = await getDashboardMarketing();
+        if (result) {
+            setDataMarketing(result.latestPosts);
+            setDataMarketingCustomer(result.customers);
+            setDataMarketingFeedback(result.latestFeedbacks);
+            setDataMarketingProduct(result.products);
+        }
+    };
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
 
     const options = {
         responsive: true,
@@ -60,21 +74,7 @@ function MarketingDashboard() {
         ],
     };
 
-    const fetchDashboardData = () => {
-        setLoading(true);
-        getDashboardMarketing()
-            .then((result) => {
-                console.log(result);
-                setData([...result]);
-                // setTotalItem(result?.count);
-                setLoading(false);
-            })
-            .catch((e) => setLoading(false));
-    };
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, []);
 
     return (
         <Layout className="layoutContent">
@@ -85,27 +85,35 @@ function MarketingDashboard() {
                 className="customPageHeader"
             />
             <Layout.Content>
-                <Row style={{ marginBottom: '10px' }}>
-                    <Col offset={4}>
-                        <Card>
-                            <Line options={options} data={dataChart} height="400px" width="1000px" />
-                        </Card>
-                    </Col>
-                </Row>
+
                 <Row style={{ height: 400, marginBottom: 40 }}>
                     {/* // top 5 post gần đây (dùng table) */}
                     <Col lg={{ span: 11 }} style={{ marginLeft: '10px', marginRight: '20px' }}>
-                        <TableCustom columns={firstColumns} dataSource={firstData} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Top 5 post gần đây</span>} pagination={false} />
+                        <TableCustom columns={firstColumns} dataSource={dataMarketing} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Top 5 post gần đây</span>} pagination={false} />
                     </Col>
                     {/* // thông số bán hàng(dùng chart) */}
                     <Col lg={{ span: 11 }}
                     // style={{ minHeight: 400 }}
                     >
-                        <TableCustom columns={secondColumns} dataSource={secondData} size="middle " title={() => <span style={{ fontSize: "bold" }}>Thông số khách hàng</span>} pagination={false} />
+                        <TableCustom columns={secondColumns} dataSource={dataMarketingCustomer} size="middle" scroll={{ y: 400 }} title={() => <span style={{ fontSize: "bold" }}>Thông số khách hàng</span>} pagination={false} />
                     </Col>
                     {/* // thông số khách hàng(email, số tiền chi trả) (dùng table) */}
 
                     {/* //khác hàng gần đây (dùng table) */}
+                </Row>
+                <Row style={{ marginBottom: '10px' }}>
+                    <Col lg={{ span: 11 }} style={{ marginLeft: '10px', marginRight: '20px' }}>
+                        {/* <Card>
+                            <Line options={options} data={dataChart} height="400px" width="1000px" />
+                        </Card> */}
+                        <TableCustom columns={fourthColumns} dataSource={dataMarketingFeedback} size="middle " scroll={{ y: 400 }} title={() => <span style={{ fontSize: "bold" }}>Feedback gần đây</span>} pagination={false} />
+                    </Col>
+                    <Col lg={{ span: 11 }}>
+                        {/* <Card>
+                            <Line options={options} data={dataChart} height="400px" width="1000px" />
+                        </Card> */}
+                        <TableCustom columns={fifthColumns} dataSource={dataMarketingProduct} size="middle " scroll={{ y: 400 }} title={() => <span style={{ fontSize: "bold" }}>Sản phẩm</span>} pagination={false} />
+                    </Col>
                 </Row>
             </Layout.Content>
         </Layout>

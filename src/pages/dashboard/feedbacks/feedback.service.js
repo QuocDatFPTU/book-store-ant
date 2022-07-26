@@ -1,8 +1,8 @@
 import axiosClient from 'util/axiosClient';
 
 //saler
-export const getOrderList = async (params) => {
-  const url = '/orders/saler';
+export const getFeedbackList = async (params) => {
+  const url = '/feedbacks/marketing';
   return axiosClient.get(url, { params });
 };
 
