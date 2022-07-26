@@ -43,21 +43,21 @@ const Login = (props) => {
         if (currentUser?.role === 'R03') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/product');
+          navigate('/dashboard');
           return;
         }
 
         if (currentUser?.role === 'R04' || currentUser?.role === 'R05') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/order');
+          navigate('/dashboard');
           return;
         }
 
         if (currentUser?.role === 'R00') {
           message.success('Đăng nhập thành công');
           setLoading(true);
-          navigate('/dashboard/user');
+          navigate('/dashboard');
           return;
         }
 

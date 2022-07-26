@@ -223,12 +223,12 @@ const ProductEdit = ({
     category: currentRow ? currentRow?.category._id : undefined,
     briefInformation: currentRow
       ? {
-          author: currentRow?.briefInformation?.author,
-          language: currentRow?.briefInformation?.language,
-          pages: currentRow?.briefInformation?.pages,
-          publicDate: moment(currentRow?.briefInformation?.publicDate),
-          publisher: currentRow?.briefInformation?.publisher,
-        }
+        author: currentRow?.briefInformation?.author,
+        language: currentRow?.briefInformation?.language,
+        pages: currentRow?.briefInformation?.pages,
+        publicDate: moment(currentRow?.briefInformation?.publicDate),
+        publisher: currentRow?.briefInformation?.publisher,
+      }
       : undefined,
   };
   return (
@@ -447,7 +447,7 @@ const ProductEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
-              // fileList={fileList}
+           
             >
               {uploadButton}
             </Upload>

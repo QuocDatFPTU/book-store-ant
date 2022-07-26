@@ -48,15 +48,15 @@ function* login(action) {
 
 function* logout(action) {
     yield call(request, '/user/logoutAll', {});
-    yield localStorage.removeItem('__role');
-    yield localStorage.removeItem('__token');
+    localStorage.removeItem('__role');
+    localStorage.removeItem('__token');
 
 }
 
 function* watchLoginFlown() {
     while (true) {
         const isLoginIn = Boolean(localStorage.getItem('__token'));
-        if (!isLoginIn) {
+        if (!isLoginIn || localStorage.getItem('__role') === 'R02') {
             const action = yield take(authAction.loginStart.type)
             yield fork(login, action)
         } else {

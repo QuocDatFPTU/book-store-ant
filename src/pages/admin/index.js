@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Col, Layout, PageHeader, Row } from 'antd'
+import { Card, Col, Layout, PageHeader, Row, Statistic } from 'antd'
 import TableCustom from 'components/CustomTable'
 import { getDashboardMarketing } from './dashboard.service';
 import { firstColumns, firstData, secondColumns, secondData, labels, thridColumns, thridData } from './constants';
 import faker from 'faker';
-
+import './style.less'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -83,7 +83,45 @@ function AdminDashboard() {
                 title="Dashboard"
                 // extra={extraButton}
                 className="customPageHeader"
-            />
+            >
+                <div className="site-statistic-demo-card">
+                    <Row gutter={16} >
+                        <Col span={8}>
+                            <Card>
+                                <Statistic
+                                    title="Đợi xác nhân"
+                                    value={11.28}
+                                    valueStyle={{
+                                        color: '#ffc300',
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={8}>
+                            <Card>
+                                <Statistic
+                                    title="Hoàn thành"
+                                    value={9}
+                                    valueStyle={{
+                                        color: '#3f8600',
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={8}>
+                            <Card>
+                                <Statistic
+                                    title="Hủy"
+                                    value={9}
+                                    valueStyle={{
+                                        color: '#cf1322',
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+            </PageHeader>
             <Layout.Content>
                 <Row style={{ marginBottom: '10px' }} >
                     <Col lg={{ span: 11 }} offset={1}>

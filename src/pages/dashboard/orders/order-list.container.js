@@ -105,10 +105,10 @@ const ManageOrderList = () => {
     {
       title: 'số lượng sản phẩm',
       dataIndex: 'items',
-      // key: 'items',
+      align: 'center', // key: 'items',
       width: '12%',
       render: (items, record) => {
-        return <p>{items?.length}</p>;
+        return items?.length
       },
     },
     {

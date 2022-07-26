@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.less';
@@ -37,6 +37,7 @@ import MarketingDashboard from 'pages/marketing';
 import SaleDashboard from 'pages/sale';
 import AdminDashboard from 'pages/admin'
 import VerifyAccountPage from 'pages/home/verify-account';
+import { current } from '@reduxjs/toolkit';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -89,10 +90,13 @@ const App = () => {
             <Route
               path="dashboard"
               element={
-                <DashboardLayout sider={<DashboardSider />} title="Admin" />
+                <DashboardLayout sider={<DashboardSider />} title="Dashboard" />
               }
             >
-              <Route path="" element={<AdminDashboard />} />
+              {currentUser?.role === 'R00' && <Route path="" element={<AdminDashboard />} />}
+              {currentUser?.role === 'R05' || currentUser?.role === 'R04' && <Route path="" element={<SaleDashboard />} />}
+              {currentUser?.role === 'R03' && <Route path="" element={<MarketingDashboard />} />}
+              {/* <Route path="" element={<AdminDashboard />} /> */}
               <Route path="product" element={<ManageProductList />} />
               <Route path="customer" element={<ManageCustomerList />} />
               <Route path="order" element={<ManageOrderList />} />
