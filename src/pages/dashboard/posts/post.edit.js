@@ -33,11 +33,9 @@ const PostEdit = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
   const [fileList, setFileList] = useState([]);
   const [defaultFileList, setDefaultFileList] = useState([]);
   const { TextArea } = Input;
-  const { Option } = Select;
 
   const getDefaultFileList = (record) => {
     return [
@@ -198,7 +196,7 @@ const PostEdit = ({
       : undefined,
     category: currentRow ? currentRow?.category._id : undefined,
   };
-  console.log(initalValue.thumbnail);
+
   return (
     <Modal
       title={currentRow ? 'Cập nhật blog' : 'Tạo blog'}

@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   message,
+  Upload,
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,9 +17,11 @@ import {
   UserOutlined,
   GoogleOutlined,
   PhoneOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { getUserInformation, updateUserInformation } from './service';
+import { fakeUpload, uuidv4 } from 'util/file';
 // import './styles.less';
 const { Option } = Select;
 
@@ -54,7 +57,42 @@ const ProfilePage = () => {
   // State
   const naviage = useNavigate();
   const [profile, setProfile] = useState({});
+  const [defaultFileList, setDefaultFileList] = useState([]);
 
+  //Upload avatar
+  const [fileList, setFileList] = useState([]);
+  const getDefaultFileList = (record) => {
+    return [
+      {
+        uid: uuidv4(),
+        name: 'image',
+        url: record,
+      },
+    ];
+  };
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
+  const onRemove = async (file) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+
+    setFileList(newFileList);
+  };
+  const handleChange = ({ fileList }) =>
+    setFileList(fileList.filter((file) => file.status !== 'error'));
+
+  console.log(fileList);
   // useEffect
   const onFinish = async (values) => {
     try {
@@ -71,12 +109,25 @@ const ProfilePage = () => {
     getUserInformation()
       .then((result) => {
         const { address, email, fullName, gender, phone } = result.user;
+        setDefaultFileList([
+          ...[],
+          {
+            uid: uuidv4(),
+            name: 'image',
+            url: result?.avatar?.img,
+          },
+        ]);
+        getDefaultFileList(result?.avatar?.img);
         const user = { address, email, fullName, gender, phone };
         form.setFieldsValue({ ...user });
       })
       .catch((error) => {
         console.log(error.response);
       });
+
+    return () => {
+      setDefaultFileList([]);
+    };
   }, []);
 
   return (
@@ -94,7 +145,23 @@ const ProfilePage = () => {
         <h3>Thông tin chung</h3>
         <Row>
           <Col span={4} offset={2}>
-            <Avatar size={100} icon={<UserOutlined />} />
+            {/* <Avatar size={100} icon={<UserOutlined />} /> */}
+            <Upload
+              accept="image/*"
+              maxCount={1}
+              className="UploadImage"
+              listType="picture-card"
+              onChange={handleChange}
+              defaultFileList={defaultFileList}
+              beforeUpload={(file) => {
+                beforeUpload(file);
+              }}
+              showUploadList={true}
+              customRequest={fakeUpload}
+              onRemove={onRemove}
+            >
+              {uploadButton}
+            </Upload>
           </Col>
           <Col span={16}>
             <Form

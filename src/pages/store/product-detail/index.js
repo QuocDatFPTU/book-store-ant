@@ -241,7 +241,7 @@ const ProductDetail = () => {
           <Row style={{ padding: '20px', backgroundColor: 'white' }}>
             <Col className="detail-images" span={10}>
               <Row>
-                <Col span={3}>
+                {/* <Col span={3}>
                   <Image.PreviewGroup>
                     {[
                       'https://cdn0.fahasa.com/media/catalog/product/8/9/8936071672704.jpg',
@@ -260,7 +260,7 @@ const ProductDetail = () => {
                       </div>
                     ))}
                   </Image.PreviewGroup>
-                </Col>
+                </Col> */}
                 <Col style={{ textAlign: 'center' }} span={21}>
                   <Image
                     height={'34vh'}

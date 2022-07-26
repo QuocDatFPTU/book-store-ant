@@ -307,7 +307,7 @@ const InformationOrder = () => {
               >
                 Hủy đơn hàng
               </Button>
-              <Button
+              {/* <Button
                 block={false}
                 className="infor-min"
                 style={{
@@ -317,7 +317,7 @@ const InformationOrder = () => {
                 }}
               >
                 Cập nhật
-              </Button>
+              </Button> */}
             </Col>
           ) : undefined}
         </Row>

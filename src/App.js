@@ -37,6 +37,7 @@ import MarketingDashboard from 'pages/marketing';
 import SaleDashboard from 'pages/sale';
 import AdminDashboard from 'pages/admin'
 import VerifyAccountPage from 'pages/home/verify-account';
+import ManageFeedbackList from 'pages/dashboard/feedbacks/feedback-list.container';
 import { current } from '@reduxjs/toolkit';
 const AppWrapper = () => {
   return (
@@ -103,6 +104,7 @@ const App = () => {
               <Route path="post" element={<ManagePostList />} />
               <Route path="slider" element={<ManageSliderList />} />
               <Route path="user" element={<AccountList />} />
+              <Route path="feedback" element={<ManageFeedbackList />} />
             </Route>
           </Routes>
         </BrowserRouter>

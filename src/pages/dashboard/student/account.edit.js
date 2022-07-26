@@ -138,7 +138,6 @@ const AccountEdit = ({
             avatar: { img: imageUrl },
           };
         }
-        console.log(createData, '?????');
         await createUser(createData)
           .then((result) => {
             if (result) {

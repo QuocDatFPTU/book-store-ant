@@ -19,7 +19,7 @@ import {
   getSalerListSaleManager,
   updateOrder,
   updateOrderSaleManager,
-} from './order.service';
+} from './feedback.service';
 import { uploadFileToFirebase, uuidv4 } from 'util/file';
 import moment from 'moment';
 import { DateFormat, MoneyFormat } from 'components/format';
@@ -327,9 +327,9 @@ const ProductEdit = ({
                         ]}
                       >
                         <Select>
-                          <Option value="submitted">Đợi xác nhận</Option>
-                          <Option value="cancelled">Hủy</Option>
-                          <Option value="success">Thành công</Option>
+                          <Option value="submitted">submitted</Option>
+                          <Option value="cancelled">cancelled</Option>
+                          <Option value="success">success</Option>
                         </Select>
                       </Form.Item>
                     </Col>
