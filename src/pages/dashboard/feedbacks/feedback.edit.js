@@ -19,7 +19,7 @@ import {
   getSalerListSaleManager,
   updateOrder,
   updateOrderSaleManager,
-} from './order.service';
+} from './feedback.service';
 import { uploadFileToFirebase, uuidv4 } from 'util/file';
 import moment from 'moment';
 import { DateFormat, MoneyFormat } from 'components/format';

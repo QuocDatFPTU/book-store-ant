@@ -40,12 +40,14 @@ const Register = (props) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   async function handleSubmit(value) {
     // setLoading(true);
     await dispatch(registerInitiate(value))
       //REGISTER SUCESS
       .then(async (result) => {
+        setIsSendingEmail(true);
         // if (localStorage.getItem('__role') === 'R01') {
         //   console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
         //   try {
@@ -126,114 +128,138 @@ const Register = (props) => {
               md={24}
               style={{ display: 'flex', justifyContent: 'center' }}
             >
-              <Form
-                layout="horizontal"
-                name="normal_login"
-                className="login-form"
-                onFinish={handleSubmit}
-                style={{ width: 300 }}
-                validateMessages={validateMessages}
-              >
-                <Form.Item
-                  name="fullName"
-                  rules={[{ required: true, message: 'Nhập họ và tên!' }]}
+              {!isSendingEmail && (
+                <Form
+                  layout="horizontal"
+                  name="normal_login"
+                  className="login-form"
+                  onFinish={handleSubmit}
+                  style={{ width: 300 }}
+                  validateMessages={validateMessages}
                 >
-                  <Input
-                    prefix={<UserOutlined className="site-form-item-icon" />}
-                    placeholder="Họ và tên"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="email"
-                  rules={[
-                    {
-                      required: 'true',
-                      message: 'Nhập Email!',
-                    },
-                    {
-                      type: 'email',
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<GoogleOutlined className="site-form-item-icon" />}
-                    placeholder="Email"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="phone"
-                  rules={[
-                    {
-                      required: 'true',
-                      message: 'Nhập số điện thoại!',
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<PhoneOutlined className="site-form-item-icon" />}
-                    placeholder="Số điện thoại"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="address"
-                  rules={[
-                    {
-                      required: 'true',
-                      message: 'Nhập địa chỉ!',
-                    },
-                  ]}
-                >
-                  <Input
-                    prefix={<HomeOutlined className="site-form-item-icon" />}
-                    placeholder="Địa chỉ"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="password"
-                  rules={[
-                    { required: true, message: 'Nhập mật khẩu!' },
-                    { min: 8, message: 'Mật khẩu phải có ít nhất độ dài là 8' },
-                  ]}
-                >
-                  <Input.Password
-                    prefix={<LockOutlined className="site-form-item-icon" />}
-                    placeholder="Mật khẩu"
-                    autoComplete="new-password"
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="gender"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Chọn giới tính',
-                    },
-                  ]}
-                >
-                  <Select placeholder="Giới tính" allowClear>
-                    <Select.Option value="M">male</Select.Option>
-                    <Select.Option value="F">female</Select.Option>
-                    <Select.Option value="D">other</Select.Option>
-                  </Select>
-                </Form.Item>
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="login-form-button"
-                    loading={loading}
+                  <Form.Item
+                    name="fullName"
+                    rules={[{ required: true, message: 'Nhập họ và tên!' }]}
                   >
-                    Đăng ký
-                  </Button>
-                </Form.Item>
-                <p style={{ textAlign: 'center' }}>
-                  Quay lại <span> </span>
+                    <Input
+                      prefix={<UserOutlined className="site-form-item-icon" />}
+                      placeholder="Họ và tên"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="email"
+                    rules={[
+                      {
+                        required: 'true',
+                        message: 'Nhập Email!',
+                      },
+                      {
+                        type: 'email',
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={
+                        <GoogleOutlined className="site-form-item-icon" />
+                      }
+                      placeholder="Email"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="phone"
+                    rules={[
+                      {
+                        required: 'true',
+                        message: 'Nhập số điện thoại!',
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={<PhoneOutlined className="site-form-item-icon" />}
+                      placeholder="Số điện thoại"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="address"
+                    rules={[
+                      {
+                        required: 'true',
+                        message: 'Nhập địa chỉ!',
+                      },
+                    ]}
+                  >
+                    <Input
+                      prefix={<HomeOutlined className="site-form-item-icon" />}
+                      placeholder="Địa chỉ"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="password"
+                    rules={[
+                      { required: true, message: 'Nhập mật khẩu!' },
+                      {
+                        min: 8,
+                        message: 'Mật khẩu phải có ít nhất độ dài là 8',
+                      },
+                    ]}
+                  >
+                    <Input.Password
+                      prefix={<LockOutlined className="site-form-item-icon" />}
+                      placeholder="Mật khẩu"
+                      autoComplete="new-password"
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="gender"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Chọn giới tính',
+                      },
+                    ]}
+                  >
+                    <Select placeholder="Giới tính" allowClear>
+                      <Select.Option value="M">male</Select.Option>
+                      <Select.Option value="F">female</Select.Option>
+                      <Select.Option value="D">other</Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      className="login-form-button"
+                      loading={loading}
+                    >
+                      Đăng ký
+                    </Button>
+                  </Form.Item>
+                  <p style={{ textAlign: 'center' }}>
+                    Quay lại <span> </span>
+                    <Typography.Link onClick={() => navigate('/login')}>
+                      đăng nhập
+                    </Typography.Link>
+                  </p>
+                </Form>
+              )}
+              {isSendingEmail && (
+                <div
+                  style={{
+                    backgroundColor: 'grey',
+                    border: '5px',
+                    padding: '10px',
+                  }}
+                >
+                  <h4>Email xác nhận đã được gửi đến Email của bạn</h4>
+                  {/* <p style={{ textAlign: 'center' }}>
+                  Bạn chưa nhận được emal? <span> </span>
                   <Typography.Link onClick={() => navigate('/login')}>
-                    đăng nhập
+                    Gửi lại
                   </Typography.Link>
-                </p>
-              </Form>
+                </p> */}
+                </div>
+              )}
             </Col>
           </Row>
         </Col>

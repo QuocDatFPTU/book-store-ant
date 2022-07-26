@@ -34,6 +34,7 @@ import ManageOrderList from 'pages/dashboard/orders/order-list.container';
 import ManageCustomerList from 'pages/dashboard/customers/customer-list.container';
 import CartCompletion from 'pages/store/cart-completion';
 import VerifyAccountPage from 'pages/home/verify-account';
+import ManageFeedbackList from 'pages/dashboard/feedbacks/feedback-list.container';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -95,6 +96,7 @@ const App = () => {
               <Route path="post" element={<ManagePostList />} />
               <Route path="slider" element={<ManageSliderList />} />
               <Route path="user" element={<AccountList />} />
+              <Route path="feedback" element={<ManageFeedbackList />} />
             </Route>
           </Routes>
         </BrowserRouter>
