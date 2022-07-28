@@ -7,13 +7,13 @@ export const firstColumns = [
     {
 
         title: 'Mã đơn hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        dataIndex: '_id',
+        key: '_id',
     },
     {
-        title: 'Ngày vận chuyển',
-        dataIndex: 'shippedDate',
-        key: 'shippedDate',
+        title: 'Ngày',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
         render: (text) => {
             return moment(text).format(formatDate)
         }
@@ -23,14 +23,14 @@ export const firstColumns = [
 export const secondColumns = [
     {
 
-        title: 'Mã đơn hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        title: 'Ngày',
+        dataIndex: 'date',
+        key: 'date',
     },
     {
-        title: 'Trạng thái',
-        dataIndex: 'status',
-        key: 'status',
+        title: 'Tổng',
+        dataIndex: 'total',
+        key: 'total',
     },
 ];
 
@@ -39,21 +39,29 @@ export const thridColumns = [
     {
 
         title: 'Mã đon hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        dataIndex: '_id',
+        key: '_id',
     },
     {
-        title: 'Ngày vận chuyển',
-        dataIndex: 'shippedDate',
-        key: 'shippedDate',
+        title: 'Ngày',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
         render: (text) => {
             return moment(text).format(formatDate)
         }
     },
     {
-        title: 'Doanh thu',
-        dataIndex: 'amount',
-        key: 'amount',
+        title: 'Trạng thái',
+        dataIndex: 'status',
+        key: 'status',
+        // render: (text, record) => {
+        //     return record?.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        // }
+    },
+    {
+        title: 'Tổng',
+        dataIndex: 'totalCost',
+        key: 'totalCost',
         // render: (text, record) => {
         //     return record?.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         // }

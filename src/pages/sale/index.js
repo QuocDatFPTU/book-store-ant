@@ -33,7 +33,9 @@ function SaleDashboard() {
     const [loading, setLoading] = useState(false);
     const [dataMarketing, setDataMarketing] = useState();
     const [data, setData] = useState([]);
-
+    const [dataSaleLatestOrder, setDataSaleLatestOrder] = useState();
+    const [dataLatestTotalOrders, setDataLatestTotalOrders] = useState();
+    const [dataRevenues, setDataRevenues] = useState();
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -64,8 +66,9 @@ function SaleDashboard() {
         setLoading(true);
         getDashboardMarketing()
             .then((result) => {
-                console.log(result);
-                setData([...result]);
+                setDataSaleLatestOrder(result?.latestSuccessOrders);
+                setDataLatestTotalOrders(result?.latestTotalOrders);
+                setDataRevenues(result?.revenues);
                 // setTotalItem(result?.count);
                 setLoading(false);
             })
@@ -87,19 +90,19 @@ function SaleDashboard() {
             <Layout.Content>
                 <Row style={{ marginBottom: '10px' }}>
                     <Col >
-                        <TableCustom columns={thridColumns} dataSource={thridData} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Tổng đơn hàng</span>} pagination={false} />
+                        <TableCustom columns={thridColumns} dataSource={dataLatestTotalOrders} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Tổng đơn hàng</span>} pagination={false} />
                     </Col>
                 </Row>
                 <Row style={{ height: 400, marginBottom: 40, marginTop: 40 }}>
                     {/* // top 5 post gần đây (dùng table) */}
                     <Col lg={{ span: 11 }} style={{ marginLeft: '10px', marginRight: '20px' }}>
-                        <TableCustom columns={firstColumns} dataSource={firstData} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Đơn hàng thành công</span>} pagination={false} />
+                        <TableCustom columns={firstColumns} dataSource={dataSaleLatestOrder} scroll={{ y: 320 }} title={() => <span style={{ fontSize: "bold" }}>Đơn hàng thành công</span>} pagination={false} />
                     </Col>
                     {/* // thông số bán hàng(dùng chart) */}
                     <Col lg={{ span: 11 }}
                     // style={{ minHeight: 400 }}
                     >
-                        <TableCustom columns={secondColumns} dataSource={secondData} title={() => <span style={{ fontSize: "bold" }}>Doanh thu</span>} pagination={false} scroll={{ y: 210 }} />
+                        <TableCustom columns={secondColumns} dataSource={dataRevenues} title={() => <span style={{ fontSize: "bold" }}>Doanh thu</span>} pagination={false} scroll={{ y: 210 }} />
                     </Col>
                     {/* // thông số khách hàng(email, số tiền chi trả) (dùng table) */}
 
