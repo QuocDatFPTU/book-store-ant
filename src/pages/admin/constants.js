@@ -6,31 +6,28 @@ export const firstColumns = [
     //contacts' id, full name, gender, email, mobile, status
     {
 
-        title: 'Mã đơn hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        title: 'Loại sản phẩm',
+        dataIndex: 'category',
+        key: 'category',
     },
     {
-        title: 'Ngày vận chuyển',
-        dataIndex: 'shippedDate',
-        key: 'shippedDate',
-        render: (text) => {
-            return moment(text).format(formatDate)
-        }
+        title: 'Tổng',
+        dataIndex: 'total',
+        key: 'total',
     },
 ];
 
 export const secondColumns = [
     {
 
-        title: 'Mã đơn hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        title: 'Loại sản phẩm',
+        dataIndex: 'category',
+        key: 'category',
     },
     {
-        title: 'Trạng thái',
-        dataIndex: 'status',
-        key: 'status',
+        title: 'Đánh giá',
+        dataIndex: 'avgStar',
+        key: 'avgStar',
     },
 ];
 
@@ -38,25 +35,83 @@ export const thridColumns = [
     //contacts' id, full name, gender, email, mobile, status
     {
 
-        title: 'Mã đon hàng',
-        dataIndex: 'orderId',
-        key: 'orderId',
+        title: 'Ngày',
+        dataIndex: 'date',
+        key: 'date',
+        // render: (text) => {
+        //     return moment(text).format(formatDate)
+        // }
     },
     {
-        title: 'Ngày vận chuyển',
-        dataIndex: 'shippedDate',
-        key: 'shippedDate',
+        title: 'Thành công',
+        dataIndex: 'success',
+        key: 'success',
+
+    },
+    {
+        title: 'Đợi xác nhận',
+        dataIndex: 'submitted',
+        key: 'submitted',
+    },
+    {
+        title: 'Hủy',
+        dataIndex: 'cancelled',
+        key: 'cancelled',
+    },
+];
+export const fourthColumns = [
+    //contacts' id, full name, gender, email, mobile, status
+    {
+
+        title: 'Email',
+        dataIndex: 'email',
+        key: 'email',
+        // render: (text) => {
+        //     return moment(text).format(formatDate)
+        // }
+    },
+    {
+        title: 'Tên',
+        dataIndex: 'fullName',
+        key: 'fullName',
+
+    },
+    {
+        title: 'SĐT',
+        dataIndex: 'phone',
+        key: 'phone',
+    },
+];
+
+export const fifthColumns = [
+    //contacts' id, full name, gender, email, mobile, status
+    {
+
+        title: 'Email',
+        dataIndex: 'email',
+        key: 'email',
+        // render: (text) => {
+        //     return moment(text).format(formatDate)
+        // }
+    },
+    {
+        title: 'Tên',
+        dataIndex: 'fullName',
+        key: 'fullName',
+
+    },
+    {
+        title: 'SĐT',
+        dataIndex: 'phone',
+        key: 'phone',
+    },
+    {
+        title: 'Ngày',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
         render: (text) => {
             return moment(text).format(formatDate)
         }
-    },
-    {
-        title: 'Doanh thu',
-        dataIndex: 'amount',
-        key: 'amount',
-        // render: (text, record) => {
-        //     return record?.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        // }
     },
 ];
 
