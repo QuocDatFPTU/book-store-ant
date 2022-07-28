@@ -26,6 +26,7 @@ const InformationOrder = () => {
   const [isEditModal, setIsEditModal] = useState(false);
   const auth = useSelector((state) => state.auth);
 
+  const { currentUser } = useSelector((state) => state.auth);
   // Run first
   const getOrder = async () => {
     getOrderInformation(id)
@@ -277,10 +278,16 @@ const InformationOrder = () => {
               <div className="infor-back">
                 <Button onClick={async () => {
                   const feedback = await getFeedback(order?.items?.[0]?.product?._id);
-                  if (feedback) {
-                    message.warning("Bạn đã feedback!")
-                    return;
+                  for (const feed of feedback) {
+                    if (feed?.user?.email === currentUser?.email) {
+                      message.warning("Bạn đã feedback!")
+                      return;
+                    }
                   }
+                  // if (feedback?.user === currentUser?.email) {
+                  //   message.warning("Bạn đã feedback!")
+                  //   return;
+                  // }
                   setIsEditModal(true)
                 }} >Viết nhận xét</Button>
                 <Button onClick={onRebuy} danger className="infor-return">
@@ -341,14 +348,14 @@ const InformationOrder = () => {
               try {
                 setLoading(true);
                 const urls = await sendImageToFirebase(fileListDone);
-                const image = urls.map(url => ({
+                const images = urls.map(url => ({
                   imageAltDoc: 'images',
                   image: url
                 }))
                 const feedbackData = {
                   ...values,
                   user: auth?.currentUser,
-                  image
+                  images
                 }
                 await createFeedback(order?.items?.[0]?.product?._id, feedbackData)
                 message.success('Tạo mới feedback thành công !');

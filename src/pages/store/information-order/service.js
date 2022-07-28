@@ -16,7 +16,6 @@ export const createFeedback = async (params, payload) => {
 };
 
 export const getFeedback = async (params) => {
-  console.log('pamrasm', params);
   // const orderId = queryString.stringify(params);
   const url = `/feedbacks/product/${params}`;
   return request(url, {}, 'GET');
