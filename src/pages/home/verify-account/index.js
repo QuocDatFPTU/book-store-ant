@@ -12,24 +12,11 @@ const VerifyAccountPage = () => {
     try {
       const user = await axiosClient.post('/user/valid-token', { token });
       await axiosClient.patch(`/user/verify-account/${user._id}`, { token });
+      localStorage.removeItem('__email');
     } catch (error) {
       navigate('/404');
     }
   }, []);
-
-  async function handleSubmit(value) {
-    setLoading(true);
-    const dataUpdate = { ...value, token: id };
-    try {
-      await axiosClient.patch('/user/reset-password', dataUpdate);
-      message.success('Đổi mật khẩu thành công');
-      navigate('/login');
-    } catch (error) {
-      message.error(error.response.data.error);
-    }
-    setLoading(false);
-    return true;
-  }
 
   return (
     <Result
