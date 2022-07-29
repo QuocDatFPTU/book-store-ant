@@ -41,12 +41,15 @@ const Register = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [registerUser, setRegisterUser] = useState();
 
   async function handleSubmit(value) {
     // setLoading(true);
+    localStorage.removeItem('__email');
     await dispatch(registerInitiate(value))
       //REGISTER SUCESS
       .then(async (result) => {
+        console.log(result);
         setIsSendingEmail(true);
         // if (localStorage.getItem('__role') === 'R01') {
         //   console.log('ĐANG LẤY ĐỒ CHƠI NÀY');
@@ -90,6 +93,15 @@ const Register = (props) => {
     return true;
   }
 
+  async function handleSendEmailAgain() {
+    const email = localStorage.getItem('__email');
+    try {
+      await axiosClient.post('/user/resend-email-verify', { email });
+      message.success('Gửi email thành công');
+    } catch (error) {
+      message.error(error?.response?.data?.error);
+    }
+  }
   // Listen to the Firebase Auth state and set the local state.
   return (
     <div className="login-page">
@@ -244,21 +256,64 @@ const Register = (props) => {
                 </Form>
               )}
               {isSendingEmail && (
-                <div
-                  style={{
-                    backgroundColor: 'grey',
-                    border: '5px',
-                    padding: '10px',
-                  }}
-                >
-                  <h4>Email xác nhận đã được gửi đến Email của bạn</h4>
-                  {/* <p style={{ textAlign: 'center' }}>
-                  Bạn chưa nhận được emal? <span> </span>
-                  <Typography.Link onClick={() => navigate('/login')}>
-                    Gửi lại
-                  </Typography.Link>
-                </p> */}
-                </div>
+                <Row>
+                  <Col
+                    style={{
+                      backgroundColor: 'white',
+                      padding: '20px',
+                      borderRadius: '10px',
+                      boxShadow:
+                        'rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px',
+                    }}
+                    span={10}
+                    offset={7}
+                  >
+                    <Row justify="center">
+                      <Col
+                        lg={24}
+                        md={24}
+                        style={{ display: 'flex', justifyContent: 'center' }}
+                      >
+                        <div style={{ color: '#bfbfbf', marginBottom: '10px' }}>
+                          <span style={{ color: 'red' }}>(*) </span>
+                          <span style={{ fontWeight: 'bold' }}>Xác nhận? </span>
+                          Chúng tôi đã gửi đến địa chỉ email một link liên kết
+                          giúp bạn xác nhận tài khoản.
+                          <div>
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              className="login-form-button"
+                              loading={loading}
+                              style={{ marginTop: '10px' }}
+                              onClick={handleSendEmailAgain}
+                            >
+                              Gửi lại Email
+                            </Button>
+                            <div
+                              style={{
+                                textAlign: 'center',
+                                fontSize: '14px',
+                                marginTop: '8px',
+                                width: '100%',
+                              }}
+                            >
+                              <Typography.Link
+                                style={{
+                                  textAlign: 'center',
+                                  fontSize: '14px',
+                                  margin: '0',
+                                }}
+                              >
+                                Không nhận được email?
+                              </Typography.Link>
+                            </div>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
               )}
             </Col>
           </Row>

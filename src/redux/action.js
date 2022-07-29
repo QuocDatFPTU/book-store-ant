@@ -71,7 +71,7 @@ export const loginInitiate = (email, password) => async (dispatch) => {
 export const registerInitiate = (registerUser) => async (dispatch) => {
   dispatch(registerStart);
   try {
-    await axiosClient.post('/user/register', registerUser, {
+    const user = await axiosClient.post('/user/register', registerUser, {
       headers: { 'Content-Type': 'application/json' },
     });
     // const auth_token = await axiosClient.post('/user/register', registerUser, {
@@ -80,8 +80,8 @@ export const registerInitiate = (registerUser) => async (dispatch) => {
     // const decode_token = jwt.decode(auth_token.token);
     // const user = { ...decode_token };
     // localStorage.setItem('__token', auth_token?.token);
-    // localStorage.setItem('__role', user.role);
     // dispatch(registerSuccess(user));
+    localStorage.setItem('__email', user?.user?.email);
     dispatch(registerSuccess());
   } catch (error) {
     dispatch(registerFail());
