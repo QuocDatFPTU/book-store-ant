@@ -42,6 +42,7 @@ const HeaderContainer = () => {
   const dispatch = useDispatch();
   const [categories, setCategories] = useState([]);
   const [username, setUsername] = useState([]);
+  const [avatar, setAvartar] = useState([]);
   const [menuItemProduct, setMenuItemProduct] = useState([]);
   const searchTimeOut = useRef(null)
   const [searchValue, setSearchValue] = useState('');
@@ -51,8 +52,13 @@ const HeaderContainer = () => {
   }, []);
 
   useEffect(() => {
-    request('/user/profile', {}, 'GET').then(({ user }) =>
-      setUsername(user?.fullName)
+    request('/user/profile', {}, 'GET').then(({ user }) => {
+      setUsername(user?.fullName);
+      if (user?.avatar) {
+        setAvartar(user?.avatar);
+      }
+    }
+
     );
   }, [username]);
 
@@ -256,7 +262,7 @@ const HeaderContainer = () => {
                   >
                     <div style={{ color: 'white' }}>
                       {username}
-                      <Avatar src="https://joeschmoe.io/api/v1/random" />
+                      <Avatar src={avatar ? avatar.img : 'https://joeschmoe.io/api/v1/random'} />
                     </div>
                   </Dropdown>
                   {/* <Button type="link" onClick={() => navigate('/blog')}>

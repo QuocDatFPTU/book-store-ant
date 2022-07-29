@@ -20,8 +20,9 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getUserInformation, updateUserInformation } from './service';
-import { fakeUpload, uuidv4 } from 'util/file';
+import { getUserInformation, getUserInformation1, updateUserInformation } from './service';
+import { fakeUpload, normFile, uploadFileToFirebase, uuidv4 } from 'util/file';
+import { async } from '@firebase/util';
 // import './styles.less';
 const { Option } = Select;
 
@@ -56,11 +57,59 @@ const ProfilePage = () => {
 
   // State
   const naviage = useNavigate();
-  const [profile, setProfile] = useState({});
-  const [defaultFileList, setDefaultFileList] = useState([]);
+  const [profile, setProfile] = useState({
+  });
 
   //Upload avatar
   const [fileList, setFileList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getUserInformation1();
+      const { address, email, fullName, gender, phone } = result.user;
+      setFileList([
+        ...[],
+        {
+          uid: uuidv4(),
+          name: 'image',
+          url: result?.user.avatar?.img,
+          status: 'done',
+        },
+      ]);
+      setProfile(result.user);
+      const user = { address, email, fullName, gender, phone };
+      form.setFieldsValue({ ...user });
+    }
+    fetchData();
+
+
+    // .then((result) => {
+    //   console.log('result: ', result)
+
+    //   const { address, email, fullName, gender, phone } = result.user;
+    //   setProfile(result)
+    //   setFileList([
+    //     ...[],
+    //     {
+    //       uid: uuidv4(),
+    //       name: 'image',
+    //       url: result?.user.avatar?.img,
+    //       status: 'done',
+    //     },
+    //   ]);
+    //   console.log(profile)
+    //   const user = { address, email, fullName, gender, phone };
+    //   form.setFieldsValue({ ...user });
+    // })
+    // .catch((error) => {
+
+    // });
+
+    // return () => {
+    //   setDefaultFileList([]);
+    // };
+  }, []);
+
   const getDefaultFileList = (record) => {
     return [
       {
@@ -92,86 +141,120 @@ const ProfilePage = () => {
   const handleChange = ({ fileList }) =>
     setFileList(fileList.filter((file) => file.status !== 'error'));
 
-  console.log(fileList);
   // useEffect
-  const onFinish = async (values) => {
-    try {
-      const { email, ...userUpdate } = values;
-      const user = await updateUserInformation(userUpdate);
-      message.success('Cập nhật thành công');
-      console.log(user);
-    } catch (error) {
-      message.error(error.response.data.error);
-    }
-  };
 
-  useEffect(() => {
-    getUserInformation()
-      .then((result) => {
-        const { address, email, fullName, gender, phone } = result.user;
-        setDefaultFileList([
-          ...[],
-          {
-            uid: uuidv4(),
-            name: 'image',
-            url: result?.avatar?.img,
-          },
-        ]);
-        getDefaultFileList(result?.avatar?.img);
-        const user = { address, email, fullName, gender, phone };
-        form.setFieldsValue({ ...user });
+  const fetchData = async () => {
+
+    const result = await getUserInformation().
+      then((result) => {
+        // console.log('result: ', result)
+        // const { address, email, fullName, gender, phone } = result.user;
+        // setProfile(result)
+        // setFileList([
+        //   ...[],
+        //   {
+        //     uid: uuidv4(),
+        //     name: 'image',
+        //     url: result?.user.avatar?.img,
+        //     status: 'done',
+        //   },
+        // ]);
+        // console.log(profile)
+        // const user = { address, email, fullName, gender, phone };
+        // form.setFieldsValue({ ...user });
+
+      }).then(data => {
+        console.log('data', data)
       })
       .catch((error) => {
-        console.log(error.response);
+
       });
+  }
 
-    return () => {
-      setDefaultFileList([]);
-    };
-  }, []);
 
+
+  const onFinish = async (values) => {
+    try {
+
+      if (!values.avatar || values?.avatar.length === 0) {
+        const { avatar, email, ...userUpdate } = values;
+        await updateUserInformation(userUpdate);
+        message.success('Cập nhật thành công');
+        return true;
+      } else {
+        const imageUrl = await uploadFileToFirebase(
+          values?.avatar[0]?.originFileObj
+        );
+        delete values?.avatar;
+        delete values?.email;
+        const updateData = {
+          ...values,
+          avatar: {
+            img: imageUrl,
+            altImg: 'name'
+          }
+        }
+        const user = await updateUserInformation(updateData);
+        message.success('Cập nhật thành công');
+        return true;
+      }
+
+    } catch (error) {
+      console.log('error', error);
+      message.error(error?.message);
+    }
+  };
   return (
     <>
-      <Col
-        style={{
-          backgroundColor: 'white',
-          padding: '10px',
-          borderRadius: '10px',
-          marginTop: '100px',
-        }}
-        span={16}
-        offset={4}
+      <Form
+        size="middle"
+        {...layout}
+        form={form}
+        name="control-hooks"
+        validateMessages={validateMessages}
+        onFinish={onFinish}
+        initialValues={{ avatar: getDefaultFileList(profile?.avatar?.img) }}
       >
-        <h3>Thông tin chung</h3>
-        <Row>
-          <Col span={4} offset={2}>
-            {/* <Avatar size={100} icon={<UserOutlined />} /> */}
-            <Upload
-              accept="image/*"
-              maxCount={1}
-              className="UploadImage"
-              listType="picture-card"
-              onChange={handleChange}
-              defaultFileList={defaultFileList}
-              beforeUpload={(file) => {
-                beforeUpload(file);
-              }}
-              showUploadList={true}
-              customRequest={fakeUpload}
-              onRemove={onRemove}
-            >
-              {uploadButton}
-            </Upload>
-          </Col>
-          <Col span={16}>
-            <Form
-              size="middle"
-              {...layout}
-              form={form}
-              name="control-hooks"
-              validateMessages={validateMessages}
-              onFinish={onFinish}
-            >
+        <Col
+          style={{
+            backgroundColor: 'white',
+            padding: '10px',
+            borderRadius: '10px',
+            marginTop: '100px',
+          }}
+          span={16}
+          offset={4}
+        >
+          <h3>Thông tin chung</h3>
+          <Row>
+            <Col span={4} offset={2}>
+              <Form.Item name="avatar" getValueFromEvent={normFile} >
+                <Upload
+                  accept="image/*"
+                  maxCount={1}
+                  className="UploadImage"
+                  listType="picture-card"
+                  onChange={handleChange}
+                  defaultFileList={[{
+                    uid: uuidv4(),
+                    name: 'image',
+                    url: profile?.avatar?.img,
+                  }]
+                  }
+                  fileList={fileList}
+                  beforeUpload={(file) => {
+                    beforeUpload(file);
+                  }}
+                  showUploadList={true}
+                  customRequest={fakeUpload}
+                  onRemove={onRemove}
+                >
+                  {fileList.length >0 ?  '': uploadButton }
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col span={16}>
+
               <Row>
                 <Col span={10}>
                   <Form.Item
@@ -268,10 +351,11 @@ const ProfilePage = () => {
                   </Form.Item>
                 </Col>
               </Row>
-            </Form>
-          </Col>
-        </Row>
-      </Col>
+
+            </Col>
+          </Row>
+        </Col>
+      </Form>
     </>
   );
 };
