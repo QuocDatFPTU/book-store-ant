@@ -23,6 +23,8 @@
   "rules": {
     "semi": [2, "always"],
     "quotes": [2, "double", { "avoidEscape": true }],
-    "indent": "off"
+    "indent": "off",
+    "avoidEscape": 2,
+    "allowTemplateLiterals": 2
   }
 }

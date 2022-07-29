@@ -1,6 +1,6 @@
-import axios from "axios";
-import queryString from "query-string";
-import firebase from "firebase";
+import axios from 'axios';
+import queryString from 'query-string';
+import firebase from 'firebase';
 // Set up default config for http requests here
 
 // Please have a look at here `https://github.com/axios/axios#request-
@@ -8,12 +8,13 @@ import firebase from "firebase";
 const axiosFormCreate = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: {
-    "content-type": "multipart/form-data"
+    'content-type': 'multipart/form-data',
   },
-  paramsSerializer: (params) => queryString.stringify(params)
+  withCredentials: true,
+  paramsSerializer: (params) => queryString.stringify(params),
 });
 axiosFormCreate.interceptors.request.use(async (config) => {
-  const access_token = await localStorage.getItem("__token");
+  const access_token = await localStorage.getItem('__token');
   if (access_token) {
     config.headers.Authorization = `Bearer ${access_token}`;
   }

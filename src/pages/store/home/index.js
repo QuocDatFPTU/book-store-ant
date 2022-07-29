@@ -5,194 +5,213 @@ import {
   Col,
   Divider,
   Image,
-  Layout,
-  Menu,
   Rate,
   Row,
   Typography,
-  Input,
-  Dropdown,
-  Space,
-  Badge,
-  Avatar,
-  Affix,
 } from 'antd';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
-import paymentImg from 'assets/footer-payment.png';
-import socialtImg from 'assets/footer-social.png';
-import appImg from 'assets/footer-app.png';
+import React, { useEffect, useState } from 'react';
 import './styles.less';
-import {
-  AntDesignOutlined,
-  AppstoreAddOutlined,
-  DownOutlined,
-  FireOutlined,
-  LogoutOutlined,
-  SaveOutlined,
-  ShoppingCartOutlined,
-  SmileOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import FooterContainer from 'layouts/store/footer';
+import { AntDesignOutlined, FireOutlined } from '@ant-design/icons';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
-import HeaderContainer from 'layouts/store/header';
 import StoreLayoutContainer from 'layouts/store/store.layout';
-const { Header, Content, Footer } = Layout;
+import {
+  getCategoyList,
+  getProductListFearture,
+  getSliderList,
+} from './service';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { DateFormat, MoneyFormat } from 'components/format';
+import axios from 'axios';
+import axiosClient from 'util/axiosClient';
+import { getBlogList } from '../blog/service';
 
-const contentStyle = {
-  height: '160px',
-  color: '#fff',
-  lineHeight: '160px',
-  textAlign: 'center',
-  background: '#364d79',
-};
-
-const menu = (
-  <Menu
-    className="header-custom-menu"
-    theme="dark"
-    style={{ width: 200 }}
-    items={[
-      {
-        key: '1',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.antgroup.com"
-          >
-            Văn học
-          </a>
-        ),
-      },
-      {
-        key: '2',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.aliyun.com"
-          >
-            Ngoại ngữ
-          </a>
-        ),
-      },
-      {
-        key: '3',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Anime
-          </a>
-        ),
-      },
-      {
-        key: '4',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Manga
-          </a>
-        ),
-      },
-    ]}
-  />
-);
-const menuUser = (
-  <Menu
-    className="header-custom-menu"
-    theme="dark"
-    style={{ width: 200 }}
-    items={[
-      {
-        icon: <UserOutlined />,
-        key: '1',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.antgroup.com"
-          >
-            Nguyễn Hoàng Anh
-          </a>
-        ),
-      },
-      {
-        key: '2',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.aliyun.com"
-          >
-            Đơn hàng của tôi
-          </a>
-        ),
-        icon: <SaveOutlined />,
-      },
-      {
-        key: '3',
-        label: (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.luohanacademy.com"
-          >
-            Thoát tài khoản
-          </a>
-        ),
-        icon: <LogoutOutlined />,
-      },
-    ]}
-  />
-);
+const dataPostFeature = [
+  {
+    title:
+      'Sếp lớn Microsoft từ chức vì bị cáo buộc xem “phim heo VR” khi đang làm việc và cả quay tay',
+    date: '14/06/2022',
+    author: 'Hoàng Anh',
+    imgLink: 'https://gstatic.gvn360.com/2022/06/61fb127c75a1f5001890a621.jpg',
+  },
+  {
+    title: 'Tiếng chuông gọi người tình trở về – Ngân lên trong vô vọng!',
+    date: '11/06/2022',
+    author: 'Hải Yến',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/05/reviewsachonly-Tieng-chuong-goi-nguoi-tinh-tro-ve.jpg',
+  },
+  {
+    title: 'Cho tôi xin một vé về tuổi thơ – tấm vé dành cho sự trưởng thành',
+    date: '22/06/2022',
+    author: 'Asu',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-cho-toi-xin-mot-ve-tuoi-tho.jpeg',
+  },
+  {
+    title: 'Tình khờ – Khi cái đẹp đồng hóa cùng quỷ dữ (Tanizaki Junichiro)',
+    date: '30/06/2022',
+    author: 'Lê Đức',
+    imgLink:
+      'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-tinh-kho-by-reviewsachl.net_.jpeg',
+  },
+];
+const dataListCates = [
+  {
+    name: 'Adventure',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9780451530943_1.jpg',
+  },
+  {
+    name: 'Lifestyle',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_25243.jpg',
+  },
+  {
+    name: 'Sách giáo khoa',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/c/o/combo-8_3.jpg',
+  },
+  {
+    name: 'Tâm lý kỹ năng',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974109105-t13.jpg',
+  },
+  {
+    name: 'Kinh tế',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043026542_1.jpg',
+  },
+  {
+    name: 'Sách tham khảo',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180049.jpg',
+  },
+  {
+    name: 'Văn học',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_39444.jpg',
+  },
+  {
+    name: 'Foreigns Books',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/9/7/9786041055421.jpg',
+  },
+  {
+    name: 'Thiếu nhi',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
+  },
+  {
+    name: 'Sách học ngoại ngữ',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/i/m/image_185738.jpg',
+  },
+  {
+    name: 'Văn phòng phẩm',
+    imgLink: 'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
+  },
+  {
+    name: 'Đồ chơi',
+    imgLink:
+      'https://cdn0.fahasa.com/media/catalog/product/e/b/eb7f9af9bc5cb8e852f206448b13d556.jpg',
+  },
+];
 
 const HomePage = () => {
-  const onSearch = (value) => console.log(value);
+  //redux
+  const user = useSelector((state) => state.user);
+  console.log(user);
 
+  //Hook
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [sliders, setSliders] = useState();
+  const [posts, setPosts] = useState();
+  const navigate = useNavigate();
+
+  //Method
+  const getSliders = () => {
+    getSliderList({ limit: 10 })
+      .then((result) => {
+        setSliders(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getPosts = () => {
+    getBlogList({
+      limit: 4,
+      sortedBy: 'updatedAt_desc',
+      status: true,
+      featured: true,
+    })
+      .then((result) => {
+        const posts = result.posts;
+        console.log(result);
+        for (const post of posts) {
+          post.thumbnail = 'url(' + post.thumbnail + ')';
+        }
+        setPosts(posts);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getProducts = () => {
+    getProductListFearture({ feartured: true, status: true, limit: 8, page: 1 })
+      .then((result) => {
+        setProducts(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getCategories = () => {
+    getCategoyList()
+      .then((result) => {
+        setCategories(result);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  //Effect
+  useEffect(() => {
+    getProducts();
+    getCategories();
+    getSliders();
+    getPosts();
+  }, []);
+
+  console.log(posts);
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer className="home-sliders">
         <Row style={{ height: '100%' }}>
           <Col className="slider-main" span={16}>
             <Carousel style={{ width: '98.5%' }} autoplay>
-              {[
-                'https://cdn0.fahasa.com/media/wysiwyg/Thang-06-2022/1980_1920.png',
-                'https://cdn0.fahasa.com/media/wysiwyg/Duy-VHDT/DoChoi/Thang5/Trang_Thi_u_nhi_1.1_1920x700.jpg',
-                'https://cdn0.fahasa.com/media/wysiwyg/Thang-05-2022/FAHASA_fs_1920x400.png',
-              ].map((img) => (
-                <a
-                  style={{ borderRadius: '10px', display: 'block' }}
-                  href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3"
-                >
-                  <Image
-                    preview={false}
-                    style={{ borderRadius: '10px' }}
-                    height={'35vh'}
-                    src={img}
-                  />
-                </a>
-              ))}
+              {sliders &&
+                sliders.map((slider) => (
+                  <a
+                    style={{ borderRadius: '10px', display: 'block' }}
+                    href={slider.backlink}
+                  >
+                    <Image
+                      preview={false}
+                      style={{ borderRadius: '10px' }}
+                      height={'35vh'}
+                      src={slider.image.img}
+                    />
+                  </a>
+                ))}
             </Carousel>
           </Col>
           <Col className="slider-sides" span={8}>
             <Row style={{ height: '100%' }} gutter={[0, 10]}>
               <Col className="slider-side" span={24}>
-                <a href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3">
-                  <img src="https://cdn0.fahasa.com/media/wysiwyg/Thang-05-2022/Mega_saleldp062022_1920x400.jpg" />
+                <a href={sliders && sliders[0]?.backlink}>
+                  <img src={sliders && sliders[0]?.image?.img} />
                 </a>
               </Col>
               <Col className="slider-side slider-side-bottom" span={24}>
-                <a href="https://www.fahasa.com/1980-books?fhs_campaign=homepageslider3">
-                  <img src="https://cdn0.fahasa.com/media/wysiwyg/Thang-06-2022/shopeepay_1920x400.png" />
+                <a href={sliders && sliders[1]?.backlink}>
+                  <img src={sliders && sliders[1]?.image?.img} />
                 </a>
               </Col>
             </Row>
@@ -201,21 +220,24 @@ const HomePage = () => {
       </WrapperConentContainer>
       <Row className="home-posts">
         <Col span={16} offset={4}>
-          <a href="https://gvn360.com/tin-game/ark-va-capcom-arcade-stadium-dang-mien-phi-cung-nhieu-game-khac-giam-gia-sap-san-tren-steam/">
+          <a onClick={() => navigate(`/blog/${posts && posts[0]._id}`)}>
             <div
               className="post-lasted"
               style={{
-                backgroundImage:
-                  'linear-gradient(to right, #23252627, #41434525), url(https://gstatic.gvn360.com/2022/06/ARK-Survival-Evolved-Update-2.64-Featured-Image-1068x580.jpg)',
+                // backgroundImage: `linear-gradient(to right, #23252627, #41434525), url(${
+                //   posts && posts[0].thumbnail
+                // })`,
+
+                backgroundImage: posts ? posts[0].thumbnail : undefined,
               }}
             >
               <div className="post-content">
                 <Typography.Title level={3} className="post-title">
-                  Mời bạn khám phá “tranh vô cực”, nơi tiềm thức bị dẫn dụ bởi
-                  thị giác
+                  {posts && posts[0].title}
                 </Typography.Title>
                 <Typography.Text className="post-info">
-                  Bởi <a href="#">Axium Fox</a> - 14/06/2022
+                  Bởi <a href="#">{posts && posts[0].author}</a> -{' '}
+                  <DateFormat>{posts && posts[0].updatedAt}</DateFormat>
                 </Typography.Text>
               </div>
             </div>
@@ -225,66 +247,35 @@ const HomePage = () => {
       <Row className="home-posts-feature">
         <Col span={16} offset={4}>
           <Row justify="space-between" style={{ height: '100%' }}>
-            {[
-              {
-                title:
-                  'Sếp lớn Microsoft từ chức vì bị cáo buộc xem “phim heo VR” khi đang làm việc và cả quay tay',
-                date: '14/06/2022',
-                author: 'Hoàng Anh',
-                imgLink:
-                  'https://gstatic.gvn360.com/2022/06/61fb127c75a1f5001890a621.jpg',
-              },
-              {
-                title:
-                  'Tiếng chuông gọi người tình trở về – Ngân lên trong vô vọng!',
-                date: '11/06/2022',
-                author: 'Hải Yến',
-                imgLink:
-                  'https://reviewsach.net/wp-content/uploads/2022/05/reviewsachonly-Tieng-chuong-goi-nguoi-tinh-tro-ve.jpg',
-              },
-              {
-                title:
-                  'Cho tôi xin một vé về tuổi thơ – tấm vé dành cho sự trưởng thành',
-                date: '22/06/2022',
-                author: 'Asu',
-                imgLink:
-                  'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-cho-toi-xin-mot-ve-tuoi-tho.jpeg',
-              },
-              {
-                title:
-                  'Tình khờ – Khi cái đẹp đồng hóa cùng quỷ dữ (Tanizaki Junichiro)',
-                date: '30/06/2022',
-                author: 'Lê Đức',
-                imgLink:
-                  'https://reviewsach.net/wp-content/uploads/2022/03/review-sach-tinh-kho-by-reviewsachl.net_.jpeg',
-              },
-            ].map((item) => (
-              <Col flex={'24.5%'}>
-                <a href="https://gvn360.com/tin-game/ark-va-capcom-arcade-stadium-dang-mien-phi-cung-nhieu-game-khac-giam-gia-sap-san-tren-steam/">
-                  <div
-                    className="post-lasted"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, #23252627, #41434525), url(${item.imgLink})`,
-                    }}
-                  >
-                    <div className="post-content post-feature">
-                      <Typography.Paragraph
-                        ellipsis={{
-                          rows: 2,
-                          // expandable: true,
-                        }}
-                        className="post-title-feature"
-                      >
-                        {item.title}
-                      </Typography.Paragraph>
-                      <Typography.Text className="post-info post-info-feature">
-                        Bởi <a href="#">{item.author}</a> - {item.date}
-                      </Typography.Text>
+            {posts &&
+              posts.map((post, index) => (
+                <Col flex={'24.5%'}>
+                  <a onClick={() => navigate(`/blog/${post?._id}`)}>
+                    <div
+                      className="post-lasted"
+                      style={{
+                        backgroundImage: post?.thumbnail,
+                      }}
+                    >
+                      <div className="post-content post-feature">
+                        <Typography.Paragraph
+                          ellipsis={{
+                            rows: 2,
+                            // expandable: true,
+                          }}
+                          className="post-title-feature"
+                        >
+                          {post?.title}
+                        </Typography.Paragraph>
+                        <Typography.Text className="post-info post-info-feature">
+                          Bởi <a href="#">{post?.author}</a> -{' '}
+                          <DateFormat>{post?.updatedDate}</DateFormat>
+                        </Typography.Text>
+                      </div>
                     </div>
-                  </div>
-                </a>
-              </Col>
-            ))}
+                  </a>
+                </Col>
+              ))}
           </Row>
         </Col>
       </Row>
@@ -308,60 +299,9 @@ const HomePage = () => {
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly" style={{ width: '100%' }}>
-            {[
-              {
-                name: 'Sách tham khảo',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/9/7/9786043519112.jpg',
-              },
-              {
-                name: 'Sách học ngoại ngữ',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-              },
-              {
-                name: 'Văn học',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/b/i/bia_tudientiengem-_1_.jpg',
-              },
-              {
-                name: 'Thiếu nhi',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-              },
-              {
-                name: 'Tâm lý kỹ năng',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-              },
-              {
-                name: 'Kinh tế',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-              },
-              {
-                name: 'Sách giáo khoa',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-              },
-              {
-                name: 'Foreigns Books',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/img_7523.jpg',
-              },
-              {
-                name: 'Văn phòng phẩm',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/img-8376.jpg',
-              },
-              {
-                name: 'Đồ chơi',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/7/c/7cq1640081325_3.jpg',
-              },
-            ].map((cateItem) => (
+            {categories.map((item, index) => (
               <Col span={2}>
-                <a href="https://www.fahasa.com/sach-trong-nuoc/thieu-nhi.html?order=num_orders&limit=24&p=1">
+                <a onClick={() => navigate(`/product-list/${item._id}`)}>
                   <Card
                     className="custom-card"
                     hoverable={false}
@@ -375,11 +315,11 @@ const HomePage = () => {
                           margin: '0 auto',
                         }}
                         alt="example"
-                        src={cateItem.imgLink}
+                        src={dataListCates[index].imgLink}
                       />
                     }
                   >
-                    <a>{cateItem.name}</a>
+                    <a style={{ color: '#646464', fontSize: '1.5rem' }} href={`/product-list/${item._id}`}>{item.name}</a>
                   </Card>
                 </a>
               </Col>
@@ -410,121 +350,54 @@ const HomePage = () => {
           </h2>
           <Divider style={{ margin: '18px 0' }} />
           <Row justify="space-evenly">
-            {[
-              {
-                name: 'Sách học ngoại ngữ Sách học ngoại ngữ ',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-                price: '182.200',
-                rate: 1,
-              },
-              {
-                name: 'Tư Duy Nhanh Và Chậm (Tái Bản 2021)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-                price: '375.000',
-                rate: 4,
-              },
-              {
-                name: 'Bộ Hộp Nhật Ký Trưởng Thành Của Đứa Trẻ Ngoan (Bộ 10 Cuốn)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-                price: '200.000',
-                rate: 5,
-              },
-              {
-                name: 'Phân Tích Chứng Khoán (Security Analysis)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-                price: '299.400',
-                rate: 4,
-              },
-              {
-                name: 'Bộ Hộp Tam Quốc Diễn Nghĩa (Bộ 3 Cuốn)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-                price: '207.200',
-                rate: 5,
-              },
-              {
-                name: 'Boardgame Thỏ Tỉnh Táo',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/9/7/9784909466037_7.jpg',
-                price: '90.000',
-                rate: 1,
-              },
-              {
-                name: 'Hoàng Tử Bé (Tái Bản 2019)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_187010.jpg',
-                price: '63.750',
-                rate: 5,
-              },
-              {
-                name: 'Nhóc Miko! Cô Bé Nhí Nhảnh - Tập 35 - Tặng Kèm Sticker (1 Miếng 6 Hình Dán)',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179108.jpg',
-                price: '20.000',
-                rate: 0,
-              },
-              {
-                name: 'Trí Thông Minh Trên Giường',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-                price: '131.000',
-                rate: 4,
-              },
-              {
-                name: 'Văn Phòng Thám Tử Quái Vật - Tập 6',
-                imgLink:
-                  'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179085_1.jpg',
-                price: '30.000',
-                rate: 5,
-              },
-            ].map((item) => (
-              <Col flex={'19%'} style={{ marginBottom: '30px' }}>
+            {products.map((item) => (
+              <Col flex={'22%'} style={{ marginBottom: '30px' }}>
                 <Card
                   className="product-card"
                   hoverable={false}
                   bordered={false}
                   cover={
-                    <img
-                      style={{
-                        width: '100%',
-                        height: '190px',
-                        // objectFit: 'cover',
-                        margin: '0 auto',
-                      }}
-                      alt="example"
-                      src={item.imgLink}
-                    />
+                    <a onClick={() => navigate(`/product-detail/${item._id}`)}>
+                      <img
+                        style={{
+                          width: '100%',
+                          height: '190px',
+                          // objectFit: 'cover',
+                          margin: '0 auto',
+                        }}
+                        alt="example"
+                        src={item.thumbnail}
+                      />
+                    </a>
                   }
                 >
                   <Typography.Paragraph
-                    className="product-title"
+                    className="home-product-title"
                     ellipsis={{
                       rows: 2,
                       // expandable: true,
                     }}
                   >
-                    <a href="">{item.name}</a>
+                    <a onClick={() => navigate(`/product-detail/${item._id}`)}>
+                      {item.title}
+                    </a>
                   </Typography.Paragraph>
                   <Typography.Text className="product-price">
-                    {item.price}đ
+                    <MoneyFormat>{item.salePrice}</MoneyFormat>
                   </Typography.Text>
-                  <Rate className="product-rate" value={item.rate} />
+                  <Rate className="product-rate" value={4} />
                 </Card>
               </Col>
             ))}
           </Row>
-          <Row style={{ width: '100%' }}>
+          {/* <Row style={{ width: '100%' }}>
             <Col style={{ textAlign: 'center' }} span={24}>
               <Button danger>Xem thêm</Button>
             </Col>
-          </Row>
+          </Row> */}
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

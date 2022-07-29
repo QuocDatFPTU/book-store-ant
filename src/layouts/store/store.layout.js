@@ -1,13 +1,15 @@
 import { Layout } from 'antd';
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import FooterContainer from './footer';
 import HeaderContainer from './header';
 
-const StoreLayoutContainer = (props) => {
+const StoreLayoutContainer = () => {
   return (
     <Layout>
       <HeaderContainer />
-      <Layout.Content>{props.children}</Layout.Content>
+      <Outlet />
+      {/* <Layout.Content>{props.children}</Layout.Content> */}
       <FooterContainer />
     </Layout>
   );
