@@ -1,4 +1,3 @@
-import { async } from '@firebase/util';
 import { message } from 'antd';
 import { storage } from 'firebase';
 import {
@@ -95,35 +94,29 @@ export const uploadFileToFirebase = async (file) => {
 };
 
 export const uploadMultipleFileToFirebase = async (fileList) => {
-  const urls = [];
+  const data = []
   const promises = [];
-  fileList.map((file) => {
-    const storageRef = ref(storage, 'images/' + `${Date.now() + file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file?.originFileObj);
-    promises.push(uploadTask);
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        // const progress = Math.round(
-        //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        // );
-        // setProgress(progress);
-      },
-      (error) => {
-        console.log(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          urls.push(url);
-          console.log('url', url)
-        });
-      }
-    );
-  });
-  // await Promise.all(promises).then(task => {
-  //   console.log('data', data);
-  // });
-  return urls;
+
+  for (const item of fileList) {
+    const storageRef = ref(storage, 'images/' + `${Date.now() + item.name}`);
+    promises.push(uploadBytes(storageRef, item?.originFileObj))
+  }
+
+  const uploadResults = await Promise.all(promises);
+  const downloadURLs = [];
+  for (const item of uploadResults) {
+    data.push({ fullPath: item.metadata.fullPath, downloadURL: '', name: '' })
+    downloadURLs.push(getDownloadURL(item.ref))
+  }
+  const downloadURLsResult = await Promise.all(downloadURLs);
+  for (let i = 0; i < downloadURLsResult.length; i++) {
+    data[i].downloadURL = downloadURLsResult[i]
+    data[i].name = fileList[i].name
+  }
+
+  console.log('data', data)
+  return data;
+
 };
 // for (let i = 0; i < fileList.length; i++) {
 //   const storageRef = ref(storage, 'images/' + `${Date.now() + fileList[i].name}`);
@@ -178,7 +171,7 @@ export const uploadMultipleFileToFirebase = async (fileList) => {
 
 const uploadFileAndGetDownloadURL = async (ref, file) => {
   try {
-    const snap = await uploadBytesResumable(ref, file);
+    const snap = await uploadBytes(ref, file);
     const downloadURL = await getDownloadURL(snap.ref);
     return downloadURL;
   } catch (error) {
@@ -195,5 +188,6 @@ export const sendImageToFirebase = async (fileList) => {
 
   //Your array with the urls
   const urlsArray = await Promise.all(promises);
+  debugger
   return urlsArray;
 };

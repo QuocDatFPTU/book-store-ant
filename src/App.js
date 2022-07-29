@@ -49,7 +49,7 @@ const AppWrapper = () => {
 const App = () => {
   const { currentUser } = useSelector((state) => state.auth);
   return (
-    <React.StrictMode>
+    <>
       {/* <HomePage /> */}
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
@@ -109,7 +109,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       </PersistGate>
-    </React.StrictMode>
+    </>
   );
 };
 

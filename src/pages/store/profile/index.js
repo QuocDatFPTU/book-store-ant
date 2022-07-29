@@ -241,6 +241,7 @@ const ProfilePage = () => {
                     url: profile?.avatar?.img,
                   }]
                   }
+                  fileList={fileList}
                   beforeUpload={(file) => {
                     beforeUpload(file);
                   }}
@@ -248,7 +249,7 @@ const ProfilePage = () => {
                   customRequest={fakeUpload}
                   onRemove={onRemove}
                 >
-                  {uploadButton}
+                  {fileList.length >0 ?  '': uploadButton }
                 </Upload>
               </Form.Item>
             </Col>

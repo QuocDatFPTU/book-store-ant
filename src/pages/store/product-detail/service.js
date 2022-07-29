@@ -30,3 +30,9 @@ export const getProductListFearture = async (params) => {
   const url = '/products?feartured=true&status=true&limit=5&page=1';
   return axiosClient.get(url, { params });
 };
+
+export const getFeedbackProductDetailById = async (params) => {
+  // eslint-disable-next-line quotes
+  const url = `feedbacks/product/${params}`;
+  return axiosClient.get(url);
+};

@@ -18,6 +18,7 @@ import {
   message,
   Result,
   Spin,
+  Empty,
 } from 'antd';
 import {
   FireOutlined,
@@ -40,6 +41,7 @@ import {
   addProudctToCart,
   addProudctToCartGuest,
   getCategoyById,
+  getFeedbackProductDetailById,
   getProductDetailById,
   getProductListFearture,
 } from './service';
@@ -47,6 +49,8 @@ import axiosClient from 'util/axiosClient';
 import { DateFormat, MoneyFormat } from 'components/format';
 
 const ProductDetail = () => {
+
+
   //data
   const dataListFeedbacks = [
     {
@@ -117,9 +121,22 @@ const ProductDetail = () => {
   const [moreProductDetail, setMoreProductDetail] = useState({});
   const [categoryName, setCategoryName] = useState('');
   const [productFeatures, setProductFeatures] = useState([]);
+  const [feedbackList, setFeedbackList] = useState([]);
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const getFeedbackList = async () => {
+    getFeedbackProductDetailById(id)
+      .then((result) => {
+        console.log('result', result);
+        setFeedbackList(result);
+      })
+      .catch((error) => {
+        message.error(error?.message);
+      });
+  };
+
+
 
   //Method
   const onClickNotExpand = () => {
@@ -138,7 +155,6 @@ const ProductDetail = () => {
         cart = await addProudctToCartGuest(cartItem);
       else cart = await addProudctToCart(cartItem);
 
-      console.log(cart);
 
       //Go to cart or not
       if (isToCart) navigate('/cart');
@@ -151,7 +167,6 @@ const ProductDetail = () => {
     getProductDetailById(productId)
       .then((res) => {
         //Set product detail
-        console.log(res);
         setProductDetail(res);
         const { author, publisher, publicDate, language, pages } =
           res.briefInformation;
@@ -182,7 +197,6 @@ const ProductDetail = () => {
   const getProductFeatureds = () => {
     getProductListFearture()
       .then((result) => {
-        console.log(result);
         setProductFeatures(result);
       })
       .catch((e) => console.log(e));
@@ -204,6 +218,9 @@ const ProductDetail = () => {
     getProductFeatureds();
   }, []);
 
+  useEffect(() => {
+    getFeedbackList();
+  }, [id])
   return productDetail.status === false ? (
     <>
       <WrapperConentContainer>
@@ -464,8 +481,8 @@ const ProductDetail = () => {
             ellipsis={
               btnExpand === true
                 ? {
-                    rows: 3,
-                  }
+                  rows: 3,
+                }
                 : false
             }
           >
@@ -507,27 +524,60 @@ const ProductDetail = () => {
           </h2>
           <List
             className="comment-list"
-            header={`${dataListFeedbacks.length} replies`}
+            header={`${feedbackList.length} replies`}
             itemLayout="horizontal"
-            dataSource={dataListFeedbacks}
-            renderItem={(item) => (
-              <li>
-                <Comment
-                  author={
-                    <Typography.Text
-                      style={{ fontSize: '16px', fontWeight: 600 }}
-                    >
-                      {item.author}
-                    </Typography.Text>
-                  }
-                  avatar={<Avatar size={50} icon={<UserOutlined />} />}
-                  content={item.content}
-                  // datetime={item.datetime}
-                />
-              </li>
-            )}
+            dataSource={feedbackList ? feedbackList : dataListFeedbacks}
+            locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>Chưa có feedback cho sản phẩm này</span>} /> }}
+            renderItem={(item) => {
+              if (feedbackList && feedbackList.length > 0) {
+                return (
+                  <li>
+                    <Comment
+                      author={
+                        <Typography.Text
+                          style={{ fontSize: '16px', fontWeight: 600 }}
+                        >
+                          {item?.user?.fullName}
+                        </Typography.Text>
+                      }
+                      avatar={<Avatar size={50} icon={<UserOutlined />} />}
+                      content={
+                        <div>
+                          <Rate disabled defaultValue={item.star} />
+                          <p>
+                            {item.content}
+                          </p>
+                          <Image.PreviewGroup>
+                            {item?.images?.map((data) => (
+                              <Image
+                                className="custom-images"
+                                width={120}
+                                height={120}
+                                src={`${data.image}`}
+                              />
+                            ))}
+                          </Image.PreviewGroup>
+                        </div>}
+                    // datetime={item.datetime}
+                    />
+                  </li>
+                )
+              } else {
+                return (
+                  <Empty
+                    description={
+                      <span>
+                        Chưa có feedback cho sản phẩm này
+                      </span>
+                    }
+                  >
+                    <Button type="primary">Create Now</Button>
+                  </Empty>
+                )
+              }
+            }}
           />
-          <Row
+          {/* <Row
             style={{
               marginTop: '20px',
               marginRight: '40px',
@@ -540,7 +590,7 @@ const ProductDetail = () => {
                 total={50}
               />
             </Col>
-          </Row>
+          </Row> */}
         </Col>
       </WrapperConentContainer>
     </>

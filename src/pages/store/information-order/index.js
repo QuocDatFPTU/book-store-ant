@@ -347,10 +347,12 @@ const InformationOrder = () => {
             onFinish={async (values) => {
               try {
                 setLoading(true);
-                const urls = await sendImageToFirebase(fileListDone);
+
+                const urls = await uploadMultipleFileToFirebase(fileListDone);
+                debugger
                 const images = urls.map(url => ({
                   imageAltDoc: 'images',
-                  image: url
+                  image: url?.downloadURL
                 }))
                 const feedbackData = {
                   ...values,
