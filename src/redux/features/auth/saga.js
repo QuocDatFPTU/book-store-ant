@@ -47,18 +47,17 @@ function* login(action) {
 
 
 function* logout(action) {
-    yield call(request, '/user/logoutAll', {});
+    yield call(request, '/user/logoutAll', {}, 'POST');
     localStorage.removeItem('__role');
     localStorage.removeItem('__token');
-
 }
 
 function* watchLoginFlown() {
     while (true) {
         const isLoginIn = Boolean(localStorage.getItem('__token'));
-        if (!isLoginIn || localStorage.getItem('__role') === 'R02') {
-            const action = yield take(authAction.loginStart.type)
-            yield fork(login, action)
+        if (!isLoginIn) {
+            const action = yield take(authAction.loginStart.type);
+            yield call(login, action);
         } else {
             yield take(authAction.logout.type);
             yield call(logout);

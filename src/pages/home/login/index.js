@@ -25,7 +25,6 @@ const Login = (props) => {
     dispatch(authAction.loginStart({ username, password }));
     setIsLogin(true);
   }
-  console.log('user', currentUser?.role);
   useEffect(async () => {
     //đang đăng nhập
     //+ bình thường: isLogin=false, role=R02
