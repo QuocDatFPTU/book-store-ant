@@ -20,19 +20,23 @@ const DashboardLayout = (props) => {
   const dispatch = useDispatch();
   const menu = (
     <Menu
-      onClick={(e) => {
-        if (e.key == 1) {
-          dispatch(authAction.logout());
-          navigate('/login');
-        }
-      }}
+    //   onClick={(e) => {
+    //     if (e.key == 1) {
+    //       dispatch(authAction.logout());
+    //       navigate('/login');
+    //     }
+    //   }
+    // }
     >
       <Menu.Item key="0" disabled style={{ cursor: 'default' }}>
         <div>{localStorage.getItem('email')}</div>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="1">
-        <LoginOutlined onClick={() => {}} />
+      <Menu.Item key="1" onClick={async () => {
+        dispatch(authAction.logout());
+        navigate('/login');
+      }}>
+        <LoginOutlined />
         {'Log out'}
       </Menu.Item>
     </Menu>
