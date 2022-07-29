@@ -1,111 +1,147 @@
-import { Col, Divider, Row } from 'antd';
+import { Button, Col, Divider, List, Result, Row, Typography } from 'antd';
 import Item from 'antd/lib/list/Item';
-import React from 'react';
+import { DateFormat, MoneyFormat } from 'components/format';
+import StatusFormat from 'components/format-status';
+import StoreLayoutContainer from 'layouts/store/store.layout';
+import WrapperConentContainer from 'layouts/store/wrapper.content';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getOrderList } from './service';
 import './styles.less';
 const OrderList = () => {
-  const orderData = [
-    {
-      id: '0458',
-      receiver: 'Lê Duy Nam Em',
-      orderDate: '28/06/2001',
-      address: '321 Hoàng Hữu Nam',
-      phoneNumber: '098934985',
-      status: 'Đợi xác nhận',
-      products: [
-        {
-          imgLink:
-            'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-          title: 'Miền đất hứa',
-          salePrice: '20.200đ',
-          publisher: 'NXB Trẻ',
-          quantity: 2,
-          totalAmount: '40.400đ',
-        },
-      ],
-    },
-    {
-      id: '0456',
-      receiver: 'Nguyễn Hoàng Anh',
-      orderDate: '28/06/2001',
-      address: '197 Lê Lai',
-      phoneNumber: '083934912',
-      status: 'Thành công',
-      products: [
-        {
-          imgLink:
-            'https://cdn0.fahasa.com/media/catalog/product/i/m/image_182308.jpg',
-          title: 'Tam quốc diễn nghĩa',
-          salePrice: '207.200đ',
-          publisher: 'NXB Trẻ',
-          quantity: 1,
-          totalAmount: '207.200đ',
-        },
-      ],
-    },
-  ];
+  // State
+  const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
+
+  // Use Effect
+  useEffect(() => {
+    getOrderList({ sortedBy: 'updatedAt_desc' })
+      .then(({ orders, count }) => {
+        setOrders(orders);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }, []);
 
   return (
-    <div style={{ backgroundColor: '#F0F2F5', height: '200vh' }}>
+    <>
       <Row className="order-content">
         <Col span={8} offset={4}>
           Danh sách đơn hàng
         </Col>
       </Row>
-      <Row>
-        <Col span={16} offset={4}>
-          <Row className="order-type">
-            <Col span={4}>ID</Col>
-            <Col span={4}>Người nhận</Col>
-            <Col span={4}>Ngày đặt hàng</Col>
-            <Col span={4}>Địa chỉ</Col>
-            <Col span={4}>Số điện thoại</Col>
-            <Col span={4}>Tình trạng</Col>
-          </Row>
-          {orderData.map((item) => (
-            <div className="order-value">
-              <Row className="order-list">
-                <Col span={4}>{item.id}</Col>
-                <Col span={4}>{item.receiver}</Col>
-                <Col span={4}>{item.orderDate}</Col>
-                <Col span={4}>{item.address}</Col>
-                <Col span={4}>{item.phoneNumber}</Col>
-                <Col className="order-status" span={4}>
-                  {item.status}
-                </Col>
-              </Row>
-              <Divider style={{ margin: '15px 0 ' }} />
-              {item.products.map((product) => (
-                <Row className="order-products" align="middle">
-                  <Col
-                    className="product-detail-container"
-                    span={12}
-                    offset={4}
-                  >
-                    <img className="product-img" src={product.imgLink} />
-                    <div className="product-detail">
-                      <p className="product-title">{product.title}</p>
-                      <p className="product-pushlisher">{product.publisher}</p>
-                      <p className="product-price">{product.salePrice}</p>
-                    </div>
+      {orders.length === 0 ? (
+        <WrapperConentContainer>
+          <Result
+            status="404"
+            // title="404"
+            subTitle="Danh sách đơn hàng của bạn đang trống, không có cái gì để xem đâu á"
+            extra={
+              <Button onClick={() => navigate('/')} type="primary">
+                {'Đi đặt hàng thôi <3'}
+              </Button>
+            }
+          />
+        </WrapperConentContainer>
+      ) : (
+        <Row>
+          <Col span={16} offset={4}>
+            <Row
+              className="order-type"
+              style={{ fontWeight: '600', fontSize: '18px' }}
+            >
+              <Col span={4}>ID</Col>
+              <Col span={4}>Người nhận</Col>
+              <Col span={4}>Ngày đặt hàng</Col>
+              <Col span={4}>Địa chỉ</Col>
+              <Col span={4}>Số điện thoại</Col>
+              <Col span={4}>Tình trạng</Col>
+            </Row>
+            {orders.map((item) => (
+              <div className="order-value">
+                <Row className="order-list">
+                  <Col span={4}>
+                    <Typography.Link
+                      onClick={() => navigate(`/order-information/${item._id}`)}
+                    >
+                      {item._id}
+                    </Typography.Link>
                   </Col>
-                  <Col span={4} className="product-quantity">
-                    x{product.quantity}
+                  <Col span={4}>{item.receiverName}</Col>
+                  <Col span={4}>
+                    <DateFormat>{item.createdAt}</DateFormat>
                   </Col>
-                  <Col span={4} className="product-totalamount">
-                    {product.totalAmount}
+                  <Col span={4}>{item.address}</Col>
+                  <Col span={4}>{item.phone}</Col>
+                  <Col className="order-status" span={4}>
+                    <StatusFormat>{item.status}</StatusFormat>
                   </Col>
                 </Row>
-              ))}
-              <Row className="product-cost">
-                <Col span={6} offset={18}>
-                  Tổng tiền: <span>40.400đ </span>
-                </Col>
-              </Row>
-            </div>
-          ))}
-        </Col>
-      </Row>
-    </div>
+                <Divider style={{ margin: '15px 0 ' }} />
+                {item.items.map((orderItem) => (
+                  <Row className="order-products" align="middle">
+                    <Col
+                      className="product-detail-container"
+                      span={13}
+                      offset={3}
+                    >
+                      <Row style={{ width: '100%' }}>
+                        <Col span={5} style={{ textAlign: 'right' }}>
+                          <img
+                            className="product-img"
+                            src={orderItem.product.thumbnail}
+                          />
+                        </Col>
+                        <Col className="product-detail" span={19}>
+                          <a
+                            onClick={() =>
+                              navigate(
+                                `/product-detail/${orderItem.product._id}`
+                              )
+                            }
+                          >
+                            <Typography.Paragraph
+                              ellipsis={{
+                                rows: 1,
+                                // expandable: true,
+                              }}
+                              className="product-title"
+                            >
+                              {orderItem.title}
+                            </Typography.Paragraph>
+                          </a>
+                          <p className="product-pushlisher">
+                            {orderItem.product.briefInformation.publisher}
+                          </p>
+                          <p className="product-price">
+                            <MoneyFormat>{orderItem.amount}</MoneyFormat>
+                          </p>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col span={4} className="product-quantity">
+                      x{orderItem.quantity}
+                    </Col>
+                    <Col span={4} className="product-totalamount">
+                      <MoneyFormat>{orderItem.totalAmount}</MoneyFormat>
+                    </Col>
+                  </Row>
+                ))}
+                <Row className="product-cost">
+                  <Col span={6} offset={18}>
+                    Tổng tiền:{' '}
+                    <span>
+                      <MoneyFormat>{item.totalCost}</MoneyFormat>
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+            ))}
+          </Col>
+        </Row>
+      )}
+    </>
   );
 };
 

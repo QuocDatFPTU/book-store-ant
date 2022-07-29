@@ -1,23 +1,27 @@
-import axiosClient from "../../../util/axiosClient";
+import environment from 'environments/environment';
+import axiosClient from 'util/axiosClient';
+import request from 'util/request';
 
-export const getStudentList = async (params) => {
-  const url = "/students";
-  return axiosClient.get(url, { params });
+export const getUserList = async (params) => {
+  return request(environment.api.getUserList, params, 'GET');
 };
 
-export async function updateStudent (payload) {
-  const clubId = payload.id;
-  const url = `/departments/${clubId}`;
-  const updateValue = {
-    ...payload
+export const getRoleList = async (params) => {
+  return request(environment.api.getRoleList, params, 'GET');
+};
+
+export async function createUser(payload) {
+  const url = '/user/admin';
+  const newUser = {
+    ...payload,
   };
-  return axiosClient.put(url, updateValue);
+  return axiosClient.post(url, newUser);
 }
 
-export async function createStudent (payload) {
-  const url = "/departments";
-  const newClub = {
-    ...payload
+export async function updateUser(payload) {
+  const url = `/user/admin`;
+  const updateValue = {
+    ...payload,
   };
-  return axiosClient.post(url, newClub);
+  return axiosClient.put(url, updateValue);
 }

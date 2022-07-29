@@ -1,21 +1,17 @@
 import {
   Button,
   Card,
-  Carousel,
-  Checkbox,
   Col,
   Divider,
-  Image,
-  Layout,
-  Menu,
   Rate,
   Row,
   Typography,
   Breadcrumb,
   Select,
   Pagination,
+  message,
+  Result,
 } from 'antd';
-
 import './styles.less';
 import {
   HomeOutlined,
@@ -24,21 +20,19 @@ import {
 } from '@ant-design/icons';
 import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
+import {
+  addProudctToCart,
+  addProudctToCartGuest,
+  getCategoyList,
+  getProductListByCategory,
+} from './service';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import axiosClient from 'util/axiosClient';
+import { getCategoyById } from '../home/service';
+import { MoneyFormat } from 'components/format';
 const { Option } = Select;
-const { Header, Content, Footer } = Layout;
-
-const plainOptions = [
-  'Sách tham khảo',
-  'Sách học ngoại ngữ',
-  'Văn học',
-  'Thiếu nhi',
-  'Tâm lý kỹ năng',
-  'Kinh tế',
-  'Sách giáo khoa',
-  'Foreigns Books',
-  'Văn phòng phẩm',
-  'Đồ chơi',
-];
+// data
 const priceOptions = [
   { label: '0đ - 150.000đ', value: { min: 0, max: 150 } },
   { label: '150,000đ - 300.000đ', value: { min: 150000, max: 300000 } },
@@ -48,31 +42,105 @@ const priceOptions = [
 ];
 
 const ProductList = () => {
-  const onChange = (checkedValues) => {
-    console.log('checked = ', checkedValues);
+  //State
+  const { id: categoryId } = useParams();
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [categoryName, setCategoryName] = useState('');
+  const [products, setProducts] = useState([]);
+  const [totalProduct, setTotalProduct] = useState(0);
+
+  const getCategories = () => {
+    getCategoyList()
+      .then((result) => {
+        setCategories(result);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getProducts = (categoryId, page) => {
+    getProductListByCategory(categoryId, { status: true, limit: 12, page })
+      .then(({ product, count }) => {
+        setProducts(product);
+        setTotalProduct(count);
+      })
+      .catch((e) => console.log(e));
+  };
+  const getCategoryName = (categoryId) => {
+    getCategoyById(categoryId)
+      .then((result) => {
+        setCategoryName(result.name);
+      })
+      .catch((e) => console.log(e));
+  };
+  const onChangePage = (page) => {
+    //Get product list again
+    getProducts(categoryId, page);
+  };
+  const addToCart = async (productId) => {
+    const cartItem = {
+      quantity: 1,
+      productId,
+    };
+    try {
+      let cart = {};
+
+      //Guest and customer
+      if (localStorage.getItem('__role') === 'R02')
+        cart = await addProudctToCartGuest(cartItem);
+      else cart = await addProudctToCart(cartItem);
+
+      //Go to cart or not
+      message.success('Thêm vào giỏ hàng thành công', 5);
+    } catch (error) {
+      message.error(`${error.response.data.error}`, 5);
+    }
   };
 
+  useEffect(() => {
+    if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
+      console.log('not have jwt store in localStorage');
+      axiosClient.post('/user/guest').then((result) => {
+        localStorage.setItem('__role', result.guest.role.code);
+      });
+    }
+
+    getCategories();
+    getCategoryName(categoryId);
+    getProducts(categoryId, 1);
+  }, [categoryId]);
+
   return (
-    <StoreLayoutContainer>
+    <>
       <WrapperConentContainer>
         <Breadcrumb>
-          <Breadcrumb.Item href="/">
-            <HomeOutlined />
+          <Breadcrumb.Item>
+            <HomeOutlined onClick={() => navigate('/')} />
           </Breadcrumb.Item>
           <Breadcrumb.Item>THỂ LOẠI</Breadcrumb.Item>
+          <Breadcrumb.Item>{categoryName}</Breadcrumb.Item>
         </Breadcrumb>
       </WrapperConentContainer>
       <WrapperConentContainer>
         <Row>
-          <Col style={{ borderRadius: '4px' }} span={4}>
+          <Col style={{ borderRadius: '4px' }} span={5}>
             <div className="list-options">
               <div className="option-cate">
                 <h4>THỂ LOẠI</h4>
                 <ul className="list-cates">
-                  {plainOptions.map((item) => (
+                  {categories.map((item) => (
                     <li>
-                      <Button value={''} type="link" block>
-                        {item}
+                      <Button
+                        onClick={() => navigate(`/product-list/${item._id}`)}
+                        type="link"
+                        block
+                        style={
+                          item._id === categoryId
+                            ? { color: '#003a8c', fontWeight: '500' }
+                            : {}
+                        }
+                        // style={{ color: 'red' }}
+                      >
+                        {item.name}
                       </Button>
                     </li>
                   ))}
@@ -80,16 +148,16 @@ const ProductList = () => {
               </div>
 
               <Divider style={{ margin: '10px 0' }} />
-              <h4>GIÁ TIỀN</h4>
+              {/* <h4>GIÁ TIỀN</h4>
               <Checkbox.Group
                 className="checkbox-custom"
                 options={priceOptions}
                 defaultValue={['Pear']}
                 onChange={onChange}
-              />
+              /> */}
             </div>
           </Col>
-          <Col style={{ backgroundColor: 'white' }} span={20}>
+          <Col style={{ backgroundColor: 'white' }} span={19}>
             <Row>
               <Col style={{ padding: '40px', paddingBottom: '20px' }} span={24}>
                 Sắp xếp theo:
@@ -108,7 +176,7 @@ const ProductList = () => {
                   <Option value="best-month">Bán chạy tháng</Option>
                   <Option value="best-year">Bán chạy năm</Option>
                 </Select>
-                <Select
+                {/* <Select
                   className="select-product"
                   defaultValue="12"
                   style={{
@@ -119,169 +187,112 @@ const ProductList = () => {
                   <Option value="12">12 sản phẩm</Option>
                   <Option value="24">24 sản phẩm</Option>
                   <Option value="48">48 sản phẩm</Option>
-                </Select>
+                </Select> */}
               </Col>
               <Divider style={{ margin: '0 14px' }} />
             </Row>
-            <Row justify="space-evenly">
-              {[
-                {
-                  name: 'Sách học ngoại ngữ Sách học ngoại ngữ ',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/z/3/z3097453775918_7ea22457f168a4de92d0ba8178a2257b.jpg',
-                  price: '182.200',
-                  rate: 1,
-                },
-                {
-                  name: 'Tư Duy Nhanh Và Chậm (Tái Bản 2021)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/c/o/cover_lhmn20.jpg',
-                  price: '375.000',
-                  rate: 4,
-                },
-                {
-                  name: 'Bộ Hộp Nhật Ký Trưởng Thành Của Đứa Trẻ Ngoan (Bộ 10 Cuốn)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509_1_18448.jpg',
-                  price: '200.000',
-                  rate: 5,
-                },
-                {
-                  name: 'Phân Tích Chứng Khoán (Security Analysis)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/i/m/image_180164_1_43_1_57_1_4_1_2_1_210_1_29_1_98_1_25_1_21_1_5_1_3_1_18_1_18_1_45_1_26_1_32_1_14_1_2354.jpg',
-                  price: '299.400',
-                  rate: 4,
-                },
-                {
-                  name: 'Bộ Hộp Tam Quốc Diễn Nghĩa (Bộ 3 Cuốn)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/3/3/3300000015408.jpg',
-                  price: '207.200',
-                  rate: 5,
-                },
-                {
-                  name: 'Boardgame Thỏ Tỉnh Táo',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/9/7/9784909466037_7.jpg',
-                  price: '90.000',
-                  rate: 1,
-                },
-                {
-                  name: 'Hoàng Tử Bé (Tái Bản 2019)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/i/m/image_187010.jpg',
-                  price: '63.750',
-                  rate: 5,
-                },
-                {
-                  name: 'Nhóc Miko! Cô Bé Nhí Nhảnh - Tập 35 - Tặng Kèm Sticker (1 Miếng 6 Hình Dán)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179108.jpg',
-                  price: '20.000',
-                  rate: 0,
-                },
-                {
-                  name: 'Trí Thông Minh Trên Giường',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/i/m/image_230339.jpg',
-                  price: '131.000',
-                  rate: 4,
-                },
-                {
-                  name: 'Văn Phòng Thám Tử Quái Vật - Tập 6',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/8/9/8934974179085_1.jpg',
-                  price: '30.000',
-                  rate: 5,
-                },
-                {
-                  name: 'Văn Phòng Thám Tử Quái Vật - Tập 4',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/n/x/nxbtre_full_05582022_085801.jpg',
-                  price: '40.000',
-                  rate: 4,
-                },
-                {
-                  name: 'Thẻ Nhân Vật Thanh Gươm Diệt Quỷ - Bandai Kimetsu no Yaiba Metallic Card (2 Thẻ Ngẫu Nhiên/Túi)',
-                  imgLink:
-                    'https://cdn0.fahasa.com/media/catalog/product/4/5/4549660725398.jpg',
-                  price: '134.100',
-                  rate: 5,
-                },
-              ].map((item) => (
-                <Col flex={'24.8%'} style={{ marginBottom: '30px' }}>
-                  <a href="https://www.youtube.com/watch?v=kRXeKR86hHc">
+            <Row>
+              {products.length !== 0 &&
+                products.map((item) => (
+                  <Col flex={'25%'} style={{ marginBottom: '30px' }}>
                     <Card
                       className="product-card"
                       hoverable={true}
                       bordered={false}
                       cover={
-                        <img
-                          style={{
-                            width: '88%',
-                            height: '190px',
-                            // objectFit: 'cover',
-                            margin: '0 auto',
-                          }}
-                          alt="example"
-                          src={item.imgLink}
-                        />
+                        <a
+                          style={{ textAlign: 'center' }}
+                          onClick={() =>
+                            navigate(`/product-detail/${item._id}`)
+                          }
+                        >
+                          <img
+                            style={{
+                              width: '88%',
+                              height: '190px',
+                              // objectFit: 'cover',
+                              margin: '0 auto',
+                            }}
+                            alt="example"
+                            src={item.thumbnail}
+                          />
+                        </a>
                       }
                     >
                       <Typography.Paragraph
-                        className="product-title"
+                        className="home-product-title"
                         ellipsis={{
                           rows: 2,
                           // expandable: true,
                         }}
                       >
-                        <a href="">{item.name}</a>
+                        <a
+                          onClick={() =>
+                            navigate(`/product-detail/${item._id}`)
+                          }
+                        >
+                          {item.title}
+                        </a>
                       </Typography.Paragraph>
                       <Typography.Text className="product-sale">
-                        {item.price}đ
+                        <MoneyFormat>{item.salePrice}</MoneyFormat>
                       </Typography.Text>
                       <Typography.Text className="product-price-old">
-                        100.000đ
+                        <MoneyFormat>{item.listPrice}</MoneyFormat>
                       </Typography.Text>
                       <Row justify="space-between">
                         <Col>
-                          <Rate className="product-rate" value={item.rate} />
+                          <Rate className="product-rate" value={4} />
                           <MessageOutlined
                             style={{ marginLeft: '10px', fontSize: '18px' }}
                           />
                         </Col>
                         <Col>
-                          <ShoppingCartOutlined
-                            style={{
-                              marginRight: '10px',
-                              fontSize: '28px',
-                              color: '#C92127',
-                            }}
-                          />
+                          <Typography.Link onClick={() => addToCart(item._id)}>
+                            <ShoppingCartOutlined
+                              style={{
+                                zIndex: '199',
+                                marginRight: '10px',
+                                fontSize: '28px',
+                                color: '#C92127',
+                              }}
+                            />
+                          </Typography.Link>
                         </Col>
                       </Row>
                     </Card>
-                  </a>
+                  </Col>
+                ))}
+            </Row>
+            {products.length !== 0 ? (
+              <Row>
+                <Col
+                  style={{ textAlign: 'center', marginBottom: '14px' }}
+                  span={24}
+                >
+                  <Pagination
+                    onChange={onChangePage}
+                    pageSize={12}
+                    showSizeChanger={false}
+                    defaultCurrent={1}
+                    total={totalProduct}
+                  />
                 </Col>
-              ))}
-            </Row>
-            <Row>
-              <Col
-                style={{ textAlign: 'center', marginBottom: '14px' }}
-                span={24}
-              >
-                <Pagination
-                  showSizeChanger={false}
-                  defaultCurrent={6}
-                  total={500}
+              </Row>
+            ) : (
+              <Row>
+                <Result
+                  style={{ width: '100%' }}
+                  status="404"
+                  // title="404"
+                  subTitle="Hiện tại không có sản phẩm khả thi"
                 />
-              </Col>
-            </Row>
+              </Row>
+            )}
           </Col>
         </Row>
       </WrapperConentContainer>
-    </StoreLayoutContainer>
+    </>
   );
 };
 

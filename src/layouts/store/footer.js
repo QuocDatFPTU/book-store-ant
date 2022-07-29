@@ -23,9 +23,9 @@ const FooterContainer = () => {
           <Col className="store-footer-left" span={6}>
             <h1 style={{ color: 'red' }}>KULI TEAM</h1>
             <p style={{ fontWeight: '500', textAlign: 'justify' }}>
-              Kuli cửa hàng được thành lập với mục đích gì cũng éo biết nhưng
-              chỉ biết đơn giản là éo biết thôi, cái gì cũng nhờ đến bố m à?????
-              ở đâu cũng vậy thôi mong chờ cc
+              Kuli cửa hàng được thành lập với mục đích làm website, chuyên nhận
+              làm thuê website, giá cả phải chăng, muốn biết thêm thông tin xin
+              vui lòng liên hệ chỉ tiết Kuli team
             </p>
           </Col>
           <Col className="store-footer-center" span={5} offset={1}>

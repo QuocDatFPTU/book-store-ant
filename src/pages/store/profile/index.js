@@ -1,62 +1,30 @@
 import {
-  Comment,
-  Affix,
   Button,
-  Card,
-  Carousel,
-  Checkbox,
   Col,
-  Divider,
-  Image,
-  Layout,
-  Menu,
-  Rate,
   Row,
-  Typography,
-  Breadcrumb,
   Select,
-  Pagination,
-  Descriptions,
-  InputNumber,
-  Tooltip,
   Avatar,
-  List,
-  Cascader,
   DatePicker,
   Form,
   Input,
-  Radio,
-  Switch,
-  TreeSelect,
+  message,
+  Upload,
 } from 'antd';
-import { Link, Route, Routes } from 'react-router-dom';
-import logoImg from 'assets/logo-new.png';
+import { useNavigate } from 'react-router-dom';
+
 import {
-  AntDesignOutlined,
-  FireOutlined,
   HomeOutlined,
-  ShoppingCartOutlined,
-  MessageOutlined,
-  PlusOutlined,
-  MinusOutlined,
-  DislikeFilled,
-  DislikeOutlined,
-  LikeFilled,
-  LikeOutlined,
   UserOutlined,
-  BookOutlined,
-  CommentOutlined,
-  InfoCircleOutlined,
   GoogleOutlined,
   PhoneOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import StoreLayoutContainer from 'layouts/store/store.layout';
+import { getUserInformation, getUserInformation1, updateUserInformation } from './service';
+import { fakeUpload, normFile, uploadFileToFirebase, uuidv4 } from 'util/file';
+import { async } from '@firebase/util';
 // import './styles.less';
 const { Option } = Select;
-const { Header, Content, Footer } = Layout;
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 const layout = {
   labelCol: {
@@ -87,55 +55,206 @@ const validateMessages = {
 const ProfilePage = () => {
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log(values);
-  };
-
-  const onReset = () => {
-    form.resetFields();
-  };
-
-  const onFill = () => {
-    form.setFieldsValue({
-      fullName: 'Nguyễn Hoàng Anh',
-      gender: 'male',
-      email: 'hoanganhgo28062001@gmail.com',
-      phoneNumber: '0375627583',
-      address: '36/38 Đường Trần Việt Châu',
-      note: 'Chú cc',
-    });
-  };
-
-  // useEffect
-  useEffect(() => {
-    onFill();
+  // State
+  const naviage = useNavigate();
+  const [profile, setProfile] = useState({
   });
 
-  return (
-    <StoreLayoutContainer>
-      <Col
+  //Upload avatar
+  const [fileList, setFileList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getUserInformation1();
+      const { address, email, fullName, gender, phone } = result.user;
+      setFileList([
+        ...[],
+        {
+          uid: uuidv4(),
+          name: 'image',
+          url: result?.user.avatar?.img,
+          status: 'done',
+        },
+      ]);
+      setProfile(result.user);
+      const user = { address, email, fullName, gender, phone };
+      form.setFieldsValue({ ...user });
+    }
+    fetchData();
+
+
+    // .then((result) => {
+    //   console.log('result: ', result)
+
+    //   const { address, email, fullName, gender, phone } = result.user;
+    //   setProfile(result)
+    //   setFileList([
+    //     ...[],
+    //     {
+    //       uid: uuidv4(),
+    //       name: 'image',
+    //       url: result?.user.avatar?.img,
+    //       status: 'done',
+    //     },
+    //   ]);
+    //   console.log(profile)
+    //   const user = { address, email, fullName, gender, phone };
+    //   form.setFieldsValue({ ...user });
+    // })
+    // .catch((error) => {
+
+    // });
+
+    // return () => {
+    //   setDefaultFileList([]);
+    // };
+  }, []);
+
+  const getDefaultFileList = (record) => {
+    return [
+      {
+        uid: uuidv4(),
+        name: 'image',
+        url: record,
+      },
+    ];
+  };
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div
         style={{
-          backgroundColor: 'white',
-          padding: '10px',
-          borderRadius: '10px',
+          marginTop: 8,
         }}
-        span={16}
-        offset={4}
       >
-        <h3>Thông tin chung</h3>
-        <Row>
-          <Col span={4} offset={2}>
-            <Avatar size={100} icon={<UserOutlined />} />
-          </Col>
-          <Col span={16}>
-            <Form
-              size="middle"
-              {...layout}
-              form={form}
-              name="control-hooks"
-              validateMessages={validateMessages}
-              onFinish={onFinish}
-            >
+        Upload
+      </div>
+    </div>
+  );
+  const onRemove = async (file) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+
+    setFileList(newFileList);
+  };
+  const handleChange = ({ fileList }) =>
+    setFileList(fileList.filter((file) => file.status !== 'error'));
+
+  // useEffect
+
+  const fetchData = async () => {
+
+    const result = await getUserInformation().
+      then((result) => {
+        // console.log('result: ', result)
+        // const { address, email, fullName, gender, phone } = result.user;
+        // setProfile(result)
+        // setFileList([
+        //   ...[],
+        //   {
+        //     uid: uuidv4(),
+        //     name: 'image',
+        //     url: result?.user.avatar?.img,
+        //     status: 'done',
+        //   },
+        // ]);
+        // console.log(profile)
+        // const user = { address, email, fullName, gender, phone };
+        // form.setFieldsValue({ ...user });
+
+      }).then(data => {
+        console.log('data', data)
+      })
+      .catch((error) => {
+
+      });
+  }
+
+
+
+  const onFinish = async (values) => {
+    try {
+
+      if (!values.avatar || values?.avatar.length === 0) {
+        const { avatar, email, ...userUpdate } = values;
+        await updateUserInformation(userUpdate);
+        message.success('Cập nhật thành công');
+        return true;
+      } else {
+        const imageUrl = await uploadFileToFirebase(
+          values?.avatar[0]?.originFileObj
+        );
+        delete values?.avatar;
+        delete values?.email;
+        const updateData = {
+          ...values,
+          avatar: {
+            img: imageUrl,
+            altImg: 'name'
+          }
+        }
+        const user = await updateUserInformation(updateData);
+        message.success('Cập nhật thành công');
+        return true;
+      }
+
+    } catch (error) {
+      console.log('error', error);
+      message.error(error?.message);
+    }
+  };
+  return (
+    <>
+      <Form
+        size="middle"
+        {...layout}
+        form={form}
+        name="control-hooks"
+        validateMessages={validateMessages}
+        onFinish={onFinish}
+        initialValues={{ avatar: getDefaultFileList(profile?.avatar?.img) }}
+      >
+        <Col
+          style={{
+            backgroundColor: 'white',
+            padding: '10px',
+            borderRadius: '10px',
+            marginTop: '100px',
+          }}
+          span={16}
+          offset={4}
+        >
+          <h3>Thông tin chung</h3>
+          <Row>
+            <Col span={4} offset={2}>
+              <Form.Item name="avatar" getValueFromEvent={normFile} >
+                <Upload
+                  accept="image/*"
+                  maxCount={1}
+                  className="UploadImage"
+                  listType="picture-card"
+                  onChange={handleChange}
+                  defaultFileList={[{
+                    uid: uuidv4(),
+                    name: 'image',
+                    url: profile?.avatar?.img,
+                  }]
+                  }
+                  fileList={fileList}
+                  beforeUpload={(file) => {
+                    beforeUpload(file);
+                  }}
+                  showUploadList={true}
+                  customRequest={fakeUpload}
+                  onRemove={onRemove}
+                >
+                  {fileList.length >0 ?  '': uploadButton }
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col span={16}>
+
               <Row>
                 <Col span={10}>
                   <Form.Item
@@ -163,6 +282,7 @@ const ProfilePage = () => {
                     ]}
                   >
                     <Input
+                      disabled
                       prefix={
                         <GoogleOutlined className="site-form-item-icon" />
                       }
@@ -182,26 +302,27 @@ const ProfilePage = () => {
                       placeholder="Select a option and change input text above"
                       allowClear
                     >
-                      <Option value="male">male</Option>
-                      <Option value="female">female</Option>
-                      <Option value="other">other</Option>
+                      <Option value="M">male</Option>
+                      <Option value="F">female</Option>
+                      <Option value="D">other</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item {...tailLayout}>
-                    <Button type="link" htmlType="button" onClick={onFill}>
-                      Hủy
-                    </Button>
                     <Button type="primary" htmlType="submit">
                       Cập nhật
                     </Button>
-                    <Button style={{ marginLeft: '20px' }} type="ghost">
+                    <Button
+                      onClick={() => naviage('/change-password')}
+                      style={{ marginLeft: '20px' }}
+                      type="ghost"
+                    >
                       Đổi mật khẩu
                     </Button>
                   </Form.Item>
                 </Col>
                 <Col span={12} offset={2}>
                   <Form.Item
-                    name="phoneNumber"
+                    name="phone"
                     label="Số điện thoại"
                     rules={[
                       {
@@ -230,11 +351,12 @@ const ProfilePage = () => {
                   </Form.Item>
                 </Col>
               </Row>
-            </Form>
-          </Col>
-        </Row>
-      </Col>
-    </StoreLayoutContainer>
+
+            </Col>
+          </Row>
+        </Col>
+      </Form>
+    </>
   );
 };
 export default ProfilePage;

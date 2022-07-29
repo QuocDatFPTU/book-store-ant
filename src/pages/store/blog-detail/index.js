@@ -1,28 +1,55 @@
-import React, { useState } from 'react';
-import { Document, Page } from 'react-pdf';
-
-const BlogDetail = () => {
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    console.log(123);
-    setNumPages(numPages);
-  }
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import parse from 'html-react-parser';
+import { getBlogListDetail } from './service';
+import WrapperConentContainer from 'layouts/store/wrapper.content';
+import { Avatar, Row } from 'antd';
+import './style.less';
+import { DateFormat } from 'components/format';
+export default function BlogListDetail() {
+  const { blogId } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [blog, setBlog] = useState();
+  const fetchBlogDetail = (params, sortedInfo) => {
+    setLoading(true);
+    getBlogListDetail(params)
+      .then((result) => {
+        console.log(result);
+        setBlog(result);
+        setLoading(false);
+      })
+      .catch((e) => setLoading(false));
+  };
+  useEffect(() => {
+    fetchBlogDetail(blogId);
+  }, [blogId]);
 
   return (
-    <div>
-      <Document
-        file="https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf"
-        onLoadSuccess={onDocumentLoadSuccess}
+    <WrapperConentContainer>
+      <div
+        style={{
+          backgroundColor: 'white',
+          padding: '30px',
+          overflow: 'hidden',
+        }}
       >
-        <Page pageNumber={pageNumber} />
-      </Document>
-      <p>
-        Page {pageNumber} of {numPages}
-      </p>
-    </div>
+        <h1 className="BlogDetail_heading">{blog?.title}</h1>
+        <div className="BlogDetail_header">
+          <div className="BlogDetail_user">
+            <Avatar
+              style={{ outline: 'none', textDecoration: 'none' }}
+              src="https://joeschmoe.io/api/v1/random"
+            />
+            <div className="BlogDetail_info">
+              <p className="BlogDetail_name">{blog?.author}</p>
+              <p className="BlogDetail_time">
+                <DateFormat>{blog?.updatedAt}</DateFormat>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div>{parse(`${blog?.description}`)}</div>
+      </div>
+    </WrapperConentContainer>
   );
-};
-
-export default BlogDetail;
+}

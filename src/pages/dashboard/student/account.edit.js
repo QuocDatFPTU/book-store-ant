@@ -1,143 +1,448 @@
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from 'react';
+import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   Col,
-  PageHeader,
-  Row,
-  Upload,
   Form,
+  Modal,
+  Upload,
+  Row,
   Input,
-  DatePicker,
-  Switch,
-  Layout,
   Button,
+  message,
+  Checkbox,
+  Select,
   InputNumber,
-  Spin,
-  Select
-} from "antd";
-import TextArea from "antd/lib/input/TextArea";
-import { Content } from "antd/lib/layout/layout";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { success } from "../../../components/CustomSuccessModal";
+  DatePicker,
+  Image,
+} from 'antd';
+import 'moment/locale/vi';
+
 import {
-  formatDate,
-  formatDateTimeFull,
-  formatDateYearFirst
-} from "../../../util/constant";
-import { getListUni } from "../university/university.service";
-import { createSchoolAdmin, getAccountById } from "./account.service";
-
-const { Option } = Select;
-
-const UniAccountEdit = () => {
-  const [account, setAccount] = useState(null);
-  const { id } = useParams();
-
-  const getAccount = async () => {
-    const res = await getAccountById(id);
-    setAccount(res.data);
+  beforeUpload,
+  fakeUpload,
+  getBase64,
+  normFile,
+  uploadFileToFirebase,
+  uuidv4,
+} from 'util/file';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { storage } from 'firebase';
+import moment from 'moment';
+import { createUser, updateUser } from './student.service';
+const AccountEdit = ({
+  currentRow,
+  onCallback,
+  isEditModal,
+  setIsEditModal,
+  roleList,
+}) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState();
+  const [fileList, setFileList] = useState([]);
+  const [defaultFileList, setDefaultFileList] = useState([]);
+  const getDefaultFileList = (record) => {
+    return [
+      {
+        uid: uuidv4(),
+        name: 'image',
+        url: record,
+      },
+    ];
   };
 
+  let roleOptions = roleList.map((data) => {
+    return {
+      label: data?.name,
+      value: data?._id,
+    };
+  });
+
+  const handleChange = ({ fileList }) =>
+    setFileList(fileList.filter((file) => file.status !== 'error'));
+
+  const onRemove = async (file) => {
+    const index = fileList.indexOf(file);
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+
+    setFileList(newFileList);
+  };
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
+
   useEffect(() => {
-    getAccount();
-  }, []);
+    return () => {
+      form.resetFields();
+    };
+  }, [isEditModal]);
+
+  useEffect(() => {
+    setDefaultFileList([
+      ...[],
+      {
+        uid: uuidv4(),
+        name: 'image',
+        url: currentRow?.avatar?.img,
+      },
+    ]);
+    return () => {
+      setDefaultFileList([]);
+    };
+  }, [currentRow]);
+
+  const onCancel = () => {
+    setIsEditModal(false);
+  };
+
   const onFinish = async (values) => {
-    values.EstablishedDate = moment(
-      values.EstablishedDate,
-      formatDate
-    ).format(formatDateYearFirst);
-    values.UploadedLogo = "";
-    const res = await createSchoolAdmin(values);
-    if (res != null) {
-      success("Add success");
+    try {
+      setLoading(true);
+      // create
+      if (!currentRow) {
+        //có up avatar
+        //Không up avatar
+        let createData = {};
+        console.log(values);
+        console.log(!values?.avatar?.img || values?.avatar?.img?.length === 0);
+        if (!values?.avatar?.img || values?.avatar?.img?.length === 0) {
+          console.log('khoông ảnh');
+          delete values.avatar;
+          if (values.status === undefined) values.status = false;
+          createData = {
+            ...values,
+          };
+        } else {
+          console.log('có ảnh');
+          console.log(values);
+          console.log(values?.avatar?.img[0]?.originFileObj);
+          const imageUrl = await uploadFileToFirebase(
+            values?.avatar?.img[0]?.originFileObj
+          );
+          console.log(imageUrl);
+          if (values.status === undefined) values.status = false;
+          createData = {
+            ...values,
+            avatar: { img: imageUrl },
+          };
+        }
+        await createUser(createData)
+          .then((result) => {
+            if (result) {
+              message.success('Thêm mới người dùng thành công!');
+            }
+            onCallback();
+          })
+          .catch((error) => message.error(error?.response?.data?.error));
+        setLoading(false);
+      }
+      // Edit
+      else {
+        delete values.avatar;
+        console.log(values);
+        const updateData = {
+          ...values,
+          id: currentRow?._id,
+        };
+        console.log(updateData);
+        await updateUser(updateData)
+          .then((result) => {
+            console.log(result);
+            message.success('Cập nhật sản phẩm thành công!');
+            setLoading(false);
+            onCallback();
+          })
+          .catch((error) => {
+            console.log('error2', error);
+            message.error(error?.response?.data?.error);
+            setLoading(false);
+          });
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.error);
+      setLoading(false);
+      return false;
     }
   };
 
-  return account == null
-    ? (
-		<Spin size="large" />
-      )
-    : (
-		<Layout className="layoutContent">
-			<PageHeader
-				onBack={() => window.history.back()}
-				ghost={false}
-				title="Create Event"
-				className="customPageHeader"
-			/>
-			<Content style={{ backgroundColor: "white" }}>
-				<div className="site-layout-content">
-					<Form
-						initialValues={{
-						  UserName: account["user-name"],
-						  Name: account.name,
-						  Email: account.email
-						}}
-						onFinish={onFinish}
-						layout="vertical"
-					>
-						<Row>
-							<Col offset={4} span={5}>
-								<Form.Item name="UploadedLogo" label="University Image">
-									<Upload
-										accept="image/*"
-										maxCount={1}
-										className="UploadImage"
-										listType="picture-card"
-									>
-										{"+ Upload "}
-									</Upload>
-								</Form.Item>
-							</Col>
-							<Col span={8}>
-								<Form.Item
-									name="UserName"
-									label="Username"
-									rules={[
-									  {
-									    required: true,
-									    message: "Event name must be entered!"
-									  }
-									]}
-								>
-									<Input />
-								</Form.Item>
-								<Form.Item
-									name="Name"
-									label="Name"
-									rules={[
-									  {
-									    required: true,
-									    message: "Event name must be entered!"
-									  }
-									]}
-								>
-									<Input />
-								</Form.Item>
-								<Form.Item
-									name="Email"
-									label="Email"
-									rules={[
-									  {
-									    required: true,
-									    message: "Address must be entered!"
-									  }
-									]}
-								>
-									<Input />
-								</Form.Item>
-								<Form.Item name="is-private">
-									<Button type="primary" htmlType="submit">
-										Edit
-									</Button>
-								</Form.Item>
-							</Col>
-						</Row>
-					</Form>
-				</div>
-			</Content>
-		</Layout>
-      );
+  const initalValue = {
+    fullName: currentRow ? currentRow?.fullName : undefined,
+    phone: currentRow ? currentRow?.phone : undefined,
+    gender: currentRow ? currentRow?.gender : undefined,
+    status: currentRow ? currentRow?.status : undefined,
+    email: currentRow ? currentRow?.email : undefined,
+    avatar: currentRow
+      ? getDefaultFileList(currentRow?.avatar?.img)
+      : undefined,
+    role: currentRow ? currentRow?.role?._id : undefined,
+    address: currentRow ? currentRow?.address : undefined,
+  };
+  return (
+    <Modal
+      title={currentRow ? 'Cập nhật account' : 'Tạo account'}
+      visible={isEditModal}
+      width={900}
+      centered
+      footer={null}
+      forceRender={true}
+      afterClose={() => {
+        // console.log(defaultFileList);
+        form.resetFields();
+      }}
+      onCancel={onCancel}
+    >
+      <Form
+        colon={false}
+        form={form}
+        layout="vertical"
+        requiredMark={true}
+        initialValues={initalValue}
+        labelWrap
+        onFinish={(values) => onFinish(values)}
+      >
+        {!currentRow && (
+          <>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                name={['avatar', 'img']}
+                label={'Avatar'}
+                getValueFromEvent={normFile}
+                style={{ width: '100%' }}
+              >
+                <Upload
+                  accept="image/*"
+                  maxCount={1}
+                  className="UploadImage"
+                  listType="picture-card"
+                  onChange={handleChange}
+                  defaultFileList={defaultFileList}
+                  beforeUpload={(file) => {
+                    beforeUpload(file);
+                  }}
+                  showUploadList={true}
+                  customRequest={fakeUpload}
+                  onRemove={onRemove}
+                  // fileList={fileList}
+                >
+                  {uploadButton}
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Họ tên"
+                name="fullName"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập họ tên!',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập email!',
+                  },
+                ]}
+              >
+                <Input type="email" />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Địa chỉ"
+                name="address"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập địa chỉ',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Số điện thoại"
+                name="phone"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Cần nhập số điện thoại!',
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Form.Item
+                label="Giới tính"
+                name="gender"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Chọn giới tính',
+                  },
+                ]}
+              >
+                <Select placeholder="Giới tính" allowClear>
+                  <Select.Option value="M">male</Select.Option>
+                  <Select.Option value="F">female</Select.Option>
+                  <Select.Option value="D">other</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </>
+        )}
+        {currentRow && (
+          <>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Họ và tên
+                </Col>
+                <Col span={18}>{currentRow.fullName}</Col>
+              </Row>
+            </Col>{' '}
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Email
+                </Col>
+                <Col span={18}>{currentRow.email}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Địa chỉ
+                </Col>
+                <Col span={18}>{currentRow.address}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Số điện thoại
+                </Col>
+                <Col span={18}>{currentRow.phone}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Giới tính
+                </Col>
+                <Col span={18}>{currentRow.gender}</Col>
+              </Row>
+            </Col>
+            <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+              <Row>
+                <Col className="order-title-receiver" span={6}>
+                  Avatar
+                </Col>
+                <Col span={18}>
+                  <Image width={'60px'} src={currentRow?.avatar?.img} />
+                </Col>
+              </Row>
+            </Col>
+          </>
+        )}
+
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item label="Trạng thái" name="status" valuePropName="checked">
+            <Checkbox>Trạng thái</Checkbox>
+          </Form.Item>
+        </Col>
+        <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+          <Form.Item
+            label="Chức vụ"
+            name="role"
+            rules={[
+              {
+                required: true,
+                message: 'Cần nhập chức vụ',
+              },
+            ]}
+          >
+            <Select placeholder="Hãy chọn chức vụ" options={roleOptions} />
+          </Form.Item>
+        </Col>
+        {!currentRow && (
+          <Col lg={{ span: 24 }} xs={{ span: 24 }}>
+            <Form.Item
+              label="Mật khẩu"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Cần nhập mật khẩu',
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        )}
+
+        <div
+          className="ant-modal-footer"
+          style={{ marginLeft: -24, marginRight: -24, marginBottom: -24 }}
+        >
+          <Row gutter={24} type="flex" style={{ textAlign: 'right' }}>
+            <Col
+              className="gutter-row"
+              span={24}
+              style={{ textAlign: 'right' }}
+            >
+              <Button
+                type="clear"
+                onClick={onCancel}
+                style={{ fontWeight: 'bold' }}
+              >
+                {'Cancel'}
+              </Button>
+              {loading === false ? (
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  style={{ fontWeight: 'bold' }}
+                >
+                  {'Save'}
+                </Button>
+              ) : (
+                <Button type="primary" loading style={{ fontWeight: 'bold' }}>
+                  {'Loading'}
+                </Button>
+              )}
+            </Col>
+          </Row>
+        </div>
+      </Form>
+    </Modal>
+  );
 };
 
-export default UniAccountEdit;
+export default AccountEdit;

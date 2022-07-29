@@ -1,26 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  GoogleOutlined,
-  HomeOutlined,
-  LockOutlined,
-  PhoneOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  message,
-  Row,
-  Select,
-  Typography,
-} from 'antd';
+
+import { Button, Col, Form, Input, message, Row, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
-import { loginInitiate } from 'redux/action';
+import { useNavigate, useParams } from 'react-router-dom';
+import axiosClient from 'util/axiosClient';
+import { async } from '@firebase/util';
 
 const validateMessages = {
   required: 'Nhập ${label}!',
@@ -37,28 +24,29 @@ const validateMessages = {
 
 const ResetPassword = (props) => {
   const [loading, setLoading] = useState(false);
-  // const navigate = useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  useEffect(async () => {
+    const token = id;
+    try {
+      await axiosClient.post('/user/valid-token', { token });
+    } catch (error) {
+      navigate('/404');
+    }
+  }, []);
 
   async function handleSubmit(value) {
-    console.log(value);
-    // await dispatch(loginInitiate(username, password));
-    // .then((result) => {
-    // 	if (!result?.error) {
-    // 		let role = localStorage.getItem("__role");
-    // 		if (role === "SystemAdministrator") {
-    // 			navigate("/admin");
-    // 		} else if (role === "SchoolAdmin") {
-    // 			navigate("/dashboard");
-    // 		} else if (role === "ClubAdmin") {
-    // 			navigate("/club");
-    // 		}
-    // 	}
-    // })
-    // .catch((error) => message.error(error));
-    message.success('Gửi gmail thành công');
     setLoading(true);
+    const dataUpdate = { ...value, token: id };
+    try {
+      await axiosClient.patch('/user/reset-password', dataUpdate);
+      message.success('Đổi mật khẩu thành công');
+      navigate('/login');
+    } catch (error) {
+      message.error(error.response.data.error);
+    }
+    setLoading(false);
     return true;
   }
 
@@ -177,7 +165,10 @@ const ResetPassword = (props) => {
                       </Button>
                     </Form.Item>
                     <p style={{ textAlign: 'center' }}>
-                      Quay lại<Typography.Link> đăng nhập</Typography.Link>
+                      Quay lại
+                      <Typography.Link onClick={() => navigate('/login')}>
+                        đăng nhập
+                      </Typography.Link>
                     </p>
                   </Form>
                 </Col>

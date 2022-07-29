@@ -4,13 +4,17 @@ import queryString from 'query-string';
 
 // Please have a look at here `https://github.com/axios/axios#request-
 
+//Config request
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_BASE_URL,
   headers: {
     'content-type': 'application/json',
   },
+  withCredentials: true,
   paramsSerializer: (params) => queryString.stringify(params),
 });
+
+//Request send with auhthorization
 axiosClient.interceptors.request.use(async (config) => {
   const access_token = await localStorage.getItem('__token');
   if (access_token) {

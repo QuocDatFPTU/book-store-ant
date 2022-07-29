@@ -6,12 +6,20 @@ if (process.env.NODE_ENV === 'development') {
   console.log('ENV params', envParams);
 }
 module.exports = {
-  webpack: {
-    alias: {
-      enviroment: path.join(__dirname, 'src', 'enviroments', 'enviroment'),
-    },
-    plugin: [new webpack.EnvironmentPlugin({ ...envParams })],
-  },
+  // webpack: {
+  //   alias: {
+  //     enviroment: path.join(__dirname, 'src', 'environments', 'environment'),
+  //   },
+  //   plugin: {
+  //     add: [
+  //       new webpack.DefinePlugin({
+  //         process: { env: {} }
+  //       }),
+  //       new webpack.EnvironmentPlugin({ ...envParams })
+  //     ]
+  //   }
+  //   // [new webpack.EnvironmentPlugin({ ...envParams })],
+  // },
   plugins: [
     {
       plugin: CracoLessPlugin,
