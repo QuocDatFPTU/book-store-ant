@@ -23,8 +23,8 @@ const VerifyAccountPage = () => {
       status="success"
       title="Bạn đã xác nhận tài khoản thành công"
       extra={[
-        <Button onClick={() => navigate('/')} type="primary" key="console">
-          Trang chủ
+        <Button onClick={() => navigate('/login')} type="primary" key="console">
+          Đăng nhập
         </Button>,
       ]}
     />

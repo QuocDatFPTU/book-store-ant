@@ -243,9 +243,9 @@ const ProductList = () => {
                       <Row justify="space-between">
                         <Col>
                           <Rate className="product-rate" value={4} />
-                          <MessageOutlined
+                          {/* <MessageOutlined
                             style={{ marginLeft: '10px', fontSize: '18px' }}
-                          />
+                          /> */}
                         </Col>
                         <Col>
                           <Typography.Link onClick={() => addToCart(item._id)}>

@@ -1,42 +1,20 @@
 import { async } from '@firebase/util';
-import React from 'react';
+import NotAuthorizePage from 'pages/home/401';
+import NotFoundPage from 'pages/home/404';
+import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import axiosClient from 'util/axiosClient';
 
-const ProtectedRoute = async ({ allowed = [], redirectPath = '/' } = {}) => {
-  const navigate = useNavigate();
+const ProtectedRoute = ({ allowedRoles }) => {
+  const naviage = useNavigate();
 
-  //Check user token, if not create as guest (Tạo object guest)
-  if (!localStorage.getItem('__token') && !localStorage.getItem('__role')) {
-    axiosClient.post('/user/guest').then((result) => {
-      localStorage.setItem('__role', result.guest.role.code);
-    });
+  if (!allowedRoles.some((role) => role === localStorage.getItem('__role'))) {
+    return <NotAuthorizePage />;
+    // return <Navigate to={'/401'} replace />;
   }
 
-  //Compare role is allow
-  console.log(allowed);
-  if (allowed.length !== 0) {
-    console.log('-3------------');
-    const role = localStorage.getItem('__role');
-    await axiosClient
-      .post('/roles/authorize', {
-        role,
-        allowed,
-      })
-      .then(({ isAllowed }) => {
-        if (!isAllowed) {
-          console.log('-4.1----------');
-          return navigate('/error');
-        } else {
-          console.log('-4.2----------');
-          return <Outlet />;
-        }
-      });
-  } else {
-    console.log('-5------------');
-    return <Outlet />;
-  }
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

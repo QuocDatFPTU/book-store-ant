@@ -22,6 +22,7 @@ import {
   Affix,
   Button,
   message,
+  Typography,
 } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import './styles.less';
@@ -44,9 +45,9 @@ const HeaderContainer = () => {
   const [username, setUsername] = useState([]);
   const [avatar, setAvartar] = useState();
   const [menuItemProduct, setMenuItemProduct] = useState([]);
-  const searchTimeOut = useRef(null)
+  const searchTimeOut = useRef(null);
   const [searchValue, setSearchValue] = useState('');
-  const [open, setOpen] = useState(false);  //Effect
+  const [open, setOpen] = useState(false); //Effect
   useEffect(() => {
     request('/categories', {}, 'GET').then((cates) => setCategories(cates));
   }, []);
@@ -57,15 +58,12 @@ const HeaderContainer = () => {
       if (user?.avatar) {
         setAvartar({ ...user?.avatar });
       }
-    }
-
-    );
+    });
   }, [username]);
 
   useEffect(() => {
     handleSearch(searchValue);
   }, [searchValue]);
-
 
   const handleSearch = async (data) => {
     try {
@@ -91,23 +89,24 @@ const HeaderContainer = () => {
     } catch (error) {
       message.error(error.message);
     }
-  }
+  };
 
   const onSearch = async (value) => {
     const searchedValue = value.target.value;
 
-    if (searchTimeOut.current) { clearTimeout(searchTimeOut.current); }
+    if (searchTimeOut.current) {
+      clearTimeout(searchTimeOut.current);
+    }
 
     searchTimeOut.current = setTimeout(() => {
       setSearchValue(searchedValue);
-    }, 300)
-  }
+    }, 300);
+  };
 
   const onLogout = async () => {
     dispatch(authAction.logout());
     navigate('/login');
   };
-
 
   const menuGuest = (
     <Menu
@@ -135,7 +134,11 @@ const HeaderContainer = () => {
         {
           icon: <UserOutlined />,
           key: '1',
-          label: <a onClick={() => navigate('/profile')}>{username}</a>,
+          label: (
+            <a style={{ color: 'black' }} onClick={() => navigate('/profile')}>
+              {username}
+            </a>
+          ),
         },
         {
           key: '2',
@@ -153,17 +156,17 @@ const HeaderContainer = () => {
     />
   );
 
-  const categoriesMenu = categories.map(item => ({
+  const categoriesMenu = categories.map((item) => ({
     key: item?.name,
-    label: (
-      <Link to={`/product-list/${item?._id}`}>{item?.name}</Link>
-    ),
-  }))
+    label: <Link to={`/product-list/${item?._id}`}>{item?.name}</Link>,
+  }));
 
   return (
     <div>
       <Affix offsetTop={'-20px'}>
-        <Header style={{ padding: '0', height: 'auto', backgroundColor: '#fff' }}>
+        <Header
+          style={{ padding: '0', height: 'auto', backgroundColor: '#fff' }}
+        >
           <Row>
             <Col span={16} offset={4}>
               <Row align="middle" style={{ padding: '3px 0' }}>
@@ -211,11 +214,14 @@ const HeaderContainer = () => {
                 >
                   <Dropdown
                     overlay={
-                      menuItemProduct?.length > 0 ?
+                      menuItemProduct?.length > 0 ? (
                         <Menu
                           // onClick={handleMenuClick}
                           items={menuItemProduct}
-                        /> : <div></div>
+                        />
+                      ) : (
+                        <div></div>
+                      )
                     }
                     placement="bottom"
                   >
@@ -235,6 +241,16 @@ const HeaderContainer = () => {
                   offset={2}
                   style={{ display: 'flex', justifyContent: 'right' }}
                 >
+                  <Typography.Link
+                    onClick={() => navigate('/blog')}
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: '600',
+                      marginRight: '16px',
+                    }}
+                  >
+                    Blog
+                  </Typography.Link>
                   <div
                     className="header_cart header-item"
                     style={{ marginRight: '20px', marginTop: '10px' }}
@@ -254,16 +270,28 @@ const HeaderContainer = () => {
                   </div>
                   <Dropdown
                     overlay={
-                      localStorage.getItem('__role') === 'R02' ||
-                        !localStorage.getItem('__role')
-                        ? menuGuest
-                        : menuUser
+                      localStorage.getItem('__role') === 'R01'
+                        ? menuUser
+                        : menuGuest
                     }
                   >
-                    <div style={{ color: 'white' }}>
-                      {username}
-                      {console.log('avatar', avatar)}
-                      <Avatar src={avatar ? avatar?.img : 'https://joeschmoe.io/api/v1/random'} />
+                    <div>
+                      <span
+                        style={{
+                          color: '#8c8c8c',
+                          marginRight: '12px',
+                          fontSize: '18px',
+                        }}
+                      >
+                        {username}
+                      </span>
+                      <Avatar
+                        src={
+                          avatar
+                            ? avatar?.img
+                            : 'https://joeschmoe.io/api/v1/random'
+                        }
+                      />
                     </div>
                   </Dropdown>
                   {/* <Button type="link" onClick={() => navigate('/blog')}>

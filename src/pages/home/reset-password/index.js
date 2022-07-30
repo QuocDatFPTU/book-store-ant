@@ -165,7 +165,7 @@ const ResetPassword = (props) => {
                       </Button>
                     </Form.Item>
                     <p style={{ textAlign: 'center' }}>
-                      Quay lại
+                      Quay lại <span> </span>
                       <Typography.Link onClick={() => navigate('/login')}>
                         đăng nhập
                       </Typography.Link>

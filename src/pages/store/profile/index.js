@@ -9,6 +9,7 @@ import {
   Input,
   message,
   Upload,
+  Spin,
 } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,9 +19,14 @@ import {
   GoogleOutlined,
   PhoneOutlined,
   PlusOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getUserInformation, getUserInformation1, updateUserInformation } from './service';
+import {
+  getUserInformation,
+  getUserInformation1,
+  updateUserInformation,
+} from './service';
 import { fakeUpload, normFile, uploadFileToFirebase, uuidv4 } from 'util/file';
 import { async } from '@firebase/util';
 // import './styles.less';
@@ -57,8 +63,8 @@ const ProfilePage = () => {
 
   // State
   const naviage = useNavigate();
-  const [profile, setProfile] = useState({
-  });
+  const [profile, setProfile] = useState({});
+  const [loading, setLoading] = useState(false);
 
   //Upload avatar
   const [fileList, setFileList] = useState([]);
@@ -79,9 +85,8 @@ const ProfilePage = () => {
       setProfile(result.user);
       const user = { address, email, fullName, gender, phone };
       form.setFieldsValue({ ...user });
-    }
+    };
     fetchData();
-
 
     // .then((result) => {
     //   console.log('result: ', result)
@@ -141,44 +146,24 @@ const ProfilePage = () => {
   const handleChange = ({ fileList }) =>
     setFileList(fileList.filter((file) => file.status !== 'error'));
 
-  // useEffect
-
-  const fetchData = async () => {
-
-    const result = await getUserInformation().
-      then((result) => {
-        // console.log('result: ', result)
-        // const { address, email, fullName, gender, phone } = result.user;
-        // setProfile(result)
-        // setFileList([
-        //   ...[],
-        //   {
-        //     uid: uuidv4(),
-        //     name: 'image',
-        //     url: result?.user.avatar?.img,
-        //     status: 'done',
-        //   },
-        // ]);
-        // console.log(profile)
-        // const user = { address, email, fullName, gender, phone };
-        // form.setFieldsValue({ ...user });
-
-      }).then(data => {
-        console.log('data', data)
-      })
-      .catch((error) => {
-
-      });
-  }
-
-
-
   const onFinish = async (values) => {
+    setLoading(true);
     try {
-
-      if (!values.avatar || values?.avatar.length === 0) {
+      console.log(values.avatar);
+      console.log(profile.avatar);
+      console.log(
+        !values.avatar,
+        values?.avatar.length === 0,
+        !values?.avatar[0]?.url
+      );
+      if (
+        !values.avatar ||
+        values?.avatar.length === 0 ||
+        (!values?.avatar[0]?.url && !values?.avatar[0]?.originFileObj)
+      ) {
         const { avatar, email, ...userUpdate } = values;
         await updateUserInformation(userUpdate);
+        setLoading(false);
         message.success('Cập nhật thành công');
         return true;
       } else {
@@ -191,15 +176,16 @@ const ProfilePage = () => {
           ...values,
           avatar: {
             img: imageUrl,
-            altImg: 'name'
-          }
-        }
+            altImg: 'name',
+          },
+        };
         const user = await updateUserInformation(updateData);
+        setLoading(false);
         message.success('Cập nhật thành công');
         return true;
       }
-
     } catch (error) {
+      setLoading(false);
       console.log('error', error);
       message.error(error?.message);
     }
@@ -228,19 +214,20 @@ const ProfilePage = () => {
           <h3>Thông tin chung</h3>
           <Row>
             <Col span={4} offset={2}>
-              <Form.Item name="avatar" getValueFromEvent={normFile} >
+              <Form.Item name="avatar" getValueFromEvent={normFile}>
                 <Upload
                   accept="image/*"
                   maxCount={1}
                   className="UploadImage"
                   listType="picture-card"
                   onChange={handleChange}
-                  defaultFileList={[{
-                    uid: uuidv4(),
-                    name: 'image',
-                    url: profile?.avatar?.img,
-                  }]
-                  }
+                  defaultFileList={[
+                    {
+                      uid: uuidv4(),
+                      name: 'image',
+                      url: profile?.avatar?.img,
+                    },
+                  ]}
                   fileList={fileList}
                   beforeUpload={(file) => {
                     beforeUpload(file);
@@ -249,12 +236,11 @@ const ProfilePage = () => {
                   customRequest={fakeUpload}
                   onRemove={onRemove}
                 >
-                  {fileList.length >0 ?  '': uploadButton }
+                  {fileList.length > 0 ? '' : uploadButton}
                 </Upload>
               </Form.Item>
             </Col>
             <Col span={16}>
-
               <Row>
                 <Col span={10}>
                   <Form.Item
@@ -309,6 +295,19 @@ const ProfilePage = () => {
                   </Form.Item>
                   <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
+                      <Spin
+                        spinning={loading}
+                        indicator={
+                          <LoadingOutlined
+                            style={{
+                              //
+                              color: 'white',
+                              marginRight: '5px',
+                            }}
+                            spin
+                          />
+                        }
+                      />
                       Cập nhật
                     </Button>
                     <Button
@@ -351,7 +350,6 @@ const ProfilePage = () => {
                   </Form.Item>
                 </Col>
               </Row>
-
             </Col>
           </Row>
         </Col>
