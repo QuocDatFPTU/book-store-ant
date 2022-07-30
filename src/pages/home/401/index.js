@@ -2,7 +2,7 @@ import { Button, Result } from 'antd';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage = () => {
+const NotAuthorizePage = () => {
   const navigate = useNavigate();
   const handleReturnHome = () => {
     const role = localStorage.getItem('__role');
@@ -13,9 +13,9 @@ const NotFoundPage = () => {
 
   return (
     <Result
-      status="404"
-      title="404"
-      subTitle="Xin lỗi, trang bạn truy cập không tồn tại"
+      status="warning"
+      title="401"
+      subTitle="Xin lỗi, bạn không được quyền truy cập vào trang/nội dung này"
       extra={
         <Button onClick={handleReturnHome} type="primary">
           Trở về nhà
@@ -25,4 +25,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage;
+export default NotAuthorizePage;

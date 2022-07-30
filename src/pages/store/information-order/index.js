@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import './styles.less';
-import { Button, Col, Divider, Form, Input, message, Modal, Rate, Row, Typography, Upload } from 'antd';
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  message,
+  Modal,
+  Rate,
+  Row,
+  Typography,
+  Upload,
+} from 'antd';
 
 import { createFeedback, getFeedback, getOrderInformation } from './service';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -10,7 +22,12 @@ import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { DateFormat, MoneyFormat } from 'components/format';
 import queryString from 'query-string';
 import { UploadOutlined } from '@ant-design/icons';
-import { beforeUpload, fakeUpload, sendImageToFirebase, uploadMultipleFileToFirebase } from 'util/file';
+import {
+  beforeUpload,
+  fakeUpload,
+  sendImageToFirebase,
+  uploadMultipleFileToFirebase,
+} from 'util/file';
 import { async } from '@firebase/util';
 import { useSelector } from 'react-redux';
 import { result } from 'lodash';
@@ -38,24 +55,19 @@ const InformationOrder = () => {
       });
   };
 
-
   useEffect(() => {
     getOrder();
   }, []);
-
 
   const handleChange = ({ file }) => {
     if (file?.status === 'done') {
       setFileListDone((prev) => [...prev, file]);
     }
-
-  }
+  };
 
   const config = {
     title: 'Cảnh báo',
-    content: (
-      <p>Bạn có muốn hủy đơn hàng?</p>
-    ),
+    content: <p>Bạn có muốn hủy đơn hàng?</p>,
     onOk: async () => {
       try {
         await onDeleteOrder();
@@ -69,7 +81,7 @@ const InformationOrder = () => {
       return Promise.resolve();
     },
     cancelText: 'Hủy',
-    closable: true
+    closable: true,
   };
   //Method:
   const onDeleteOrder = async () => {
@@ -158,7 +170,7 @@ const InformationOrder = () => {
                   <Col className="order-title-receiver" span={6}>
                     Giới tính
                   </Col>
-                  <Col span={18}>Nữ</Col>
+                  <Col span={18}>{order.gender}</Col>
                 </Row>
                 <Row>
                   <Col className="order-title-receiver" span={6}>
@@ -247,15 +259,18 @@ const InformationOrder = () => {
                   <img className="infor-img" src={item.product.thumbnail} />
                 </Col>
                 <Col span={18} className="infor-form">
-                  <Typography.Paragraph
+                  <Typography.Link
                     ellipsis={{
                       rows: 1,
                       // expandable: true,
                     }}
                     className="infor-type"
+                    onClick={() =>
+                      navigate(`/product-detail/${item.product._id}`)
+                    }
                   >
                     {item.title}
-                  </Typography.Paragraph>
+                  </Typography.Link>
                   <p className="infor-pushlisher">
                     {item.product.briefInformation.publisher}
                   </p>
@@ -276,20 +291,26 @@ const InformationOrder = () => {
           <Col span={8} offset={2}>
             {order.status === 'success' && (
               <div className="infor-back">
-                <Button onClick={async () => {
-                  const feedback = await getFeedback(order?.items?.[0]?.product?._id);
-                  for (const feed of feedback) {
-                    if (feed?.user?.email === currentUser?.email) {
-                      message.warning("Bạn đã feedback!")
-                      return;
+                <Button
+                  onClick={async () => {
+                    const feedback = await getFeedback(
+                      order?.items?.[0]?.product?._id
+                    );
+                    for (const feed of feedback) {
+                      if (feed?.user?.email === currentUser?.email) {
+                        message.warning('Bạn đã feedback!');
+                        return;
+                      }
                     }
-                  }
-                  // if (feedback?.user === currentUser?.email) {
-                  //   message.warning("Bạn đã feedback!")
-                  //   return;
-                  // }
-                  setIsEditModal(true)
-                }} >Viết nhận xét</Button>
+                    // if (feedback?.user === currentUser?.email) {
+                    //   message.warning("Bạn đã feedback!")
+                    //   return;
+                    // }
+                    setIsEditModal(true);
+                  }}
+                >
+                  Viết nhận xét
+                </Button>
                 <Button onClick={onRebuy} danger className="infor-return">
                   Mua lại
                 </Button>
@@ -329,7 +350,7 @@ const InformationOrder = () => {
           ) : undefined}
         </Row>
         <Modal
-          title={"Đánh giá sản phẩm"}
+          title={'Đánh giá sản phẩm'}
           visible={isEditModal}
           width={600}
           style={{
@@ -349,49 +370,62 @@ const InformationOrder = () => {
                 setLoading(true);
 
                 const urls = await uploadMultipleFileToFirebase(fileListDone);
-                debugger
-                const images = urls.map(url => ({
+                debugger;
+                const images = urls.map((url) => ({
                   imageAltDoc: 'images',
-                  image: url?.downloadURL
-                }))
+                  image: url?.downloadURL,
+                }));
                 const feedbackData = {
                   ...values,
                   user: auth?.currentUser,
-                  images
-                }
-                await createFeedback(order?.items?.[0]?.product?._id, feedbackData)
+                  images,
+                };
+                await createFeedback(
+                  order?.items?.[0]?.product?._id,
+                  feedbackData
+                );
                 message.success('Tạo mới feedback thành công !');
                 setLoading(false);
                 setIsEditModal(false);
                 return true;
               } catch (error) {
                 message.error(error?.message);
-                return false
+                return false;
               }
-            }
-            }>
+            }}
+          >
             <Row>
               <Col offset={9}>
-                <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Vui lòng đánh giá</p>
+                <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                  Vui lòng đánh giá
+                </p>
               </Col>
-              <Row justify='center' style={{ width: '100%' }} >
+              <Row justify="center" style={{ width: '100%' }}>
                 <Col>
                   <Form.Item name="star" style={{ width: '100%' }}>
-                    <Rate onChange={setRate} value={rate} style={{ fontSize: '40px' }} />
+                    <Rate
+                      onChange={setRate}
+                      value={rate}
+                      style={{ fontSize: '40px' }}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
             </Row>
             <Row style={{ marginTop: '10px' }}>
               <Form.Item name="content" style={{ width: '100%' }}>
-                <Input.TextArea placeholder='Hãy chia sẻ cảm nhận, đánh giá của bạn về sản phẩm này nhé.' style={{ height: '150px' }} />
+                <Input.TextArea
+                  placeholder="Hãy chia sẻ cảm nhận, đánh giá của bạn về sản phẩm này nhé."
+                  style={{ height: '150px' }}
+                />
               </Form.Item>
             </Row>
             <Row>
-              <Upload multiple={true}
+              <Upload
+                multiple={true}
                 accept="image/*"
                 onChange={handleChange}
-                listType='picture'
+                listType="picture"
                 beforeUpload={(file) => {
                   return beforeUpload(file);
                 }}
@@ -430,7 +464,6 @@ const InformationOrder = () => {
               </Row>
             </div>
           </Form>
-
         </Modal>
       </WrapperConentContainer>
     </>

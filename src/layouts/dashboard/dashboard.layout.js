@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Badge, Avatar, Dropdown } from 'antd';
 import {
   DownOutlined,
@@ -11,6 +11,7 @@ import './styles.less';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { authAction, logoutStart } from 'redux/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
+import request from 'util/request';
 const { Header } = Layout;
 
 // import logo from "assets/logo.png";
@@ -18,6 +19,9 @@ const { Header } = Layout;
 const DashboardLayout = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [username, setUsername] = useState([]);
+  const [avatar, setAvartar] = useState();
+
   const menu = (
     <Menu
     //   onClick={(e) => {
@@ -28,14 +32,17 @@ const DashboardLayout = (props) => {
     //   }
     // }
     >
-      <Menu.Item key="0" disabled style={{ cursor: 'default' }}>
+      {/* <Menu.Item key="0" disabled style={{ cursor: 'default' }}>
         <div>{localStorage.getItem('email')}</div>
       </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="1" onClick={async () => {
-        dispatch(authAction.logout());
-        navigate('/login');
-      }}>
+      <Menu.Divider /> */}
+      <Menu.Item
+        key="1"
+        onClick={async () => {
+          dispatch(authAction.logout());
+          navigate('/login');
+        }}
+      >
         <LoginOutlined />
         {'Log out'}
       </Menu.Item>
@@ -46,6 +53,16 @@ const DashboardLayout = (props) => {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
   };
+
+  useEffect(() => {
+    request('/user/profile', {}, 'GET').then(({ user }) => {
+      setUsername(user?.fullName);
+      console.log(user);
+      if (user?.avatar) {
+        setAvartar({ ...user?.avatar });
+      }
+    });
+  }, [username]);
 
   return (
     <Layout className="dashboard-layout">
@@ -63,7 +80,22 @@ const DashboardLayout = (props) => {
               <div className="profile-container">
                 <Dropdown overlay={menu}>
                   <div className="profile">
-                    <Avatar size="large" icon={<UserOutlined />} />
+                    <span
+                      style={{
+                        color: '#8c8c8c',
+                        marginRight: '12px',
+                        fontSize: '18px',
+                      }}
+                    >
+                      {username}
+                    </span>
+                    <Avatar
+                      src={
+                        avatar
+                          ? avatar?.img
+                          : 'https://joeschmoe.io/api/v1/random'
+                      }
+                    />
                     <div
                       style={{
                         color: 'white',
@@ -84,8 +116,8 @@ const DashboardLayout = (props) => {
                     />
                   </div>
                 </Dropdown>
-                <div id="space" />
-                <Dropdown
+                {/* <div id="space" /> */}
+                {/* <Dropdown
                   placement="bottomCenter"
                   style={{ top: 75 }}
                   overlay={
@@ -118,7 +150,7 @@ const DashboardLayout = (props) => {
                   <Badge dot>
                     <BellOutlined style={{ fontSize: 24, color: 'white' }} />
                   </Badge>
-                </Dropdown>
+                </Dropdown> */}
               </div>
             </div>
           }

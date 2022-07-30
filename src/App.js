@@ -35,10 +35,12 @@ import ManageCustomerList from 'pages/dashboard/customers/customer-list.containe
 import CartCompletion from 'pages/store/cart-completion';
 import MarketingDashboard from 'pages/marketing';
 import SaleDashboard from 'pages/sale';
-import AdminDashboard from 'pages/admin'
+import AdminDashboard from 'pages/admin';
 import VerifyAccountPage from 'pages/home/verify-account';
 import ManageFeedbackList from 'pages/dashboard/feedbacks/feedback-list.container';
 import { current } from '@reduxjs/toolkit';
+import NotFoundPage from 'pages/home/404';
+import NotAuthorizePage from 'pages/home/401';
 const AppWrapper = () => {
   return (
     <Provider store={store}>
@@ -56,28 +58,24 @@ const App = () => {
           <Routes>
             <Route path="/" element={<StoreLayoutContainer />}>
               //Public route
-              {/* <Route element={<ProtectedRoute />}> */}
               <Route path="/" element={<HomePage />}></Route>
               <Route path="/product-list/:id" element={<ProductList />} />
               <Route path="/product-detail/:id" element={<ProductDetail />} />
-              {/* <Route path="/blog-detail" element={<BlogDetail />} /> */}
+              <Route path="/blog" element={<BlogList />} />
+              <Route path="/blog/:blogId" element={<BlogListDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/cart-contact" element={<CartContact />} />
               <Route path="/cart-completion/:id" element={<CartCompletion />} />
-              <Route
-                path="/order-information/:id"
-                element={<InformationOrder />}
-              />
-              {/* </Route> */}
               //Protected route
-              {/* <Route element={<ProtectedRoute allowed={['customer']} />}> */}
-              <Route path="/order-list" element={<OrderList />} />
-              <Route path="/information-order" element={<InformationOrder />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/blog" element={<BlogList />} />
-              <Route path="/blog/:blogId" element={<BlogListDetail />} />
+              <Route element={<ProtectedRoute allowedRoles={['R01']} />}>
+                <Route path="/order-list" element={<OrderList />} />
+                <Route
+                  path="/order-information/:id"
+                  element={<InformationOrder />}
+                />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
             </Route>
-            {/* </Route> */}
           </Routes>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -89,23 +87,52 @@ const App = () => {
           </Routes>
           <Routes>
             <Route
-              path="dashboard"
               element={
-                <DashboardLayout sider={<DashboardSider />} title="Dashboard" />
+                <ProtectedRoute allowedRoles={['R00', 'R03', 'R04', 'R05']} />
               }
             >
-              {currentUser?.role === 'R00' && <Route path="" element={<AdminDashboard />} />}
-              {currentUser?.role === 'R05' || currentUser?.role === 'R04' && <Route path="" element={<SaleDashboard />} />}
-              {currentUser?.role === 'R03' && <Route path="" element={<MarketingDashboard />} />}
-              {/* <Route path="" element={<AdminDashboard />} /> */}
-              <Route path="product" element={<ManageProductList />} />
-              <Route path="customer" element={<ManageCustomerList />} />
-              <Route path="order" element={<ManageOrderList />} />
-              <Route path="post" element={<ManagePostList />} />
-              <Route path="slider" element={<ManageSliderList />} />
-              <Route path="user" element={<AccountList />} />
-              <Route path="feedback" element={<ManageFeedbackList />} />
+              <Route
+                path="dashboard"
+                element={
+                  <DashboardLayout
+                    sider={<DashboardSider />}
+                    title="Dashboard"
+                  />
+                }
+              >
+                {currentUser?.role === 'R00' && (
+                  <Route path="" element={<AdminDashboard />} />
+                )}
+                {currentUser?.role === 'R05' ||
+                  (currentUser?.role === 'R04' && (
+                    <Route path="" element={<SaleDashboard />} />
+                  ))}
+                {currentUser?.role === 'R03' && (
+                  <Route path="" element={<MarketingDashboard />} />
+                )}
+                <Route element={<ProtectedRoute allowedRoles={['R00']} />}>
+                  <Route path="user" element={<AccountList />} />
+                </Route>
+                <Route element={<ProtectedRoute allowedRoles={['R03']} />}>
+                  <Route path="product" element={<ManageProductList />} />
+                  <Route path="customer" element={<ManageCustomerList />} />
+                  <Route path="post" element={<ManagePostList />} />
+                  <Route path="slider" element={<ManageSliderList />} />
+                  <Route path="feedback" element={<ManageFeedbackList />} />
+                </Route>
+                <Route
+                  element={<ProtectedRoute allowedRoles={['R04', 'R05']} />}
+                >
+                  <Route path="order" element={<ManageOrderList />} />
+                </Route>
+                <Route path="/dashboard/*" element={<NotFoundPage />} />
+              </Route>
             </Route>
+          </Routes>
+          <Routes>
+            <Route path="/404" element={<NotFoundPage />} />
+            <Route path="/401" element={<NotAuthorizePage />} />
+            {/* <Route path="/*" element={<NotFoundPage />} /> */}
           </Routes>
         </BrowserRouter>
       </PersistGate>

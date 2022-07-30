@@ -3,6 +3,7 @@ import axiosClient from 'util/axiosClient';
 //saler
 export const getOrderList = async (params) => {
   const url = '/orders/saler';
+  params = { ...params, sortedBy: 'orderDate_desc' };
   return axiosClient.get(url, { params });
 };
 
@@ -23,6 +24,7 @@ export const getCategoryList = async (params) => {
 //saleManger
 export const getOrderListSaleManager = async (params) => {
   const url = '/orders/saleManager';
+  params = { ...params, sortedBy: 'orderDate_desc' };
   return axiosClient.get(url, { params });
 };
 

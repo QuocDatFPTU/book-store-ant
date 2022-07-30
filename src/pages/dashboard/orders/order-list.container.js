@@ -45,6 +45,7 @@ const ManageOrderList = () => {
       .then((result) => {
         setOrderList([...result?.orders]);
         setTotalItem(result?.count);
+        console.log(result.count);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
@@ -108,7 +109,7 @@ const ManageOrderList = () => {
       align: 'center', // key: 'items',
       width: '12%',
       render: (items, record) => {
-        return items?.length
+        return items?.length;
       },
     },
     {

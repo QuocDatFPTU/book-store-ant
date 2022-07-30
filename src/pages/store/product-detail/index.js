@@ -49,8 +49,6 @@ import axiosClient from 'util/axiosClient';
 import { DateFormat, MoneyFormat } from 'components/format';
 
 const ProductDetail = () => {
-
-
   //data
   const dataListFeedbacks = [
     {
@@ -136,8 +134,6 @@ const ProductDetail = () => {
       });
   };
 
-
-
   //Method
   const onClickNotExpand = () => {
     setBtnExpand((val) => !val);
@@ -154,7 +150,6 @@ const ProductDetail = () => {
       if (localStorage.getItem('__role') === 'R02')
         cart = await addProudctToCartGuest(cartItem);
       else cart = await addProudctToCart(cartItem);
-
 
       //Go to cart or not
       if (isToCart) navigate('/cart');
@@ -220,7 +215,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     getFeedbackList();
-  }, [id])
+  }, [id]);
   return productDetail.status === false ? (
     <>
       <WrapperConentContainer>
@@ -481,8 +476,8 @@ const ProductDetail = () => {
             ellipsis={
               btnExpand === true
                 ? {
-                  rows: 3,
-                }
+                    rows: 3,
+                  }
                 : false
             }
           >
@@ -520,14 +515,21 @@ const ProductDetail = () => {
                 borderRadius: '100%',
               }}
             />
-            Thông tin sản phẩm
+            Bình luận sản phẩm
           </h2>
           <List
             className="comment-list"
             header={`${feedbackList.length} replies`}
             itemLayout="horizontal"
             dataSource={feedbackList ? feedbackList : dataListFeedbacks}
-            locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>Chưa có feedback cho sản phẩm này</span>} /> }}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={<span>Chưa có feedback cho sản phẩm này</span>}
+                />
+              ),
+            }}
             renderItem={(item) => {
               if (feedbackList && feedbackList.length > 0) {
                 return (
@@ -540,13 +542,24 @@ const ProductDetail = () => {
                           {item?.user?.fullName}
                         </Typography.Text>
                       }
-                      avatar={<Avatar size={50} icon={<UserOutlined />} />}
+                      avatar={
+                        <Avatar
+                          style={{
+                            color: '#f56a00',
+                            backgroundColor: '#fde3cf',
+                          }}
+                        >
+                          {
+                            item?.user?.fullName[
+                              item?.user?.fullName.length - 1
+                            ]
+                          }
+                        </Avatar>
+                      }
                       content={
                         <div>
                           <Rate disabled defaultValue={item.star} />
-                          <p>
-                            {item.content}
-                          </p>
+                          <p>{item.content}</p>
                           <Image.PreviewGroup>
                             {item?.images?.map((data) => (
                               <Image
@@ -557,23 +570,20 @@ const ProductDetail = () => {
                               />
                             ))}
                           </Image.PreviewGroup>
-                        </div>}
-                    // datetime={item.datetime}
+                        </div>
+                      }
+                      // datetime={item.datetime}
                     />
                   </li>
-                )
+                );
               } else {
                 return (
                   <Empty
-                    description={
-                      <span>
-                        Chưa có feedback cho sản phẩm này
-                      </span>
-                    }
+                    description={<span>Chưa có feedback cho sản phẩm này</span>}
                   >
                     <Button type="primary">Create Now</Button>
                   </Empty>
-                )
+                );
               }
             }}
           />

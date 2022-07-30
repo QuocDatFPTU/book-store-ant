@@ -1,12 +1,19 @@
-import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Card,
   Col,
   Form,
+  Image,
   Input,
   Layout,
   PageHeader,
+  Popconfirm,
   Rate,
   Row,
   Switch,
@@ -19,7 +26,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { defaultPage } from 'util/constant';
 // import DepaEdit from "./department.edit";
-import { getFeedbackList, getOrderListSaleManager } from './feedback.service';
+import {
+  getFeedbackList,
+  getOrderListSaleManager,
+  updateFeedback,
+} from './feedback.service';
 import ProductEdit from './feedback.edit';
 import TableCustom from 'components/CustomTable';
 import axiosClient from 'util/axiosClient';
@@ -52,8 +63,6 @@ const ManageFeedbackList = () => {
       .catch((e) => setLoading(false));
   };
 
-
-
   useEffect(() => {
     fetchFeedbackList(params);
   }, [params]);
@@ -64,38 +73,112 @@ const ManageFeedbackList = () => {
       title: 'Tên sản phẩm',
       dataIndex: 'product',
       key: 'receiverName',
-      width: '20%',
-      render: (_, record) => record?.product?.title
+      width: '12%',
+      ellipsis: {
+        showTitle: false,
+      },
+      sorter: (a, b) => a.product?.title.length - b.product?.title.length,
+      render: (_, record) => (
+        <Tooltip placement="topLeft" title={record?.product?.title}>
+          <h4>{record?.product?.title}</h4>
+        </Tooltip>
+      ),
     },
     {
       title: 'Tên khách hàng',
       dataIndex: 'user',
       key: 'user',
       width: '12%',
-      render: (_, record) => record?.user?.fullName
+      sorter: (a, b) => a.user.fullName - b.user.fullName,
+      render: (_, record) => record?.user?.fullName,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: '12%',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (_, record) => (
+        <Tooltip placement="topLeft" title={record?.product?.title}>
+          {record?.user?.email}
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Số điện thoại',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: '12%',
+      render: (_, record) => record?.user?.phone,
     },
     {
       title: 'Đánh giá',
       dataIndex: 'star',
-      // key: 'items',
+      filters: [
+        { text: '1', value: 1 },
+        { text: '2', value: 2 },
+        { text: '3', value: 3 },
+        { text: '4', value: 4 },
+        { text: '5', value: 5 },
+      ],
+      sorter: (a, b) => a.star - b.star,
+      onFilter: (value, record) => value === record.star,
       width: '12%',
-      render: (text) => <Rate value={text} />
+      render: (text) => <Rate value={text} />,
     },
     {
       title: 'Nội dung',
       dataIndex: 'content',
       // key: 'items',
-
     },
     {
-      title: 'Trang thái',
+      title: 'Ảnh bình luận',
+      dataIndex: 'images',
+      key: 'images',
+      // width: '12%',
+      render: (_, record) => {
+        // console.log(record?.images[0]?.image);
+
+        return (
+          <Image.PreviewGroup>
+            {record?.images?.map(({ image }) => (
+              <Image width={50} src={image} />
+            ))}
+          </Image.PreviewGroup>
+        );
+      },
+    },
+    {
+      title: 'Trạng thái',
       dataIndex: 'status',
-      // key: 'items',
-      align: 'center',
+      key: 'status',
       width: '12%',
-      render: (text) => {
-        return <Switch checked={text} />
-      }
+      filters: [
+        { text: 'true', value: true },
+        { text: 'false', value: false },
+      ],
+      onFilter: (value, record) => value === record.status,
+      sorter: (a, b) => a.status - b.status,
+      render: (text, record) => (
+        <Popconfirm
+          icon={<ExclamationCircleOutlined />}
+          title={
+            <div>
+              <span>Bạn có muốn thay đổi trạng thái bình luận này không?</span>
+            </div>
+          }
+          onConfirm={async (value) => {
+            await updateFeedback({ id: record._id, status: !text });
+            fetchFeedbackList(params);
+          }}
+          okText={'Có'}
+          cancelText={'Không'}
+        >
+          <Switch checked={text}></Switch>
+        </Popconfirm>
+      ),
     },
   ];
 
@@ -124,36 +207,22 @@ const ManageFeedbackList = () => {
             form={form}
             layout="horizontal"
             className="customFormSearch"
-          // onFinish={async (value) => {
-          //   const searchVal = form.getFieldValue('search-value');
-          //   if (!searchVal || !searchVal.trim()) {
-          //     if (localStorage.getItem('__role') === 'R04')
-          //       return fetchOrderList(params);
-          //     if (localStorage.getItem('__role') === 'R05')
-          //       return fetchOrderListSaleManager(params);
-          //   }
+            onFinish={async (value) => {
+              const searchVal = form.getFieldValue('search-value');
+              if (!searchVal || !searchVal.trim()) return fetchFeedbackList();
 
-          //   if (localStorage.getItem('__role') === 'R04') {
-          //     const sliderSearch = await axiosClient.post(
-          //       '/orders/saler/search',
-          //       {
-          //         search: form.getFieldValue('search-value'),
-          //         limit: 100,
-          //       }
-          //     );
-          //     setOrderList(sliderSearch);
-          //   }
-          //   if (localStorage.getItem('__role') === 'R05') {
-          //     const sliderSearch = await axiosClient.post(
-          //       '/orders/saleManager/search',
-          //       {
-          //         search: form.getFieldValue('search-value'),
-          //         limit: 100,
-          //       }
-          //     );
-          //     setOrderList(sliderSearch);
-          //   }
-          // }}
+              console.log(form.getFieldValue('search-value'));
+              const fbSearch = await axiosClient.post(
+                '/feedbacks/marketing/search',
+                {
+                  search: form.getFieldValue('search-value'),
+                  limit: 100,
+                }
+              );
+              console.log('---');
+              console.log(fbSearch);
+              setFeedbackList(fbSearch);
+            }}
           >
             <Row gutter={16}>
               <Col xxl={{ span: 6 }} md={8} sm={12} xs={24}>

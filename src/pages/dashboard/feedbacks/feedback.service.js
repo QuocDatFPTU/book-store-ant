@@ -6,6 +6,12 @@ export const getFeedbackList = async (params) => {
   return axiosClient.get(url, { params });
 };
 
+export async function updateFeedback(payload) {
+  const { id, ...updateFeedback } = payload;
+  const url = `/feedbacks/marketing/${id}`;
+  return axiosClient.patch(url, updateFeedback);
+}
+
 export async function updateOrder(payload) {
   const { id, ...updatePayload } = payload;
   const url = `/orders/saler/${id}`;

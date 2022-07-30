@@ -274,8 +274,8 @@ const BlogList = () => {
                                   <span>
                                     <DateFormat>{blog?.updatedAt}</DateFormat>
                                   </span>
-                                  <span className="blog-container__dot">.</span>
-                                  <span>7 phút đọc</span>
+                                  {/* <span className="blog-container__dot">.</span>
+                                  <span>7 phút đọc</span> */}
                                 </div>
                               </div>
                               <div className="blog-thumbnail">
