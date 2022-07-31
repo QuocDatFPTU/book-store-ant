@@ -91,6 +91,7 @@ const ManageProductList = () => {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      width: '20%',
       sorter: (a, b) => a.title.length - b.title.length,
       ellipsis: {
         showTitle: false,
@@ -98,7 +99,7 @@ const ManageProductList = () => {
       render: (text, record) => {
         return (
           <Tooltip placement="topLeft" title={text}>
-            <h3>{text}</h3>
+            <h4>{text}</h4>
           </Tooltip>
         );
       },

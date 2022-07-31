@@ -105,7 +105,7 @@ const CartCompletion = () => {
         <Result
           status="success"
           icon={<SmileOutlined />}
-          title="Woa chủ nhân đã đặt hàng thành công rồi a <3"
+          title="Qúy khách đã đặt hàng thành công rồi a"
           extra={[
             <Button type="primary" key="console" onClick={() => navigate('/')}>
               Quay lại trang chủ

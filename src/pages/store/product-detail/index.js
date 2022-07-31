@@ -222,10 +222,10 @@ const ProductDetail = () => {
         <Result
           status="404"
           // title="404"
-          subTitle="Aaaa không tìm thấy rồi á đồ ngốc này :(((("
+          subTitle="Sản phẩm bạn tìm không tồn tại"
           extra={
             <Button onClick={() => navigate(-1)} type="primary">
-              {'Quay lại trang trước đi nha <3'}
+              {'Quay lại trang trước'}
             </Button>
           }
         />

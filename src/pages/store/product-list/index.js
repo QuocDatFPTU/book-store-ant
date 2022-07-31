@@ -158,7 +158,7 @@ const ProductList = () => {
             </div>
           </Col>
           <Col style={{ backgroundColor: 'white' }} span={19}>
-            <Row>
+            {/* <Row>
               <Col style={{ padding: '40px', paddingBottom: '20px' }} span={24}>
                 Sắp xếp theo:
                 <Select
@@ -176,7 +176,7 @@ const ProductList = () => {
                   <Option value="best-month">Bán chạy tháng</Option>
                   <Option value="best-year">Bán chạy năm</Option>
                 </Select>
-                {/* <Select
+                <Select
                   className="select-product"
                   defaultValue="12"
                   style={{
@@ -187,10 +187,10 @@ const ProductList = () => {
                   <Option value="12">12 sản phẩm</Option>
                   <Option value="24">24 sản phẩm</Option>
                   <Option value="48">48 sản phẩm</Option>
-                </Select> */}
+                </Select>
               </Col>
               <Divider style={{ margin: '0 14px' }} />
-            </Row>
+            </Row> */}
             <Row>
               {products.length !== 0 &&
                 products.map((item) => (

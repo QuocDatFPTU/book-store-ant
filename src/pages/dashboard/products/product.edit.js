@@ -131,10 +131,10 @@ const ProductEdit = ({
             if (result) {
               message.success('Thêm mới sản phẩm thành công!');
             }
+            onCallback();
           })
           .catch((error) => message.error(error?.response?.data?.error));
         setLoading(false);
-        onCallback();
       }
       //Edit
       else {
@@ -223,12 +223,12 @@ const ProductEdit = ({
     category: currentRow ? currentRow?.category._id : undefined,
     briefInformation: currentRow
       ? {
-        author: currentRow?.briefInformation?.author,
-        language: currentRow?.briefInformation?.language,
-        pages: currentRow?.briefInformation?.pages,
-        publicDate: moment(currentRow?.briefInformation?.publicDate),
-        publisher: currentRow?.briefInformation?.publisher,
-      }
+          author: currentRow?.briefInformation?.author,
+          language: currentRow?.briefInformation?.language,
+          pages: currentRow?.briefInformation?.pages,
+          publicDate: moment(currentRow?.briefInformation?.publicDate),
+          publisher: currentRow?.briefInformation?.publisher,
+        }
       : undefined,
   };
   return (
@@ -278,11 +278,18 @@ const ProductEdit = ({
                 required: true,
                 message: 'Cần nhập giá',
               },
+              {
+                type: 'number',
+                min: 1000,
+                message: 'Giá phải lớn hơn bằng 1,000 đồng',
+              },
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }
               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
             />
           </Form.Item>
@@ -297,22 +304,37 @@ const ProductEdit = ({
                 required: true,
                 message: 'Cần nhập giá sale',
               },
+              {
+                type: 'number',
+                min: 1000,
+                message: 'Giá sale phải lớn hơn bằng 1,000 đồng',
+              },
               ({ getFieldValue }) => ({
                 validator(_, value) {
+                  console.log(
+                    'test: ',
+                    getFieldValue('listPrice'),
+                    value,
+                    getFieldValue('listPrice') > value
+                  );
                   if (!value || getFieldValue('listPrice') > value) {
                     return Promise.resolve();
                   }
                   if (getFieldValue('listPrice') === undefined) {
                     return Promise.reject(new Error('Cần nhập giá gốc!'));
                   }
-                  return Promise.reject(new Error('Giá sale phải nhỏ hơn giá gốc!'));
+                  return Promise.reject(
+                    new Error('Giá sale phải nhỏ hơn giá gốc!')
+                  );
                 },
               }),
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }
               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
             />
           </Form.Item>
@@ -326,11 +348,18 @@ const ProductEdit = ({
                 required: true,
                 message: 'Cần nhập số lượng sản phẩm!',
               },
+              {
+                type: 'number',
+                min: 1,
+                message: 'Số lượng phải lớn hơn hoặc bằng 1',
+              },
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }
               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
             />
           </Form.Item>
@@ -432,6 +461,11 @@ const ProductEdit = ({
                   required: true,
                   message: 'Cần nhập số trang',
                 },
+                {
+                  type: 'number',
+                  min: 1,
+                  message: 'Số trang phải lớn hơn hoặc bằng 1',
+                },
               ]}
             >
               <InputNumber />
@@ -472,7 +506,6 @@ const ProductEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
-
             >
               {uploadButton}
             </Upload>
