@@ -414,7 +414,6 @@ const CartContact = () => {
               </h2>
             </Row>
             <Divider style={{ margin: '18px 0' }} />
-            {cart.items?.map((item) => (
               <div className="cart-value">
                 <Row
                   className="cart-form"
@@ -427,7 +426,6 @@ const CartContact = () => {
                   Thanh toán bằng tiền mặt khi nhận hàng
                 </Row>
               </div>
-            ))}
           </Col>
         </Row>
       </WrapperConentContainer>

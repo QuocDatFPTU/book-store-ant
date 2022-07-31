@@ -150,7 +150,7 @@ function AdminDashboard() {
                     <Col lg={{ span: 11 }}
                     // style={{ minHeight: 400 }}
                     >
-                        <TableCustom columns={fourthColumns} dataSource={dataAdmiCustomerBought} title={() => <span style={{ fontSize: "bold" }}>Đánh gi</span>} pagination={false} scroll={{ y: 210 }} />
+                        <TableCustom columns={fourthColumns} dataSource={dataAdmiCustomerBought} title={() => <span style={{ fontSize: "bold" }}>Tài khoản hoạt động gần đây</span>} pagination={false} scroll={{ y: 210 }} />
                     </Col>
                     {/* // thông số khách hàng(email, số tiền chi trả) (dùng table) */}
 
