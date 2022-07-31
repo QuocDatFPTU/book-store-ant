@@ -14,6 +14,8 @@ import {
   InfoCircleOutlined,
   QuestionOutlined,
   ArrowLeftOutlined,
+  MoneyCollectOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import './styles.less';
@@ -383,6 +385,46 @@ const CartContact = () => {
                   >
                     <MoneyFormat>{item.totalAmount}</MoneyFormat>
                   </Col>
+                </Row>
+              </div>
+            ))}
+          </Col>
+        </Row>
+      </WrapperConentContainer>
+      <WrapperConentContainer>
+        <Row style={{ backgroundColor: 'white', padding: '10px' }}>
+          <Col span={24}>
+            <Row>
+              <Col span={24}></Col>
+              <h2
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '22px',
+                }}
+              >
+                <MoneyCollectOutlined
+                  style={{
+                    fontSize: '28px',
+                    marginRight: '5px',
+                    color: 'red',
+                  }}
+                />
+                Phương thức thanh toán
+              </h2>
+            </Row>
+            <Divider style={{ margin: '18px 0' }} />
+            {cart.items?.map((item) => (
+              <div className="cart-value">
+                <Row
+                  className="cart-form"
+                  style={{ width: '100%' }}
+                  align="middle"
+                >
+                  <DollarOutlined
+                    style={{ fontSize: '22px', marginRight: '10px' }}
+                  />
+                  Thanh toán bằng tiền mặt khi nhận hàng
                 </Row>
               </div>
             ))}
