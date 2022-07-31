@@ -55,12 +55,12 @@ const DashboardSider = () => {
           />
         </div>
       )}
-      <Menu theme="light" mode="inline" className="menu-list">
+      <Menu theme="light" mode="inline" className="menu-list" defaultSelectedKeys={['0']}>
         <>
           <Menu.Item
             key="0"
             icon={<DashboardOutlined />}
-            onClick={() => navigate('/dashboard/')}
+            onClick={() => navigate('/dashboard')}
           >
             Dashboard
           </Menu.Item>
@@ -90,14 +90,14 @@ const DashboardSider = () => {
               </Menu.Item>
               <Menu.Item
                 key="5"
-                icon={<SlidersOutlined /> }
+                icon={<SlidersOutlined />}
                 onClick={() => navigate('/dashboard/slider')}
               >
                 Slider
               </Menu.Item>
               <Menu.Item
                 key="9"
-                icon={<StarOutlined />} 
+                icon={<StarOutlined />}
                 onClick={() => navigate('/dashboard/feedback')}
               >
                 Feedback
