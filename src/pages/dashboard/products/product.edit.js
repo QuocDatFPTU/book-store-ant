@@ -272,6 +272,7 @@ const ProductEdit = ({
           <Form.Item
             label="Giá"
             name="listPrice"
+            style={{ width: '100%' }}
             rules={[
               {
                 required: true,
@@ -279,21 +280,41 @@ const ProductEdit = ({
               },
             ]}
           >
-            <Input />
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+            />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
           <Form.Item
             label="Giá sale"
             name="salePrice"
+            style={{ width: '100%' }}
             rules={[
               {
                 required: true,
                 message: 'Cần nhập giá sale',
               },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('listPrice') > value) {
+                    return Promise.resolve();
+                  }
+                  if (getFieldValue('listPrice') === undefined) {
+                    return Promise.reject(new Error('Cần nhập giá gốc!'));
+                  }
+                  return Promise.reject(new Error('Giá sale phải nhỏ hơn giá gốc!'));
+                },
+              }),
             ]}
           >
-            <Input />
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+            />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
@@ -307,7 +328,11 @@ const ProductEdit = ({
               },
             ]}
           >
-            <Input />
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+            />
           </Form.Item>
         </Col>
         <Col lg={{ span: 24 }} xs={{ span: 24 }}>
@@ -447,7 +472,7 @@ const ProductEdit = ({
               showUploadList={true}
               customRequest={fakeUpload}
               onRemove={onRemove}
-           
+
             >
               {uploadButton}
             </Upload>

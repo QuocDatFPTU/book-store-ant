@@ -103,10 +103,10 @@ const App = () => {
                 {currentUser?.role === 'R00' && (
                   <Route path="" element={<AdminDashboard />} />
                 )}
-                {currentUser?.role === 'R05' ||
-                  (currentUser?.role === 'R04' && (
+                {(currentUser?.role === 'R05' ||
+                  currentUser?.role === 'R04') && (
                     <Route path="" element={<SaleDashboard />} />
-                  ))}
+                  )}
                 {currentUser?.role === 'R03' && (
                   <Route path="" element={<MarketingDashboard />} />
                 )}

@@ -27,6 +27,7 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import './styles.less';
 import logoImg from 'assets/logo-new.png';
+import newlogo from 'assets/logo_1.png';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from 'util/axiosClient';
 import { useDispatch } from 'react-redux';
@@ -173,8 +174,8 @@ const HeaderContainer = () => {
                 <Col span={2}>
                   <a onClick={() => navigate('/')}>
                     <img
-                      style={{ height: '48px' }}
-                      src={logoImg}
+                      style={{ height: '48px', objectFit: 'cover', width: '100%' }}
+                      src={newlogo}
                       alt="logo image"
                     />
                   </a>

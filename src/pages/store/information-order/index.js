@@ -270,7 +270,11 @@ const InformationOrder = () => {
                         rows: 1,
                         // expandable: true,
                       }}
+                      style={{ cursor: 'pointer' }}
                       className="infor-type"
+                      onClick={() =>
+                        navigate(`/product-detail/${item.product._id}`)
+                      }
                     >
                       {item.title}
                     </Typography.Paragraph>
