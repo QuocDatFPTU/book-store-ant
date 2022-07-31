@@ -16,7 +16,12 @@ function AdminDashboard() {
     const [dataAdmiCustomerRegister, setAdminCustomerRegister] = useState();
     const [dataAdmiCustomerBought, setAdminCustomerBought] = useState();
     const [dataMarketing, setDataMarketing] = useState();
+    const [dataAdminSubmiited, setDataAdminSubmiited] = useState();
+    const [dataAdminSuccess, setDataAdminSuccess] = useState();
+    const [dataAdminCancel, setDataAdminCancel] = useState();
+
     const [data, setData] = useState([]);
+
 
     const options = {
         responsive: true,
@@ -52,6 +57,11 @@ function AdminDashboard() {
                 setAdminRate(result?.feedbackStatic);
                 setAdminOrder(result?.orderStatics);
                 // setTotalItem(result?.count);
+                setDataAdminSubmiited(result?.productStatuses.find(item => item.status === 'submitted').count);
+                setDataAdminSuccess(result?.productStatuses.find(item => item.status === 'success').count);
+                setDataAdminCancel(result?.productStatuses.find(item => item.status === 'cancelled').count);
+
+                // setDataAdminStatic(result?.productStatuses);
                 setAdminCustomerRegister(result?.newlyRegisteredCustomer);
                 setAdminCustomerBought(result?.newlyBoughtCustomer);
                 setLoading(false);
@@ -73,40 +83,40 @@ function AdminDashboard() {
             >
                 <div className="site-statistic-demo-card">
                     <Row gutter={16} >
-                        <Col span={6}>
+                        <Col span={8}>
                             <Card>
                                 <Statistic
                                     title="Đợi xác nhân"
-                                    value={11.28}
+                                    value={dataAdminSubmiited}
                                     valueStyle={{
                                         color: '#ffc300',
                                     }}
                                 />
                             </Card>
                         </Col>
-                        <Col span={6}>
+                        <Col span={8}>
                             <Card>
                                 <Statistic
                                     title="Hoàn thành"
-                                    value={9}
+                                    value={dataAdminSuccess}
                                     valueStyle={{
                                         color: '#3f8600',
                                     }}
                                 />
                             </Card>
                         </Col>
-                        <Col span={6}>
+                        <Col span={8}>
                             <Card>
                                 <Statistic
                                     title="Hủy"
-                                    value={9}
+                                    value={dataAdminCancel}
                                     valueStyle={{
                                         color: '#cf1322',
                                     }}
                                 />
                             </Card>
                         </Col>
-                        <Col span={6}>
+                        {/* <Col span={6}>
                             <Card>
                                 <Statistic
                                     title="Doanh Thu"
@@ -116,7 +126,7 @@ function AdminDashboard() {
                                     }}
                                 />
                             </Card>
-                        </Col>
+                        </Col> */}
                     </Row>
                 </div>
             </PageHeader>

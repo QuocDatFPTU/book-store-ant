@@ -4,6 +4,7 @@ import React from 'react';
 import paymentImg from 'assets/footer-payment.png';
 import socialtImg from 'assets/footer-social.png';
 import appImg from 'assets/footer-app.png';
+import logo from 'assets/logo_2.png';
 import WrapperConentContainer from './wrapper.content';
 
 const { Footer } = Layout;
@@ -21,7 +22,14 @@ const FooterContainer = () => {
       <WrapperConentContainer>
         <Row>
           <Col className="store-footer-left" span={6}>
-            <h1 style={{ color: 'red' }}>KULI TEAM</h1>
+            {/* <h1 style={{ color: 'red' }}>KULI TEAM</h1> */}
+            <div>
+              <img src={logo} style={{
+                'width': '200px',
+                'height': '80px',
+                'objectFit': 'cover'
+              }} />
+            </div>
             <p style={{ fontWeight: '500', textAlign: 'justify' }}>
               Kuli cửa hàng được thành lập với mục đích làm website, chuyên nhận
               làm thuê website, giá cả phải chăng, muốn biết thêm thông tin xin
