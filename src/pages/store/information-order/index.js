@@ -31,6 +31,7 @@ import {
 import { async } from '@firebase/util';
 import { useSelector } from 'react-redux';
 import { result } from 'lodash';
+import { format } from 'prettier';
 
 const InformationOrder = () => {
   // State
@@ -41,6 +42,11 @@ const InformationOrder = () => {
   const [fileListDone, setFileListDone] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditModal, setIsEditModal] = useState(false);
+  const [productId, setProductId] = useState();
+
+
+
+  const [form] = Form.useForm();
   const auth = useSelector((state) => state.auth);
 
   const { currentUser } = useSelector((state) => state.auth);
@@ -59,11 +65,10 @@ const InformationOrder = () => {
     getOrder();
   }, []);
 
-  const handleChange = ({ file }) => {
-    if (file?.status === 'done') {
-      setFileListDone((prev) => [...prev, file]);
-    }
-  };
+
+  const handleChange = ({ fileList }) => {
+    setFileListDone(fileList);
+  }
 
   const config = {
     title: 'Cảnh báo',
@@ -241,83 +246,81 @@ const InformationOrder = () => {
           <Col span={9} style={{ fontWeight: '500', fontSize: '18px' }}>
             Sản phẩm
           </Col>
-          <Col span={5} style={{ fontWeight: '500', fontSize: '18px' }}>
+          <Col span={3} style={{ fontWeight: '500', fontSize: '18px' }}>
             Giá
           </Col>
-          <Col span={5} style={{ fontWeight: '500', fontSize: '18px' }}>
+          <Col span={2} style={{ fontWeight: '500', fontSize: '18px' }}>
             Số lượng
           </Col>
-          <Col span={5} style={{ fontWeight: '500', fontSize: '18px' }}>
+          <Col span={2} style={{ fontWeight: '500', fontSize: '18px' }}>
             Tổng tiền
           </Col>
         </Row>
         {order.items?.map((item) => (
-          <Row className="infor-detail" align="middle">
-            <Col span={9} className="infor-detail-container">
-              <Row className="infor-lock">
-                <Col span={6}>
-                  <img className="infor-img" src={item.product.thumbnail} />
-                </Col>
-                <Col span={18} className="infor-form">
-                  <Typography.Link
-                    ellipsis={{
-                      rows: 1,
-                      // expandable: true,
-                    }}
-                    className="infor-type"
-                    onClick={() =>
-                      navigate(`/product-detail/${item.product._id}`)
-                    }
-                  >
-                    {item.title}
-                  </Typography.Link>
-                  <p className="infor-pushlisher">
-                    {item.product.briefInformation.publisher}
-                  </p>
-                  {/* <p className="infor-category">{item.Category}</p> */}
-                </Col>
-              </Row>
-            </Col>
-            <Col style={{ display: 'flex' }} span={5}>
-              <MoneyFormat>{item.amount}</MoneyFormat>
-            </Col>
-            <Col span={5}>{item.quantity}</Col>
-            <Col span={5}>
-              <MoneyFormat>{item.totalAmount}</MoneyFormat>
-            </Col>
-          </Row>
+          <>
+            <Row className="infor-detail" align="middle">
+              <Col span={9} className="infor-detail-container">
+                <Row className="infor-lock">
+                  <Col span={6}>
+                    <img className="infor-img" src={item.product.thumbnail} />
+                  </Col>
+                  <Col span={18} className="infor-form">
+                    <Typography.Paragraph
+                      ellipsis={{
+                        rows: 1,
+                        // expandable: true,
+                      }}
+                      className="infor-type"
+                    >
+                      {item.title}
+                    </Typography.Paragraph>
+                    <p className="infor-pushlisher">
+                      {item.product.briefInformation.publisher}
+                    </p>
+                    {/* <p className="infor-category">{item.Category}</p> */}
+                  </Col>
+                </Row>
+              </Col>
+              <Col style={{ display: 'flex' }} span={3}>
+                <MoneyFormat>{item.amount}</MoneyFormat>
+              </Col>
+              <Col span={2}>{item.quantity}</Col>
+              <Col span={2}>
+                <MoneyFormat>{item.totalAmount}</MoneyFormat>
+              </Col>
+              <Col span={2}>
+                <Row className="infor-form-buy">
+                  {order.status === 'success' && (
+                    <div className="infor-back">
+                      <Button onClick={async () => {
+                        const feedback = await getFeedback(item.product?._id);
+                        for (const feed of feedback) {
+                          if (feed?.user?.email === currentUser?.email) {
+                            message.warning("Bạn đã feedback!")
+                            return;
+                          }
+                        }
+                        // if (feedback?.user === currentUser?.email) {
+                        //   message.warning("Bạn đã feedback!")
+                        //   return;
+                        // }
+                        setProductId(item.product?._id);
+                        setIsEditModal(true);
+                      }} >Viết nhận xét</Button>
+                      <Button onClick={onRebuy} danger className="infor-return">
+                        Mua lại
+                      </Button>
+                    </div>
+                  )}
+                </Row>
+              </Col>
+            </Row>
+          </>
         ))}
-        <Row className="infor-form-buy">
+        {/* <Row className="infor-form-buy">
           <Col span={8} offset={2}>
-            {order.status === 'success' && (
-              <div className="infor-back">
-                <Button
-                  onClick={async () => {
-                    const feedback = await getFeedback(
-                      order?.items?.[0]?.product?._id
-                    );
-                    for (const feed of feedback) {
-                      if (feed?.user?.email === currentUser?.email) {
-                        message.warning('Bạn đã feedback!');
-                        return;
-                      }
-                    }
-                    // if (feedback?.user === currentUser?.email) {
-                    //   message.warning("Bạn đã feedback!")
-                    //   return;
-                    // }
-                    setIsEditModal(true);
-                  }}
-                >
-                  Viết nhận xét
-                </Button>
-                <Button onClick={onRebuy} danger className="infor-return">
-                  Mua lại
-                </Button>
-              </div>
-            )}
           </Col>
-        </Row>
+        </Row> */}
 
         <Row className="infor-update" align="middle">
           <Col span={5}>
@@ -362,35 +365,39 @@ const InformationOrder = () => {
           //   // console.log(defaultFileList);
           //   form.resetFields();
           // }}
-          onCancel={() => setIsEditModal(false)}
+          onCancel={() => { setIsEditModal(false); }}
         >
           <Form
+            form={form}
             onFinish={async (values) => {
               try {
                 setLoading(true);
-
                 const urls = await uploadMultipleFileToFirebase(fileListDone);
-                debugger;
-                const images = urls.map((url) => ({
+
+                const images = urls.map(url => ({
                   imageAltDoc: 'images',
                   image: url?.downloadURL,
                 }));
                 const feedbackData = {
                   ...values,
                   user: auth?.currentUser,
-                  images,
-                };
-                await createFeedback(
-                  order?.items?.[0]?.product?._id,
-                  feedbackData
-                );
-                message.success('Tạo mới feedback thành công !');
-                setLoading(false);
-                setIsEditModal(false);
-                return true;
+                  images
+                }
+                const feedback = await createFeedback(productId, feedbackData);
+                if (feedback) {
+                  message.success('Tạo mới feedback thành công !');
+                  setFileListDone((prev) => setFileListDone([]));
+                  setLoading(false);
+                  setIsEditModal(false);
+                  form.resetFields();
+                  setProductId();
+                  return true;
+                }
               } catch (error) {
                 message.error(error?.message);
-                return false;
+                setLoading(false);
+                form.resetFields();
+                return false
               }
             }}
           >
@@ -430,6 +437,7 @@ const InformationOrder = () => {
                   return beforeUpload(file);
                 }}
                 showUploadList={true}
+                fileList={fileListDone}
                 customRequest={fakeUpload}
               >
                 <Button icon={<UploadOutlined />}>Thêm ảnh</Button>
@@ -447,7 +455,7 @@ const InformationOrder = () => {
                 >
                   <Button
                     type="clear"
-                    onClick={() => setIsEditModal(false)}
+                    onClick={() => { setIsEditModal(false); form.resetFields() }}
                     style={{ fontWeight: 'bold' }}
                   >
                     {'Hủy'}
