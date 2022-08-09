@@ -8,6 +8,8 @@ import {
   Form,
   Input,
   message,
+  Radio,
+  Space,
 } from 'antd';
 
 import {
@@ -23,6 +25,7 @@ import StoreLayoutContainer from 'layouts/store/store.layout';
 import WrapperConentContainer from 'layouts/store/wrapper.content';
 import { useNavigate } from 'react-router-dom';
 import {
+  checkoutUsingMomo,
   createOrder,
   createOrderGuest,
   getCartItemList,
@@ -33,6 +36,7 @@ import {
 } from './service';
 import axiosClient from 'util/axiosClient';
 import { MoneyFormat } from 'components/format';
+import { convertDataMomo } from './constant';
 const { Option } = Select;
 
 const layout = {
@@ -67,6 +71,7 @@ const CartContact = () => {
   const [receiver, setReceiver] = useState({});
   const [inforDefault, setInforDefault] = useState({});
   const [cart, setCart] = useState({});
+  const [paymentValue, setPaymentValue] = useState(1);
 
   // Hook
   const navigate = useNavigate();
@@ -77,7 +82,6 @@ const CartContact = () => {
     if (updated) {
       setUpdated(false);
     } else {
-      // set session receiver information:
       setReceiverInforSession(values)
         .then((result) => {
           // Set state and form
@@ -93,11 +97,12 @@ const CartContact = () => {
   const onReset = () => form.setFieldsValue(inforDefault);
 
   const onClickConfirm = async () => {
+    debugger
+
     try {
       if (localStorage.getItem('__role') === 'R02') {
         // Create order
         const order = await createOrderGuest();
-        console.log(order);
 
         message.loading('Đang kiểm tra...', 1.5);
 
@@ -110,34 +115,36 @@ const CartContact = () => {
           navigate(`/cart-completion/${order._id}`);
         }, 2500);
       } else {
-        // Create order
-        const order = await createOrder();
-        console.log(order);
+        if (paymentValue === 2) {
 
-        message.loading('Đang kiểm tra...', 1.5);
+          const order = await createOrder();
+          const momoData = convertDataMomo(order);
+          const checkout = await checkoutUsingMomo('/v2/gateway/api/create', momoData);
+          console.log('momo', checkout);
+          message.loading('Đang kiểm tra...', 1.5);
+        }
+        // Create order
+
 
         // Empty a lot
-        await axiosClient.patch('/checkout/confirm');
-        setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
+        // await axiosClient.patch('/checkout/confirm');
+        // setTimeout(() => message.success('Đặt hàng thành công', 2.5), 1800);
 
         //naviage
-        setTimeout(() => {
-          navigate(`/cart-completion/${order._id}`);
-        }, 2500);
+        // setTimeout(() => {
+        //   navigate(`/cart-completion/${order._id}`);
+        // }, 2500);
       }
     } catch (error) {
       // Dù lỗi gì thì redirect car-contact
       navigate('/cart');
-
-      // Anounce error message
-      console.log(error.reponse);
-      const dataError = error.response.data.error;
+      const dataError = error.message;
       const msgError = Array.isArray(dataError)
         ? dataError.map((error) => (
-            <div>
-              {error} <br />
-            </div>
-          ))
+          <div>
+            {error} <br />
+          </div>
+        ))
         : dataError;
 
       message.error(msgError, 5);
@@ -414,18 +421,39 @@ const CartContact = () => {
               </h2>
             </Row>
             <Divider style={{ margin: '18px 0' }} />
-              <div className="cart-value">
-                <Row
-                  className="cart-form"
-                  style={{ width: '100%' }}
-                  align="middle"
-                >
-                  <DollarOutlined
-                    style={{ fontSize: '22px', marginRight: '10px' }}
-                  />
-                  Thanh toán bằng tiền mặt khi nhận hàng
-                </Row>
-              </div>
+            <div className="cart-value">
+              <Row
+                className="cart-form"
+                style={{ width: '100%' }}
+                align="middle"
+              >
+                <Radio.Group defaultValue={paymentValue} onChange={(e) => {
+                  console.log('type', e.target.value);
+                  setPaymentValue(e.target.value);
+                }}>
+                  <Space direction='vertical'>
+                    <Radio value={1}>
+                      <DollarOutlined
+                        style={{ fontSize: '22px', marginRight: '10px' }}
+                      />
+                      Thanh toán bằng tiền mặt khi nhận hàng
+                    </Radio>
+                    <Radio value={2}>
+                      <DollarOutlined
+                        style={{ fontSize: '22px', marginRight: '10px' }}
+                      />
+                      Thanh toán bằng momo
+                    </Radio>
+                  </Space>
+                </Radio.Group>
+              </Row>
+              <Row
+                className="cart-form"
+                style={{ width: '100%' }}
+                align="middle"
+              >
+              </Row>
+            </div>
           </Col>
         </Row>
       </WrapperConentContainer>

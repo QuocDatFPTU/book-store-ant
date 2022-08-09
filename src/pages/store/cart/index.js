@@ -33,6 +33,7 @@ import {
 import axiosClient from 'util/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { MoneyFormat } from 'components/format';
+import request from 'util/request';
 const { confirm } = Modal;
 
 const Cart = () => {
@@ -75,8 +76,12 @@ const Cart = () => {
   //Method
   const onClickCheckout = async () => {
     try {
-      if (localStorage.getItem('__role') === 'R02') await onCheckoutGuest();
-      else await onCheckout();
+      if (localStorage.getItem('__role') === 'R02') {
+        await onCheckoutGuest();
+
+      } else {
+        const checkQty = await onCheckout();
+      }
       navigate('/cart-contact');
     } catch (error) {
       const msgError = error.response.data.error.map((error) => (

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
+import logo1 from 'assets/logo_1.png';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosClient from 'util/axiosClient';
 import { async } from '@firebase/util';
@@ -66,10 +67,10 @@ const ResetPassword = (props) => {
         >
           <div className="login-logo">
             <img
-              src={logo}
+              src={logo1}
               alt="logo"
               className="logo"
-              style={{ height: 80 }}
+              style={{ height: 130, width: 276, objectFit: 'cover', marginTop: '10px' }}
             />
           </div>
           <Row style={{ paddingTop: '130px' }}>

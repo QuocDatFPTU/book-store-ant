@@ -1,3 +1,5 @@
+import axiosClientMomo from 'util/axiosClientMomo';
+
 const { default: axiosClient } = require('util/axiosClient');
 
 //------------------------CUSTOMER
@@ -42,4 +44,9 @@ export const getCartItemListGuest = async (params) => {
 export const createOrderGuest = async (params) => {
   const url = '/checkout/confirm/guest';
   return axiosClient.post(url, { params });
+};
+
+export const checkoutUsingMomo = async (suburl, data) => {
+  const url = `https://test-payment.momo.vn${suburl}`;
+  return axiosClientMomo.post(url, { ...data });
 };

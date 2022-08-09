@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import bgLogin from 'assets/bgLogin.png';
 import logo from 'assets/logo-new.png';
+import logo1 from 'assets/logo_1.png';
 import { loginInitiate } from 'redux/action';
 import './styles.less';
 import axiosClient from 'util/axiosClient';
@@ -195,10 +196,10 @@ const Login = (props) => {
           <div className="login-logo">
             <a onClick={() => navigate('/')}>
               <img
-                src={logo}
+                src={logo1}
                 alt="logo"
                 className="logo"
-                style={{ height: 80 }}
+                style={{ height: 130, width: 276, objectFit: 'cover', marginTop: '10px' }}
               />
             </a>
           </div>
